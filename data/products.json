@@ -847,35 +847,6 @@
         "Best-in-class Pro camera system with 8x optical-quality zoom",
         "All-day battery life"
       ]
-    },
-    {
-      "slug": "- Network:       http://10.177.116.227:3000 ✓ Ready in 203ms ⚠ Warning: Next.js ignored package-lock.json in /Users/kaushalmali because it would include your home directory (/Users/kaushalmali).  To use this directory, set `outputFileTracingRoot` in your Next.js config.  ✓ Running next.config.ts took 57ms Error: ENOENT: no such file or directory, open '/Users/kaushalmali/Desktop/jai apple store/.next/prerender-manifest.json'     at ignore-listed frames {   errno: -2,   code: 'ENOENT',   syscall: 'open',   path: '/Users/kaushalmali/Desktop/jai apple store/.next/prerender-manifest.json' } kaushalmali@Kaushals-Laptop-3 jai apple store % npm run build npm start   > jai-apple-store@0.1.0 build > next build  ▲ Next.js 16.3.3 (Turbopack) ⚠ Warning: Next.js ignored package-lock.json in /Users/kaushalmali because it would include your home directory (/Users/kaushalmali).  To use this directory, set `turbopack.root` in your Next.js config.  ✓ Running next.config.ts took 119ms    Creating an optimized production build ... ✓ Compiled successfully in 624ms ✓ Finished TypeScript in 1501ms     ✓ Collecting page data using 7 workers in 1184ms     Error occurred prerendering page \"/product/https:%2F%2Fstore.storeimages.cdn-apple.com%2F1%2Fas-images.apple.com%2Fis%2Fiphone-17pro-digitalmat-gallery-1-202509_GEO_EMEA%3Fwid=728&hei=666&fmt=p-jpg&qlt=95&.v=ekJPc2lPUlRuRk50SkcyOVdnU1d0TjFla0N0Znl3UThxdjB3SW91ZDVJeFptNC9yejJUMWI2dmhrTGRMd2F4ZjhpVENtU1Jsa01tcGtZS0IwM01XVkVaMm9lVjZWaGFvQVRMeWxLakVNdXRpc2lSR1BSMzNQQm5UMU83ZFVxQmFYSVI4ZkRTLy83YU5OdEFVT1FiTW9R\". Read more: https://nextjs.org/docs/messages/prerender-error Error: ENAMETOOLONG: name too long, mkdir '/Users/kaushalmali/Desktop/jai apple store/.next/server/app/product/https:%2F%2Fstore.storeimages.cdn-apple.com%2F1%2Fas-images.apple.com%2Fis%2Fiphone-17pro-digitalmat-gallery-1-202509_GEO_EMEA%3Fwid=728&hei=666&fmt=p-jpg&qlt=95&.v=ekJPc2lPUlRuRk50SkcyOVdnU1d0TjFla0N0Znl3UThxdjB3SW91ZDVJeFptNC9yejJUMWI2dmhrTGRMd2F4ZjhpVENtU1Jsa01tcGtZS0IwM01XVkVaMm9lVjZWaGFvQVRMeWxLakVNdXRpc2lSR1BSMzNQQm5UMU83ZFVxQmFYSVI4ZkRTLy83YU5OdEFVT1FiTW9R.segments'     at ignore-listed frames {   errno: -63,   code: 'ENAMETOOLONG',   syscall: 'mkdir',   path: '/Users/kaushalmali/Desktop/jai apple store/.next/server/app/product/https:%2F%2Fstore.storeimages.cdn-apple.com%2F1%2Fas-images.apple.com%2Fis%2Fiphone-17pro-digitalmat-gallery-1-202509_GEO_EMEA%3Fwid=728&hei=666&fmt=p-jpg&qlt=95&.v=ekJPc2lPUlRuRk50SkcyOVdnU1d0TjFla0N0Znl3UThxdjB3SW91ZDVJeFptNC9yejJUMWI2dmhrTGRMd2F4ZjhpVENtU1Jsa01tcGtZS0IwM01XVkVaMm9lVjZWaGFvQVRMeWxLakVNdXRpc2lSR1BSMzNQQm5UMU83ZFVxQmFYSVI4ZkRTLy83YU5OdEFVT1FiTW9R.segments' } Export encountered an error on /product/[slug]/page: /product/https:%2F%2Fstore.storeimages.cdn-apple.com%2F1%2Fas-images.apple.com%2Fis%2Fiphone-17pro-digitalmat-gallery-1-202509_GEO_EMEA%3Fwid=728&hei=666&fmt=p-jpg&qlt=95&.v=ekJPc2lPUlRuRk50SkcyOVdnU1d0TjFla0N0Znl3UThxdjB3SW91ZDVJeFptNC9yejJUMWI2dmhrTGRMd2F4ZjhpVENtU1Jsa01tcGtZS0IwM01XVkVaMm9lVjZWaGFvQVRMeWxLakVNdXRpc2lSR1BSMzNQQm5UMU83ZFVxQmFYSVI4ZkRTLy83YU5OdEFVT1FiTW9R, exiting the build. ⨯ Next.js build worker exited with code: 1 and signal: null  > jai-apple-store@0.1.0 start > next start  ▲ Next.js 16.3.3 - Local:         http://localhost:3000 - Network:       http://10.177.116.227:3000 ✓ Ready in 146ms ⚠ Warning: Next.js ignored package-lock.json in /Users/kaushalmali because it would include your home directory (/Users/kaushalmali).  To use this directory, set `outputFileTracingRoot` in your Next.js config.  ✓ Running next.config.ts took 29ms Error: ENOENT: no such file or directory, open '/Users/kaushalmali/Desktop/jai apple store/.next/prerender-manifest.json'     at ignore-listed frames {   errno: -2,   code: 'ENOENT',   syscall: 'open',   path: '/Users/kaushalmali/Desktop/jai apple store/.next/prerender-manifest.json' } kaushalmali@Kaushals-Laptop-3 jai apple store % ",
-      "name": "iPhone 17 Pro",
-      "tagline": "Most advanced iPhone ever.",
-      "description": "Titanium design, Pro camera system and all-day battery life. The ultimate iPhone.",
-      "category": "iphone",
-      "price": "₹1,44,900",
-      "badge": "New",
-      "colors": [
-        {
-          "name": "Cosmic Orange",
-          "hex": "#a8563c"
-        },
-        {
-          "name": "Deep Blue",
-          "hex": "#0b1736"
-        },
-        {
-          "name": "Silver",
-          "hex": "#e2e2de"
-        }
-      ],
-      "image": "https://www.apple.com/in/iphone/home/images/overview/select/iphone_17pro__t1j902iw6kya_large.jpg",
-      "highlights": [
-        "Up to 1TB storage",
-        "Best-in-class Pro camera system with 8x optical-quality zoom",
-        "All-day battery life"
-      ]
     }
   ]
 }
