@@ -1,0 +1,881 @@
+{
+  "categories": [
+    {
+      "slug": "iphone",
+      "name": "iPhone",
+      "blurb": "Every model. Every colour. Full range in stock.",
+      "tint": "#0071e3"
+    },
+    {
+      "slug": "mac",
+      "name": "Mac",
+      "blurb": "MacBook Air, MacBook Pro, iMac & Mac Mini.",
+      "tint": "#5e5ce6"
+    },
+    {
+      "slug": "ipad",
+      "name": "iPad",
+      "blurb": "iPad Pro, iPad Air, iPad & iPad mini.",
+      "tint": "#ff9f0a"
+    },
+    {
+      "slug": "watch",
+      "name": "Watch",
+      "blurb": "Apple Watch Ultra, Series & SE.",
+      "tint": "#bf5af2"
+    },
+    {
+      "slug": "airpods",
+      "name": "AirPods",
+      "blurb": "Pro, AirPods 4 & AirPods Max.",
+      "tint": "#30d158"
+    },
+    {
+      "slug": "accessories",
+      "name": "Accessories",
+      "blurb": "Cases, chargers, cables, AirTag & more.",
+      "tint": "#ffd60a"
+    }
+  ],
+  "products": [
+    {
+      "slug": "iphone-17-pro",
+      "name": "iPhone 17 Pro",
+      "tagline": "Most advanced iPhone ever.",
+      "description": "Titanium design, Pro camera system and all-day battery life. The ultimate iPhone.",
+      "category": "iphone",
+      "price": "₹1,44,900",
+      "badge": "New",
+      "colors": [
+        {
+          "name": "Cosmic Orange",
+          "hex": "#a8563c"
+        },
+        {
+          "name": "Deep Blue",
+          "hex": "#0b1736"
+        },
+        {
+          "name": "Silver",
+          "hex": "#e2e2de"
+        }
+      ],
+      "image": "https://www.apple.com/in/iphone/home/images/overview/select/iphone_17pro__t1j902iw6kya_large.jpg",
+      "highlights": [
+        "Up to 1TB storage",
+        "Best-in-class Pro camera system with 8x optical-quality zoom",
+        "All-day battery life"
+      ]
+    },
+    {
+      "slug": "iphone-17-air",
+      "name": "iPhone 17 Air",
+      "tagline": "The thinnest iPhone ever.",
+      "description": "Beautifully thin with a stunning large display. The power of Pro inside.",
+      "category": "iphone",
+      "price": "₹1,29,900",
+      "badge": "New",
+      "colors": [
+        {
+          "name": "Sky Blue",
+          "hex": "#9ec5e8"
+        },
+        {
+          "name": "Light Gold",
+          "hex": "#f0e6d3"
+        },
+        {
+          "name": "Cloud White",
+          "hex": "#f0f0f2"
+        },
+        {
+          "name": "Space Black",
+          "hex": "#2b2b2f"
+        }
+      ],
+      "image": "https://www.apple.com/v/iphone/home/cj/images/overview/select/iphone_air__b5qmgl05ojyq_large.jpg",
+      "highlights": [
+        "Thinnest iPhone ever made",
+        "Fusion camera system with 2-in-1 lens",
+        "Lightweight aluminium body"
+      ]
+    },
+    {
+      "slug": "iphone-17",
+      "name": "iPhone 17",
+      "tagline": "Even more delightful. Even more durable.",
+      "description": "Super Retina display, advanced dual-camera system and Ceramic Shield front glass.",
+      "category": "iphone",
+      "price": "₹79,900",
+      "badge": "New",
+      "colors": [
+        {
+          "name": "Lavender",
+          "hex": "#c9b1c9"
+        },
+        {
+          "name": "Sage",
+          "hex": "#b9c4b2"
+        },
+        {
+          "name": "Mist Blue",
+          "hex": "#aec5d4"
+        },
+        {
+          "name": "White",
+          "hex": "#fafafa"
+        },
+        {
+          "name": "Black",
+          "hex": "#333"
+        }
+      ],
+      "image": "https://www.apple.com/in/iphone/home/images/overview/select/iphone_17__fb1277oq3eaa_large.jpg",
+      "highlights": [
+        "Advanced dual-camera system",
+        "Ceramic Shield 2 front glass",
+        "Super Retina XDR display"
+      ]
+    },
+    {
+      "slug": "iphone-17e",
+      "name": "iPhone 17e",
+      "tagline": "Feature stacked. Value packed.",
+      "description": "The essentials, done incredibly well. Big battery, great camera and A-series performance.",
+      "category": "iphone",
+      "price": "₹55,900",
+      "badge": "New",
+      "colors": [
+        {
+          "name": "Soft Pink",
+          "hex": "#f2cfd4"
+        },
+        {
+          "name": "White",
+          "hex": "#fafafa"
+        },
+        {
+          "name": "Black",
+          "hex": "#333"
+        }
+      ],
+      "image": "https://www.apple.com/in/iphone/home/images/overview/select/iphone_17e__cq5ygzct314y_large.jpg",
+      "highlights": [
+        "Great all-day battery life",
+        "48MP Fusion camera",
+        "Powerful A-series chip"
+      ]
+    },
+    {
+      "slug": "iphone-16",
+      "name": "iPhone 16",
+      "tagline": "Amazing performance. Durable design.",
+      "description": "Everything to love about iPhone at a more accessible price.",
+      "category": "iphone",
+      "price": "₹69,900",
+      "oldPrice": "₹79,900",
+      "badge": "Save ₹10,000",
+      "colors": [
+        {
+          "name": "Ultramarine",
+          "hex": "#4169e1"
+        },
+        {
+          "name": "Teal",
+          "hex": "#008080"
+        },
+        {
+          "name": "Pink",
+          "hex": "#f5bbc9"
+        },
+        {
+          "name": "White",
+          "hex": "#fafafa"
+        },
+        {
+          "name": "Black",
+          "hex": "#333"
+        }
+      ],
+      "image": "https://www.apple.com/in/iphone/home/images/overview/select/iphone_16__b6tkv86m2gc2_large.jpg",
+      "highlights": [
+        "Advanced dual-camera system",
+        "A18 chip with fast performance",
+        "Vibrant Super Retina display"
+      ]
+    },
+    {
+      "slug": "iphone-15",
+      "name": "iPhone 15",
+      "tagline": "A beautiful way to stay in touch.",
+      "description": "Dynamic Island, excellent camera and USB-C in a lightweight aluminium design.",
+      "category": "iphone",
+      "price": "₹59,900",
+      "oldPrice": "₹69,900",
+      "badge": "Save ₹10,000",
+      "colors": [
+        {
+          "name": "Black",
+          "hex": "#333"
+        },
+        {
+          "name": "Blue",
+          "hex": "#4a7bb5"
+        },
+        {
+          "name": "Green",
+          "hex": "#73a67e"
+        },
+        {
+          "name": "Yellow",
+          "hex": "#f0d060"
+        },
+        {
+          "name": "Pink",
+          "hex": "#f2c1c8"
+        }
+      ],
+      "highlights": [
+        "Dynamic Island",
+        "48MP main camera",
+        "USB-C connectivity"
+      ]
+    },
+    {
+      "slug": "iphone-14",
+      "name": "iPhone 14",
+      "tagline": "The value iPhone.",
+      "description": "A solid all-rounder. Great price, reliable performance.",
+      "category": "iphone",
+      "price": "₹49,900",
+      "colors": [
+        {
+          "name": "Midnight",
+          "hex": "#1f2430"
+        },
+        {
+          "name": "Purple",
+          "hex": "#a3a1d6"
+        },
+        {
+          "name": "Starlight",
+          "hex": "#f2efe9"
+        },
+        {
+          "name": "Red",
+          "hex": "#c91f2e"
+        }
+      ],
+      "highlights": [
+        "Dual-camera system with low-light improvements",
+        "All-day battery",
+        "Emergency SOS via satellite"
+      ]
+    },
+    {
+      "slug": "macbook-air-13",
+      "name": "MacBook Air 13",
+      "tagline": "Seriously thin. Seriously fast.",
+      "description": "The world's most loved laptop, now with even more performance and battery life.",
+      "category": "mac",
+      "price": "₹99,900",
+      "badge": "Newest chip",
+      "colors": [
+        {
+          "name": "Midnight",
+          "hex": "#1f2430"
+        },
+        {
+          "name": "Starlight",
+          "hex": "#f2efe9"
+        },
+        {
+          "name": "Silver",
+          "hex": "#e2e2de"
+        }
+      ],
+      "highlights": [
+        "Up to 18 hr battery life",
+        "Liquid Retina display",
+        "Fanless silent design"
+      ]
+    },
+    {
+      "slug": "macbook-air-15",
+      "name": "MacBook Air 15",
+      "tagline": "Bigger screen. Same Air feel.",
+      "description": "All the Air brilliance, now in a 15-inch display.",
+      "category": "mac",
+      "price": "₹1,14,900",
+      "colors": [
+        {
+          "name": "Midnight",
+          "hex": "#1f2430"
+        },
+        {
+          "name": "Starlight",
+          "hex": "#f2efe9"
+        },
+        {
+          "name": "Silver",
+          "hex": "#e2e2de"
+        }
+      ],
+      "highlights": [
+        "15.3\" Liquid Retina display",
+        "Powerful M-series chip",
+        "6-speaker sound system"
+      ]
+    },
+    {
+      "slug": "macbook-pro-14",
+      "name": "MacBook Pro 14",
+      "tagline": "Pro performance in a mobile frame.",
+      "description": "A muscular laptop for creative pros, developers and power users.",
+      "category": "mac",
+      "price": "₹1,69,900",
+      "colors": [
+        {
+          "name": "Space Black",
+          "hex": "#2b2b2f"
+        },
+        {
+          "name": "Silver",
+          "hex": "#e2e2de"
+        }
+      ],
+      "highlights": [
+        "Up to 24 hr battery life",
+        "Liquid Retina XDR display",
+        "Pro-class chip"
+      ]
+    },
+    {
+      "slug": "macbook-pro-16",
+      "name": "MacBook Pro 16",
+      "tagline": "The most powerful MacBook ever.",
+      "description": "Ultimate performance for the most demanding workflows.",
+      "category": "mac",
+      "price": "₹2,49,900",
+      "colors": [
+        {
+          "name": "Space Black",
+          "hex": "#2b2b2f"
+        },
+        {
+          "name": "Silver",
+          "hex": "#e2e2de"
+        }
+      ],
+      "highlights": [
+        "Largest ever MacBook display",
+        "Maximum CPU/GPU performance",
+        "Studio-quality mics"
+      ]
+    },
+    {
+      "slug": "imac",
+      "name": "iMac",
+      "tagline": "A work of art that works.",
+      "description": "All-in-one desktop brilliance in seven vibrant colours.",
+      "category": "mac",
+      "price": "₹1,34,900",
+      "colors": [
+        {
+          "name": "Blue",
+          "hex": "#5a7bd8"
+        },
+        {
+          "name": "Green",
+          "hex": "#6bb37a"
+        },
+        {
+          "name": "Pink",
+          "hex": "#f0a7b0"
+        },
+        {
+          "name": "Orange",
+          "hex": "#ef8a4a"
+        }
+      ],
+      "highlights": [
+        "24\" 4.5K Retina display",
+        "1090p FaceTime camera",
+        "Three mics + six speakers"
+      ]
+    },
+    {
+      "slug": "mac-mini",
+      "name": "Mac Mini",
+      "tagline": "Tiny. Mighty. Mac.",
+      "description": "Desktop-class power in a pocket-sized aluminium box.",
+      "category": "mac",
+      "price": "₹59,900",
+      "colors": [
+        {
+          "name": "Silver",
+          "hex": "#e2e2de"
+        }
+      ],
+      "highlights": [
+        "Small footprint, massive power",
+        "Lots of ports",
+        "Quiet by design"
+      ]
+    },
+    {
+      "slug": "ipad-pro",
+      "name": "iPad Pro",
+      "tagline": "The ultimate iPad experience.",
+      "description": "OLED display and desktop-class performance in a thin, light frame.",
+      "category": "ipad",
+      "price": "₹99,900",
+      "badge": "Pro",
+      "colors": [
+        {
+          "name": "Silver",
+          "hex": "#e2e2de"
+        },
+        {
+          "name": "Space Black",
+          "hex": "#2b2b2f"
+        }
+      ],
+      "highlights": [
+        "Ultra Retina XDR display",
+        "M-series chip",
+        "Thinnest Apple device ever"
+      ]
+    },
+    {
+      "slug": "ipad-air",
+      "name": "iPad Air",
+      "tagline": "A big splash of genius.",
+      "description": "Powerful, colourful and incredibly versatile.",
+      "category": "ipad",
+      "price": "₹59,900",
+      "colors": [
+        {
+          "name": "Blue",
+          "hex": "#8ea8e8"
+        },
+        {
+          "name": "Purple",
+          "hex": "#c3b1e0"
+        },
+        {
+          "name": "Starlight",
+          "hex": "#f2efe9"
+        },
+        {
+          "name": "Space Gray",
+          "hex": "#4a4a52"
+        }
+      ],
+      "highlights": [
+        "Liquid Retina display",
+        "Fast M-series chip",
+        "Apple Pencil Pro support"
+      ]
+    },
+    {
+      "slug": "ipad",
+      "name": "iPad",
+      "tagline": "The everyday favourite.",
+      "description": "Tablet essential — great for learning, watching and creating.",
+      "category": "ipad",
+      "price": "₹39,900",
+      "colors": [
+        {
+          "name": "Blue",
+          "hex": "#8ea8e8"
+        },
+        {
+          "name": "Pink",
+          "hex": "#f2c1c8"
+        },
+        {
+          "name": "Yellow",
+          "hex": "#f0d060"
+        },
+        {
+          "name": "Silver",
+          "hex": "#e2e2de"
+        }
+      ],
+      "highlights": [
+        "Great value",
+        "Vibrant 10.9\" display",
+        "USB-C + Apple Pencil support"
+      ]
+    },
+    {
+      "slug": "ipad-mini",
+      "name": "iPad mini",
+      "tagline": "Mini. Mighty. Magic.",
+      "description": "Full iPad power in a pocket-sized frame.",
+      "category": "ipad",
+      "price": "₹49,900",
+      "colors": [
+        {
+          "name": "Space Gray",
+          "hex": "#4a4a52"
+        },
+        {
+          "name": "Starlight",
+          "hex": "#f2efe9"
+        },
+        {
+          "name": "Pink",
+          "hex": "#f2c1c8"
+        },
+        {
+          "name": "Purple",
+          "hex": "#c3b1e0"
+        }
+      ],
+      "highlights": [
+        "8.3\" Liquid Retina display",
+        "A-series performance",
+        "Apple Pencil support"
+      ]
+    },
+    {
+      "slug": "apple-watch-ultra",
+      "name": "Apple Watch Ultra",
+      "tagline": "Adventure waits.",
+      "description": "The most rugged and capable Apple Watch for every extreme.",
+      "category": "watch",
+      "price": "₹89,900",
+      "badge": "Premium",
+      "colors": [
+        {
+          "name": "Natural Titanium",
+          "hex": "#c9c4bd"
+        },
+        {
+          "name": "Black",
+          "hex": "#333"
+        }
+      ],
+      "highlights": [
+        "Most durable Watch ever",
+        "Precision GPS",
+        "Extended battery life"
+      ]
+    },
+    {
+      "slug": "apple-watch-series",
+      "name": "Apple Watch Series",
+      "tagline": "Stronger together.",
+      "description": "Health, safety and connectivity in a bright all-around display.",
+      "category": "watch",
+      "price": "₹46,900",
+      "colors": [
+        {
+          "name": "Jet Black",
+          "hex": "#1a1a1e"
+        },
+        {
+          "name": "Rose Gold",
+          "hex": "#ddb7ac"
+        },
+        {
+          "name": "Silver",
+          "hex": "#e2e2de"
+        },
+        {
+          "name": "Midnight",
+          "hex": "#1f2430"
+        }
+      ],
+      "highlights": [
+        "Bright always-on display",
+        "Advanced health sensors",
+        "Crash & fall detection"
+      ]
+    },
+    {
+      "slug": "apple-watch-se",
+      "name": "Apple Watch SE",
+      "tagline": "All the essentials.",
+      "description": "A great all-rounder with the essentials, at a great price.",
+      "category": "watch",
+      "price": "₹26,900",
+      "colors": [
+        {
+          "name": "Midnight",
+          "hex": "#1f2430"
+        },
+        {
+          "name": "Starlight",
+          "hex": "#f2efe9"
+        },
+        {
+          "name": "Silver",
+          "hex": "#e2e2de"
+        }
+      ],
+      "highlights": [
+        "Essential health features",
+        "All-day battery",
+        "Family Setup support"
+      ]
+    },
+    {
+      "slug": "airpods-pro-3",
+      "name": "AirPods Pro 3",
+      "tagline": "Pro sound. Pro found.",
+      "description": "Best-in-class Active Noise Cancellation with a personalised sound experience.",
+      "category": "airpods",
+      "price": "₹25,900",
+      "badge": "Best seller",
+      "colors": [
+        {
+          "name": "Mica",
+          "hex": "#cfd2da"
+        },
+        {
+          "name": "White",
+          "hex": "#fafafa"
+        }
+      ],
+      "highlights": [
+        "Up to 2x more Active Noise Cancellation",
+        "Adaptive Audio",
+        "USB-C + wireless charging"
+      ]
+    },
+    {
+      "slug": "airpods-4",
+      "name": "AirPods 4",
+      "tagline": "So light. So right.",
+      "description": "Comfortable all-day fit with great sound and effortless pairing.",
+      "category": "airpods",
+      "price": "₹19,900",
+      "colors": [
+        {
+          "name": "White",
+          "hex": "#fafafa"
+        }
+      ],
+      "highlights": [
+        "Comfortable open-ear design",
+        "Personalised Spatial Audio",
+        "USB-C charging case"
+      ]
+    },
+    {
+      "slug": "airpods-max",
+      "name": "AirPods Max",
+      "tagline": "This is the sound.",
+      "description": "Over-ear headphones with knock-out sound and Active Noise Cancellation.",
+      "category": "airpods",
+      "price": "₹59,900",
+      "colors": [
+        {
+          "name": "Midnight",
+          "hex": "#1f2430"
+        },
+        {
+          "name": "Blue",
+          "hex": "#5a7bd8"
+        },
+        {
+          "name": "Silver",
+          "hex": "#e2e2de"
+        }
+      ],
+      "highlights": [
+        "High-fidelity audio",
+        "Active Noise Cancellation",
+        "Computational Spatial Audio"
+      ]
+    },
+    {
+      "slug": "magsafe-charger",
+      "name": "MagSafe Charger",
+      "tagline": "Snaps into place. Charges perfectly.",
+      "description": "Wireless fast charging that aligns perfectly, every time.",
+      "category": "accessories",
+      "price": "₹4,900",
+      "colors": [
+        {
+          "name": "White",
+          "hex": "#fafafa"
+        }
+      ],
+      "highlights": [
+        "Fast wireless charging",
+        "Perfect alignment",
+        "Works with most cases"
+      ]
+    },
+    {
+      "slug": "20w-usb-c-power-adapter",
+      "name": "20W USB‑C Power Adapter",
+      "tagline": "Rapid, reliable power.",
+      "description": "Fast and safe charging for iPhone, iPad and more.",
+      "category": "accessories",
+      "price": "₹1,900",
+      "colors": [
+        {
+          "name": "White",
+          "hex": "#fafafa"
+        }
+      ],
+      "highlights": [
+        "20W fast charging",
+        "USB-C connector",
+        "Compact design"
+      ]
+    },
+    {
+      "slug": "airtag",
+      "name": "AirTag",
+      "tagline": "Attach to your stuff. Find it easily.",
+      "description": "Track keys, bags and more in the Find My app.",
+      "category": "accessories",
+      "price": "₹2,900",
+      "badge": "Popular",
+      "colors": [
+        {
+          "name": "White",
+          "hex": "#fafafa"
+        }
+      ],
+      "highlights": [
+        "One-tap setup",
+        "Precision tracking",
+        "Replaceable battery"
+      ]
+    },
+    {
+      "slug": "silicone-case",
+      "name": "Silicone Case",
+      "tagline": "Protection with personality.",
+      "description": "Snug, soft-touch protection in a range of vibrant colours.",
+      "category": "accessories",
+      "price": "₹2,900",
+      "colors": [
+        {
+          "name": "Blue",
+          "hex": "#5a7bd8"
+        },
+        {
+          "name": "Pink",
+          "hex": "#f2c1c8"
+        },
+        {
+          "name": "Green",
+          "hex": "#6bb37a"
+        },
+        {
+          "name": "Black",
+          "hex": "#333"
+        }
+      ],
+      "highlights": [
+        "Soft-touch silicone",
+        "MagSafe compatible",
+        "Protects against drops"
+      ]
+    },
+    {
+      "slug": "clear-case",
+      "name": "Clear Case",
+      "tagline": "Show off the colour.",
+      "description": "Crystal-clear protection that shows off your iPhone finish.",
+      "category": "accessories",
+      "price": "₹2,900",
+      "colors": [
+        {
+          "name": "Clear",
+          "hex": "#e6eef5"
+        }
+      ],
+      "highlights": [
+        "Optically clear design",
+        "Scratch resistant",
+        "MagSafe compatible"
+      ]
+    },
+    {
+      "slug": "usb-c-cable",
+      "name": "USB‑C Charging Cable",
+      "tagline": "Powerful and convenient.",
+      "description": "Durable braided USB-C to USB-C cable for fast charging.",
+      "category": "accessories",
+      "price": "₹1,900",
+      "colors": [
+        {
+          "name": "White",
+          "hex": "#fafafa"
+        }
+      ],
+      "highlights": [
+        "Fast charging + data",
+        "Braided for durability",
+        "1m / 2m options"
+      ]
+    },
+    {
+      "slug": "iphone-17-pro-max-test",
+      "name": "iPhone 17 Pro",
+      "tagline": "Most advanced iPhone ever.",
+      "description": "Titanium design, Pro camera system and all-day battery life. The ultimate iPhone.",
+      "category": "iphone",
+      "price": "₹1,44,900",
+      "badge": "New",
+      "colors": [
+        {
+          "name": "Cosmic Orange",
+          "hex": "#a8563c"
+        },
+        {
+          "name": "Deep Blue",
+          "hex": "#0b1736"
+        },
+        {
+          "name": "Silver",
+          "hex": "#e2e2de"
+        }
+      ],
+      "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-17pro-digitalmat-gallery-1-202509_GEO_EMEA?wid=728&hei=666&fmt=p-jpg&qlt=95&.v=ekJPc2lPUlRuRk50SkcyOVdnU1d0TjFla0N0Znl3UThxdjB3SW91ZDVJeFptNC9yejJUMWI2dmhrTGRMd2F4ZjhpVENtU1Jsa01tcGtZS0IwM01XVkVaMm9lVjZWaGFvQVRMeWxLakVNdXRpc2lSR1BSMzNQQm5UMU83ZFVxQmFYSVI4ZkRTLy83YU5OdEFVT1FiTW9R",
+      "highlights": [
+        "Up to 1TB storage",
+        "Best-in-class Pro camera system with 8x optical-quality zoom",
+        "All-day battery life"
+      ]
+    },
+    {
+      "slug": "- Network:       http://10.177.116.227:3000 ✓ Ready in 203ms ⚠ Warning: Next.js ignored package-lock.json in /Users/kaushalmali because it would include your home directory (/Users/kaushalmali).  To use this directory, set `outputFileTracingRoot` in your Next.js config.  ✓ Running next.config.ts took 57ms Error: ENOENT: no such file or directory, open '/Users/kaushalmali/Desktop/jai apple store/.next/prerender-manifest.json'     at ignore-listed frames {   errno: -2,   code: 'ENOENT',   syscall: 'open',   path: '/Users/kaushalmali/Desktop/jai apple store/.next/prerender-manifest.json' } kaushalmali@Kaushals-Laptop-3 jai apple store % npm run build npm start   > jai-apple-store@0.1.0 build > next build  ▲ Next.js 16.3.3 (Turbopack) ⚠ Warning: Next.js ignored package-lock.json in /Users/kaushalmali because it would include your home directory (/Users/kaushalmali).  To use this directory, set `turbopack.root` in your Next.js config.  ✓ Running next.config.ts took 119ms    Creating an optimized production build ... ✓ Compiled successfully in 624ms ✓ Finished TypeScript in 1501ms     ✓ Collecting page data using 7 workers in 1184ms     Error occurred prerendering page \"/product/https:%2F%2Fstore.storeimages.cdn-apple.com%2F1%2Fas-images.apple.com%2Fis%2Fiphone-17pro-digitalmat-gallery-1-202509_GEO_EMEA%3Fwid=728&hei=666&fmt=p-jpg&qlt=95&.v=ekJPc2lPUlRuRk50SkcyOVdnU1d0TjFla0N0Znl3UThxdjB3SW91ZDVJeFptNC9yejJUMWI2dmhrTGRMd2F4ZjhpVENtU1Jsa01tcGtZS0IwM01XVkVaMm9lVjZWaGFvQVRMeWxLakVNdXRpc2lSR1BSMzNQQm5UMU83ZFVxQmFYSVI4ZkRTLy83YU5OdEFVT1FiTW9R\". Read more: https://nextjs.org/docs/messages/prerender-error Error: ENAMETOOLONG: name too long, mkdir '/Users/kaushalmali/Desktop/jai apple store/.next/server/app/product/https:%2F%2Fstore.storeimages.cdn-apple.com%2F1%2Fas-images.apple.com%2Fis%2Fiphone-17pro-digitalmat-gallery-1-202509_GEO_EMEA%3Fwid=728&hei=666&fmt=p-jpg&qlt=95&.v=ekJPc2lPUlRuRk50SkcyOVdnU1d0TjFla0N0Znl3UThxdjB3SW91ZDVJeFptNC9yejJUMWI2dmhrTGRMd2F4ZjhpVENtU1Jsa01tcGtZS0IwM01XVkVaMm9lVjZWaGFvQVRMeWxLakVNdXRpc2lSR1BSMzNQQm5UMU83ZFVxQmFYSVI4ZkRTLy83YU5OdEFVT1FiTW9R.segments'     at ignore-listed frames {   errno: -63,   code: 'ENAMETOOLONG',   syscall: 'mkdir',   path: '/Users/kaushalmali/Desktop/jai apple store/.next/server/app/product/https:%2F%2Fstore.storeimages.cdn-apple.com%2F1%2Fas-images.apple.com%2Fis%2Fiphone-17pro-digitalmat-gallery-1-202509_GEO_EMEA%3Fwid=728&hei=666&fmt=p-jpg&qlt=95&.v=ekJPc2lPUlRuRk50SkcyOVdnU1d0TjFla0N0Znl3UThxdjB3SW91ZDVJeFptNC9yejJUMWI2dmhrTGRMd2F4ZjhpVENtU1Jsa01tcGtZS0IwM01XVkVaMm9lVjZWaGFvQVRMeWxLakVNdXRpc2lSR1BSMzNQQm5UMU83ZFVxQmFYSVI4ZkRTLy83YU5OdEFVT1FiTW9R.segments' } Export encountered an error on /product/[slug]/page: /product/https:%2F%2Fstore.storeimages.cdn-apple.com%2F1%2Fas-images.apple.com%2Fis%2Fiphone-17pro-digitalmat-gallery-1-202509_GEO_EMEA%3Fwid=728&hei=666&fmt=p-jpg&qlt=95&.v=ekJPc2lPUlRuRk50SkcyOVdnU1d0TjFla0N0Znl3UThxdjB3SW91ZDVJeFptNC9yejJUMWI2dmhrTGRMd2F4ZjhpVENtU1Jsa01tcGtZS0IwM01XVkVaMm9lVjZWaGFvQVRMeWxLakVNdXRpc2lSR1BSMzNQQm5UMU83ZFVxQmFYSVI4ZkRTLy83YU5OdEFVT1FiTW9R, exiting the build. ⨯ Next.js build worker exited with code: 1 and signal: null  > jai-apple-store@0.1.0 start > next start  ▲ Next.js 16.3.3 - Local:         http://localhost:3000 - Network:       http://10.177.116.227:3000 ✓ Ready in 146ms ⚠ Warning: Next.js ignored package-lock.json in /Users/kaushalmali because it would include your home directory (/Users/kaushalmali).  To use this directory, set `outputFileTracingRoot` in your Next.js config.  ✓ Running next.config.ts took 29ms Error: ENOENT: no such file or directory, open '/Users/kaushalmali/Desktop/jai apple store/.next/prerender-manifest.json'     at ignore-listed frames {   errno: -2,   code: 'ENOENT',   syscall: 'open',   path: '/Users/kaushalmali/Desktop/jai apple store/.next/prerender-manifest.json' } kaushalmali@Kaushals-Laptop-3 jai apple store % ",
+      "name": "iPhone 17 Pro",
+      "tagline": "Most advanced iPhone ever.",
+      "description": "Titanium design, Pro camera system and all-day battery life. The ultimate iPhone.",
+      "category": "iphone",
+      "price": "₹1,44,900",
+      "badge": "New",
+      "colors": [
+        {
+          "name": "Cosmic Orange",
+          "hex": "#a8563c"
+        },
+        {
+          "name": "Deep Blue",
+          "hex": "#0b1736"
+        },
+        {
+          "name": "Silver",
+          "hex": "#e2e2de"
+        }
+      ],
+      "image": "https://www.apple.com/in/iphone/home/images/overview/select/iphone_17pro__t1j902iw6kya_large.jpg",
+      "highlights": [
+        "Up to 1TB storage",
+        "Best-in-class Pro camera system with 8x optical-quality zoom",
+        "All-day battery life"
+      ]
+    }
+  ]
+}
