@@ -35,6 +35,10 @@ export default async function ProductPage({ params }: { params: Params }) {
   const category = categoryBySlug(product.category);
   const related = productsByCategory(product.category).filter((p) => p.slug !== slug).slice(0, 3);
 
+  const isComingSoon =
+    product.badge?.toLowerCase().includes("coming soon") ||
+    product.price?.toLowerCase().includes("coming soon");
+
   return (
     <>
       <nav className="border-b border-black/[0.05] bg-cloud/60">
@@ -59,29 +63,63 @@ export default async function ProductPage({ params }: { params: Params }) {
 
           <Reveal delay={80}>
             {product.badge ? (
-              <span className="chip mb-4 bg-apple text-white">{product.badge}</span>
+              <span
+                className={`inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-xs font-bold tracking-wider text-white mb-4 ${
+                  isComingSoon
+                    ? "bg-gradient-to-r from-purple-600 to-indigo-600 shadow-md ring-1 ring-purple-400/40"
+                    : "bg-apple"
+                }`}
+              >
+                {isComingSoon ? (
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-300 opacity-75"></span>
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"></span>
+                  </span>
+                ) : null}
+                {product.badge}
+              </span>
             ) : null}
             <h1 className="text-display-md">{product.name}</h1>
             <p className="mt-2 text-xl text-ink/70">{product.tagline}</p>
 
-            <div className="mt-5 flex items-baseline gap-3">
-              <span className="text-3xl font-semibold tracking-tight">{product.price}</span>
-              {product.oldPrice ? (
-                <>
-                  <span className="text-lg text-ink/40 line-through">{product.oldPrice}</span>
-                  <span className="rounded-full bg-green-100 px-3 py-1 text-sm font-semibold text-green-700">
-                    Save{" "}
-                    {(() => {
-                      const diff =
-                        Number(product.price.replace(/[^\d]/g, "")) -
-                        Number(product.oldPrice.replace(/[^\d]/g, ""));
-                      return diff ? `₹${diff.toLocaleString("en-IN")}` : "";
-                    })()}
+            {isComingSoon ? (
+              <div className="mt-5 rounded-2xl bg-gradient-to-br from-purple-50 via-indigo-50 to-blue-50 p-5 ring-1 ring-purple-200/80">
+                <div className="flex items-baseline gap-3">
+                  <span className="text-3xl font-extrabold tracking-tight text-purple-900">
+                    Coming Soon
                   </span>
-                </>
-              ) : null}
-            </div>
-            <p className="mt-1 text-xs text-ink/50">*Indicative price. Confirm today&apos;s best price with the store.</p>
+                  <span className="rounded-full bg-purple-200/80 px-3 py-1 text-xs font-bold text-purple-900 uppercase">
+                    Official Launch
+                  </span>
+                </div>
+                <p className="mt-2 text-sm text-purple-950/80">
+                  Pre-bookings are now open! Reserve your device early to guarantee delivery on launch day with official 1-year Apple India warranty.
+                </p>
+              </div>
+            ) : (
+              <div className="mt-5 flex items-baseline gap-3">
+                <span className="text-3xl font-semibold tracking-tight">{product.price}</span>
+                {product.oldPrice ? (
+                  <>
+                    <span className="text-lg text-ink/40 line-through">{product.oldPrice}</span>
+                    <span className="rounded-full bg-green-100 px-3 py-1 text-sm font-semibold text-green-700">
+                      Save{" "}
+                      {(() => {
+                        const diff =
+                          Number(product.price.replace(/[^\d]/g, "")) -
+                          Number(product.oldPrice.replace(/[^\d]/g, ""));
+                        return diff ? `₹${diff.toLocaleString("en-IN")}` : "";
+                      })()}
+                    </span>
+                  </>
+                ) : null}
+              </div>
+            )}
+            <p className="mt-1 text-xs text-ink/50">
+              {isComingSoon
+                ? "*Official prices will be confirmed on release. Pre-book now for priority allocation."
+                : "*Indicative price. Confirm today's best price with the store."}
+            </p>
 
             <p className="mt-5 text-[17px] leading-relaxed text-ink/75">{product.description}</p>
 
@@ -98,8 +136,16 @@ export default async function ProductPage({ params }: { params: Params }) {
             </div>
 
             <div className="mt-7 flex flex-wrap items-center gap-3">
-              <AddToCartButton product={product} />
-              <WhatsAppButton productName={product.name} />
+              {isComingSoon ? (
+                <WhatsAppButton
+                  productName={`${product.name} (Pre-Book Priority)`}
+                  label="Pre-Book on WhatsApp"
+                  className="btn-wa px-7 py-3.5 text-base font-bold shadow-lg shadow-emerald-950/20"
+                />
+              ) : (
+                <AddToCartButton product={product} />
+              )}
+              <WhatsAppButton productName={product.name} label="Enquire" />
               <CallButton />
             </div>
 

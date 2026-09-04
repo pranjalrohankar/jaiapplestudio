@@ -1,4 +1,5 @@
 import Hero from "@/components/sections/Hero";
+import LaunchBanner from "@/components/sections/LaunchBanner";
 import ChapterNav from "@/components/sections/ChapterNav";
 import Lineup from "@/components/sections/Lineup";
 import WhyShop from "@/components/sections/WhyShop";
@@ -42,6 +43,7 @@ export default function HomePage() {
     <>
       <Hero />
       <ChapterNav />
+      <LaunchBanner />
       <Lineup />
       <WhyShop />
       <CategoryTiles />

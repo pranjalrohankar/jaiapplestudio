@@ -6,6 +6,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <nav className="flex gap-4 text-sm font-medium">
           <a href="/admin" className="text-gray-600 hover:text-gray-900">Dashboard</a>
           <a href="/admin/products" className="text-gray-600 hover:text-gray-900">Products</a>
+          <a href="/admin/banners" className="text-gray-600 hover:text-gray-900">Banners</a>
           <a href="/" className="text-blue-600 hover:text-blue-800">View Site &rarr;</a>
         </nav>
       </header>

@@ -64,6 +64,8 @@ export const iphoneHeroImage =
  * -- EDIT -- prices here are placeholders.
  */
 const VARIANT_MAP: Record<string, VariantInfo> = {
+  "iphone-18-pro": { variants: ["256GB", "512GB", "1TB", "2TB"], prices: { "256GB": "Coming Soon", "512GB": "Coming Soon", "1TB": "Coming Soon", "2TB": "Coming Soon" } },
+  "iphone-18": { variants: ["128GB", "256GB", "512GB"], prices: { "128GB": "Coming Soon", "256GB": "Coming Soon", "512GB": "Coming Soon" } },
   "iphone-17-pro": { variants: ["256GB", "512GB", "1TB"], prices: { "256GB": "₹1,44,900", "512GB": "₹1,69,900", "1TB": "₹1,99,900" } },
   "iphone-17-air": { variants: ["256GB", "512GB"], prices: { "256GB": "₹1,29,900", "512GB": "₹1,49,900" } },
   "iphone-17": { variants: ["128GB", "256GB", "512GB"], prices: { "128GB": "₹79,900", "256GB": "₹89,900", "512GB": "₹1,09,900" } },

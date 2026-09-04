@@ -29,6 +29,17 @@ async function run() {
       console.log(`${data.products.length} products inserted`);
     }
 
+    // Insert banner
+    if (fs.existsSync('data/banners.json')) {
+      const bannerData = JSON.parse(fs.readFileSync('data/banners.json', 'utf8'));
+      const bannersCollection = db.collection('banners');
+      await bannersCollection.deleteMany({});
+      if (bannerData.banner) {
+        await bannersCollection.insertOne(bannerData.banner);
+        console.log('Banner configuration inserted');
+      }
+    }
+
     console.log('Seeding to Atlas completed successfully!');
   } catch (err) {
     console.error('Error during seeding:', err);

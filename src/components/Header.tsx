@@ -1,28 +1,61 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { store, waLink } from "@/lib/store";
 import { categories } from "@/lib/products";
+import { defaultBanner, type BannerConfig } from "@/lib/banners";
 import CartIcon from "@/components/CartIcon";
-import { MenuIcon, CloseIcon, WhatsAppIcon, MailIcon } from "@/lib/icons";
+import { MenuIcon, CloseIcon, WhatsAppIcon, MailIcon, ChevronRightIcon } from "@/lib/icons";
 
 const nav = categories.map((c) => ({ href: `/${c.slug}`, label: c.name }));
 
 export default function Header() {
   const [open, setOpen] = useState(false);
+  const [banner, setBanner] = useState<BannerConfig>(defaultBanner);
+
+  useEffect(() => {
+    async function fetchBanner() {
+      try {
+        const res = await fetch("/api/banners");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.banner) setBanner(data.banner);
+        }
+      } catch (err) {
+        // silent fallback
+      }
+    }
+    fetchBanner();
+  }, []);
 
   return (
     <header className="sticky top-0 z-50">
-      <div className="bg-ink px-4 py-2 text-center text-[13px] text-white/90">
-        <span className="font-semibold">100% Genuine Apple products</span>
-        <span className="mx-2 text-white/40">·</span>
-        <span>No-Cost EMI</span>
-        <span className="mx-2 text-white/40">·</span>
-        <span>1-Year Warranty</span>
-        <span className="mx-2 text-white/40">·</span>
-        <span>Exchange available</span>
-      </div>
+      {banner.isActive && banner.announcement ? (
+        <div className="bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-950 px-4 py-2 text-center text-[13px] font-medium text-white shadow-inner">
+          <div className="container-px flex items-center justify-center gap-2">
+            <span className="truncate">{banner.announcement}</span>
+            <a
+              href={banner.ctaLink || waLink("Hi! I want to pre-book iPhone 18")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-0.5 rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-bold text-white transition hover:bg-white/30"
+            >
+              Pre-Book <ChevronRightIcon width={12} height={12} />
+            </a>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-ink px-4 py-2 text-center text-[13px] text-white/90">
+          <span className="font-semibold">100% Genuine Apple products</span>
+          <span className="mx-2 text-white/40">·</span>
+          <span>No-Cost EMI</span>
+          <span className="mx-2 text-white/40">·</span>
+          <span>1-Year Warranty</span>
+          <span className="mx-2 text-white/40">·</span>
+          <span>Exchange available</span>
+        </div>
+      )}
 
       <div className="border-b border-black/[0.06] bg-white/80 backdrop-blur-xl">
         <div className="container-px flex h-14 items-center justify-between gap-4">

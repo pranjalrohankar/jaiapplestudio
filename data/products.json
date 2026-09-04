@@ -1,43 +1,73 @@
 {
-  "categories": [
-    {
-      "slug": "iphone",
-      "name": "iPhone",
-      "blurb": "Every model. Every colour. Full range in stock.",
-      "tint": "#0071e3"
-    },
-    {
-      "slug": "mac",
-      "name": "Mac",
-      "blurb": "MacBook Air, MacBook Pro, iMac & Mac Mini.",
-      "tint": "#5e5ce6"
-    },
-    {
-      "slug": "ipad",
-      "name": "iPad",
-      "blurb": "iPad Pro, iPad Air, iPad & iPad mini.",
-      "tint": "#ff9f0a"
-    },
-    {
-      "slug": "watch",
-      "name": "Watch",
-      "blurb": "Apple Watch Ultra, Series & SE.",
-      "tint": "#bf5af2"
-    },
-    {
-      "slug": "airpods",
-      "name": "AirPods",
-      "blurb": "Pro, AirPods 4 & AirPods Max.",
-      "tint": "#30d158"
-    },
-    {
-      "slug": "accessories",
-      "name": "Accessories",
-      "blurb": "Cases, chargers, cables, AirTag & more.",
-      "tint": "#ffd60a"
-    }
-  ],
   "products": [
+    {
+      "slug": "iphone-18-pro",
+      "name": "iPhone 18 Pro",
+      "tagline": "The future of Apple Intelligence.",
+      "description": "Groundbreaking A20 Pro chip, revolutionary under-display camera architecture, and aerospace-grade liquid titanium casing. Pre-booking now open.",
+      "category": "iphone",
+      "price": "Coming Soon",
+      "badge": "Coming Soon",
+      "colors": [
+        {
+          "name": "Cosmic Obsidian",
+          "hex": "#1e2024"
+        },
+        {
+          "name": "Liquid Titanium",
+          "hex": "#b0b3b8"
+        },
+        {
+          "name": "Celestial Gold",
+          "hex": "#ebd2a7"
+        },
+        {
+          "name": "Deep Emerald",
+          "hex": "#1e392e"
+        }
+      ],
+      "image": "/images/iphone-18-pro.jpg",
+      "highlights": [
+        "A20 Pro Quantum Bionic processor",
+        "ProMotion 2.0 Ultra XDR holographic display",
+        "Next-gen 200MP fusion camera with 10x optical zoom",
+        "All-day-plus battery life with 65W MagSafe 2"
+      ]
+    },
+    {
+      "slug": "iphone-18",
+      "name": "iPhone 18",
+      "tagline": "Supercharged. Futuristic. Unstoppable.",
+      "description": "Equipped with A20 Bionic performance, all-new unified Dynamic Island, and vibrant aerospace finishes. Coming soon to Jai Apple Store.",
+      "category": "iphone",
+      "price": "Coming Soon",
+      "badge": "Coming Soon",
+      "colors": [
+        {
+          "name": "Cyber Teal",
+          "hex": "#2dd4bf"
+        },
+        {
+          "name": "Sunset Pink",
+          "hex": "#f472b6"
+        },
+        {
+          "name": "Starlight White",
+          "hex": "#f8fafc"
+        },
+        {
+          "name": "Midnight Black",
+          "hex": "#0f172a"
+        }
+      ],
+      "image": "/images/iphone-18-pro.jpg",
+      "highlights": [
+        "A20 Bionic processor with enhanced Apple Intelligence",
+        "Advanced Dual-Fusion 64MP Camera system",
+        "Ceramic Shield Gen 3 with extreme scratch resistance",
+        "USB-C with Thunderbolt speed & Superfast MagSafe"
+      ]
+    },
     {
       "slug": "iphone-17-pro",
       "name": "iPhone 17 Pro",
@@ -60,7 +90,7 @@
           "hex": "#e2e2de"
         }
       ],
-      "image": "https://www.apple.com/in/iphone/home/images/overview/select/iphone_17pro__t1j902iw6kya_large.jpg",
+      "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-17-pro-model-unselect-gallery-1-202509?wid=5120&hei=2880&fmt=webp&qlt=90&.v=dU9qRExIQUlQTzVKeDd1V1dtUE1MUWFRQXQ2R0JQTk5udUZxTkR3ZVlpS1ZKNzlseDJva0h5NlRjOVNob0hSVjBoUVhuTWlrY2hIK090ZGZZbk9HeEJWb1BiTjRORlc1Y1lKU3JWempySklRNmNHZmh4VCt0eWNpdXFKdGlmMVRmbW94YnYxc1YvNXZ4emJGL0IxNFp3&traceId=1",
       "highlights": [
         "Up to 1TB storage",
         "Best-in-class Pro camera system with 8x optical-quality zoom",
@@ -847,6 +877,44 @@
         "Best-in-class Pro camera system with 8x optical-quality zoom",
         "All-day battery life"
       ]
+    }
+  ],
+  "categories": [
+    {
+      "slug": "iphone",
+      "name": "iPhone",
+      "blurb": "Every model. Every colour. Full range in stock.",
+      "tint": "#0071e3"
+    },
+    {
+      "slug": "mac",
+      "name": "Mac",
+      "blurb": "MacBook Air, MacBook Pro, iMac & Mac Mini.",
+      "tint": "#5e5ce6"
+    },
+    {
+      "slug": "ipad",
+      "name": "iPad",
+      "blurb": "iPad Pro, iPad Air, iPad & iPad mini.",
+      "tint": "#ff9f0a"
+    },
+    {
+      "slug": "watch",
+      "name": "Watch",
+      "blurb": "Apple Watch Ultra, Series & SE.",
+      "tint": "#bf5af2"
+    },
+    {
+      "slug": "airpods",
+      "name": "AirPods",
+      "blurb": "Pro, AirPods 4 & AirPods Max.",
+      "tint": "#30d158"
+    },
+    {
+      "slug": "accessories",
+      "name": "Accessories",
+      "blurb": "Cases, chargers, cables, AirTag & more.",
+      "tint": "#ffd60a"
     }
   ]
 }
