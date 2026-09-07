@@ -4,6 +4,31 @@ import { store } from "@/lib/store";
 import { formatINR } from "@/lib/currency";
 import type { CartItem } from "@/lib/cart-context";
 
+export type OrderItem = {
+  name: string;
+  color?: string;
+  variant?: string;
+  qty: number;
+  price: number;
+  priceLabel: string;
+  image?: string;
+};
+
+export type OrderRecord = {
+  orderNo: string;
+  date: string;
+  createdAt: string;
+  customerName: string;
+  customerPhone: string;
+  customerCity?: string;
+  customerNote?: string;
+  items: OrderItem[];
+  subtotal: number;
+  totalDisplay: string;
+  status: "New" | "Contacted" | "Confirmed" | "Dispatched" | "Delivered" | "Cancelled";
+  adminNote?: string;
+};
+
 /**
  * Order number = "Date" + n+1, where n is the count of orders already
  * generated today on this device, stored in localStorage.
@@ -42,46 +67,71 @@ export function formatDate(now = new Date()): string {
   });
 }
 
-/**
- * One line per cart item with the three columns the customer asked for:
- * Product name | Colour | Storage/Size
- */
 function itemLine(item: CartItem, index: number): string {
-  const color = item.color || "-";
-  const variant = item.variant || "-";
-  return `${index + 1}) ${item.name}  |  ${color}  |  ${variant}  |  x${item.qty}  =  ${formatINR(
-    item.price * item.qty,
-  )}`;
+  const color = item.color ? `Finish: ${item.color}` : "";
+  const variant = item.variant ? `Storage/Size: ${item.variant}` : "";
+  const specs = [color, variant].filter(Boolean).join(" | ");
+  
+  const priceDisplay =
+    item.price > 0
+      ? `${formatINR(item.price * item.qty)} (${formatINR(item.price)} each)`
+      : item.priceLabel || "Coming Soon (Pre-Order)";
+
+  return `${index + 1}) *${item.name}* (Qty: ${item.qty})\n   ${specs ? `• ${specs}\n   ` : ""}• Price: ${priceDisplay}`;
 }
 
 export function buildOrderMessage({
-  orderNo,
   items,
   subtotal,
   name,
   phone,
+  city,
+  customerNote,
 }: {
-  orderNo: string;
+  orderNo?: string;
   items: CartItem[];
   subtotal: number;
   name: string;
   phone: string;
+  city?: string;
+  customerNote?: string;
 }): string {
+  const hasComingSoon = items.some((i) => i.price === 0);
+  const subtotalDisplay =
+    subtotal > 0
+      ? formatINR(subtotal) + (hasComingSoon ? " (+ Pre-order items)" : "")
+      : "Pre-order (Price to be confirmed)";
+
   const lines: string[] = [
-    `NEW ORDER - ${store.name}`,
-    `Order No: ${orderNo}`,
-    `Date: ${formatDate()}`,
-    "",
-    `ITEMS (Name | Colour | Storage | Qty | Amount)`,
+    `👋 Hi ${store.name}!`,
+    `I am interested in placing an order for the following items:`,
+    ``,
+    `🛒 *PRODUCTS & DETAILS:*`,
     ...items.map(itemLine),
-    "",
-    `Subtotal: ${formatINR(subtotal)}`,
-    "Prices are indicative - final price, EMI and exchange confirmed on confirmation call.",
-    "",
-    `Name: ${name || "-"}`,
-    `Phone: ${phone || "-"}`,
-    "",
-    "Please confirm my order.",
+    ``,
+    `💰 *ESTIMATED TOTAL:* ${subtotalDisplay}`,
+    ``,
+    `👤 *CUSTOMER DETAILS:*`,
+    `• *Name:* ${name || "Customer"}`,
+    `• *Phone:* ${phone || "Provided on WhatsApp"}`,
+    ...(city ? [`• *Location / Area:* ${city}`] : []),
+    ...(customerNote ? [`• *Note:* ${customerNote}`] : []),
+    ``,
+    `Please confirm product availability, current best price/offers, and pickup or delivery details. Thank you!`,
   ];
+
   return lines.join("\n");
+}
+
+export async function recordOrder(order: OrderRecord) {
+  try {
+    const res = await fetch("/api/orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ order }),
+    });
+    return await res.json();
+  } catch (err) {
+    console.warn("Could not record order on server API:", err);
+  }
 }

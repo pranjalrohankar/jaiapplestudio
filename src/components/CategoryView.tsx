@@ -2,7 +2,6 @@ import Link from "next/link";
 import ChapterNav from "@/components/sections/ChapterNav";
 import ProductCard from "@/components/ProductCard";
 import Reveal from "@/components/Reveal";
-import EnquiryButtons from "@/components/EnquiryButtons";
 import { categoryBySlug, productsByCategory } from "@/lib/products";
 
 export default function CategoryView({ slug }: { slug: string }) {
@@ -27,8 +26,13 @@ export default function CategoryView({ slug }: { slug: string }) {
             <p className="text-2xl sm:text-3xl font-medium tracking-tight text-gray-900 max-w-2xl mx-auto mb-8">
               {category.blurb}
             </p>
-            <div className="flex justify-center gap-4">
-              <EnquiryButtons productName={`a ${category.name}`} compact={false} />
+            <div className="flex flex-wrap justify-center gap-3">
+              <a href="#lineup-models" className="btn-apple">
+                Explore {category.name} Models
+              </a>
+              <Link href="/cart" className="btn-ghost">
+                View Cart & Orders
+              </Link>
             </div>
           </Reveal>
         </div>
@@ -39,7 +43,7 @@ export default function CategoryView({ slug }: { slug: string }) {
       </section>
 
       {/* Featured/Compare Section */}
-      <section className="py-20 bg-white">
+      <section id="lineup-models" className="py-20 bg-white">
         <div className="container-px text-center">
           <Reveal>
             <h2 className="text-[40px] font-semibold tracking-tighter mb-16">Which {category.name} is right for you?</h2>

@@ -7,8 +7,10 @@ const nextConfig: NextConfig = {
     // keeps Netlify deployments fast and offline builds reliable.
     unoptimized: true,
     remotePatterns: [
-      { protocol: "https", hostname: "www.apple.com", pathname: "/in/**" },
+      { protocol: "https", hostname: "www.apple.com", pathname: "/**" },
       { protocol: "https", hostname: "images.apple.com", pathname: "/**" },
+      { protocol: "https", hostname: "store.storeimages.cdn-apple.com", pathname: "/**" },
+      { protocol: "https", hostname: "store.apple.com", pathname: "/**" },
     ],
   },
 };

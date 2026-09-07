@@ -10,21 +10,17 @@ export default function CtaBanner() {
           <div className="absolute -bottom-16 -right-16 h-64 w-64 rounded-full bg-wa/20 blur-3xl" />
 
           <div className="relative">
-            <h2 className="text-display-md">Get your new device today.</h2>
+            <h2 className="text-display-md">Get your new Apple device today.</h2>
             <p className="mx-auto mt-4 max-w-xl text-white/70">
-              Message us on WhatsApp for today&apos;s best price, available stock and
-              exchange deals. We usually reply within minutes.
+              Browse the catalog, choose your model and finishes, add to cart, and confirm your order for instant store pickup or delivery in Pune.
             </p>
 
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <a
-                href={waLink(`Hi ${store.name}! I'd like today's best price and offers.`)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-wa"
+                href="/iphone"
+                className="btn-apple !bg-white !text-ink hover:!bg-slate-100"
               >
-                <WhatsAppIcon width={18} height={18} />
-                Chat on WhatsApp
+                Browse Products & Add to Cart
               </a>
               <a
                 href={store.mapUrl}

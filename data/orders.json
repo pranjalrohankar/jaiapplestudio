@@ -1,0 +1,73 @@
+{
+  "orders": [
+    {
+      "orderNo": "JAS-20260907-001",
+      "date": "07/09/2026",
+      "createdAt": "2026-09-07T06:49:43.714Z",
+      "customerName": "Pratham",
+      "customerPhone": "9156088616",
+      "customerCity": "Pune, Maharashtra",
+      "items": [
+        {
+          "name": "iPhone 17 Pro",
+          "color": "Cosmic Orange",
+          "variant": "256GB",
+          "qty": 1,
+          "price": 144900,
+          "priceLabel": "₹1,44,900",
+          "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-17-pro-model-unselect-gallery-1-202509?wid=5120&hei=2880&fmt=webp&qlt=90&.v=dU9qRExIQUlQTzVKeDd1V1dtUE1MUWFRQXQ2R0JQTk5udUZxTkR3ZVlpS1ZKNzlseDJva0h5NlRjOVNob0hSVjBoUVhuTWlrY2hIK090ZGZZbk9HeEJWb1BiTjRORlc1Y1lKU3JWempySklRNmNHZmh4VCt0eWNpdXFKdGlmMVRmbW94YnYxc1YvNXZ4emJGL0IxNFp3&traceId=1"
+        },
+        {
+          "name": "iPad Air",
+          "color": "Blue",
+          "variant": "128GB",
+          "qty": 1,
+          "price": 59900,
+          "priceLabel": "₹59,900"
+        },
+        {
+          "name": "Apple Watch Series",
+          "color": "Jet Black",
+          "variant": "42mm",
+          "qty": 1,
+          "price": 46900,
+          "priceLabel": "₹46,900"
+        }
+      ],
+      "subtotal": 251700,
+      "totalDisplay": "₹2,51,700",
+      "status": "New",
+      "adminNote": ""
+    },
+    {
+      "orderNo": "JAS-20260907-002",
+      "date": "07/09/2026",
+      "createdAt": "2026-09-07T11:05:00.000Z",
+      "customerName": "Pooja Deshmukh",
+      "customerPhone": "9970112233",
+      "customerCity": "Chinchwad, Pune",
+      "customerNote": "Need billing in company name (GST invoice).",
+      "items": [
+        {
+          "name": "iPhone 16",
+          "color": "Teal",
+          "variant": "128 GB",
+          "qty": 1,
+          "price": 69900,
+          "priceLabel": "₹69,900"
+        },
+        {
+          "name": "20W USB‑C Power Adapter",
+          "color": "White",
+          "qty": 1,
+          "price": 1900,
+          "priceLabel": "₹1,900"
+        }
+      ],
+      "subtotal": 71800,
+      "totalDisplay": "₹71,800",
+      "status": "New",
+      "adminNote": ""
+    }
+  ]
+}

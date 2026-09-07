@@ -37,6 +37,11 @@ export default function Footer() {
                 </li>
               ))}
               <li>
+                <Link href="/cart" className="hover:text-apple">
+                  Your Cart & Orders
+                </Link>
+              </li>
+              <li>
                 <Link href="/contact" className="hover:text-apple">
                   Contact
                 </Link>
@@ -97,9 +102,14 @@ export default function Footer() {
 
       <div className="border-t border-black/10">
         <div className="container-px flex flex-col gap-3 py-6 text-[13px] text-ink/55 md:flex-row md:items-center md:justify-between">
-          <p>
-            Copyright © {new Date().getFullYear()} {store.name}. All rights reserved.
-          </p>
+          <div className="flex flex-wrap items-center gap-4">
+            <p>
+              Copyright © {new Date().getFullYear()} {store.name}. All rights reserved.
+            </p>
+            <Link href="/admin/login" className="text-xs text-ink/40 hover:text-ink hover:underline">
+              Store Admin Portal &rarr;
+            </Link>
+          </div>
           <p>
             Apple, the Apple logo, iPhone, iPad, Mac, Apple Watch and AirPods are trademarks of Apple
             Inc. {store.name} is an independent reseller and is not affiliated with Apple Inc.

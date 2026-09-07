@@ -1,6 +1,26 @@
 import { MongoClient, ServerApiVersion } from 'mongodb';
+import fs from 'fs';
+import path from 'path';
 
-const uri = process.env.MONGODB_URI;
+function getMongoURI(): string | undefined {
+  if (process.env.MONGODB_URI) {
+    return process.env.MONGODB_URI;
+  }
+  try {
+    const envPath = path.join(process.cwd(), '.env.local');
+    if (fs.existsSync(envPath)) {
+      const content = fs.readFileSync(envPath, 'utf8');
+      const match = content.match(/MONGODB_URI=(.*)/);
+      if (match) {
+        return match[1].trim();
+      }
+    }
+  } catch {
+    // ignore
+  }
+  return undefined;
+}
+
 const options = {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -11,28 +31,54 @@ const options = {
   serverSelectionTimeoutMS: 5000,
 };
 
-let clientPromise: Promise<MongoClient> | null = null;
+declare global {
+  // eslint-disable-next-line no-var
+  var _mongoClientPromise: Promise<MongoClient> | undefined;
+  // eslint-disable-next-line no-var
+  var _mongoCachedUri: string | undefined;
+}
 
-if (uri) {
-  let client: MongoClient;
+export async function getMongoClient(): Promise<MongoClient> {
+  const uri = getMongoURI();
+  if (!uri) {
+    throw new Error('MONGODB_URI is not set');
+  }
+
+  // In development, reuse promise if URI hasn't changed
+  if (global._mongoClientPromise && global._mongoCachedUri === uri) {
+    try {
+      const client = await global._mongoClientPromise;
+      return client;
+    } catch {
+      // If previous promise rejected, reset and retry below
+      global._mongoClientPromise = undefined;
+    }
+  }
+
+  const client = new MongoClient(uri, options);
+  const promise = client.connect();
 
   if (process.env.NODE_ENV === 'development') {
-    // In development mode, use a global variable so that the value
-    // is preserved across module reloads caused by HMR (Hot Module Replacement).
-    const globalWithMongo = global as typeof globalThis & {
-      _mongoClientPromise?: Promise<MongoClient>;
-    };
-
-    if (!globalWithMongo._mongoClientPromise) {
-      client = new MongoClient(uri, options);
-      globalWithMongo._mongoClientPromise = client.connect();
-    }
-    clientPromise = globalWithMongo._mongoClientPromise;
-  } else {
-    // In production mode, it's best to not use a global variable.
-    client = new MongoClient(uri, options);
-    clientPromise = client.connect();
+    global._mongoClientPromise = promise;
+    global._mongoCachedUri = uri;
   }
+
+  return promise;
 }
+
+// Proxy object or thenable to remain 100% backward compatible with `await clientPromise`
+const clientPromise = {
+  then<TResult1 = MongoClient, TResult2 = never>(
+    onfulfilled?: ((value: MongoClient) => TResult1 | PromiseLike<TResult1>) | null,
+    onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | null
+  ): Promise<TResult1 | TResult2> {
+    return getMongoClient().then(onfulfilled, onrejected);
+  },
+  catch<TResult = never>(
+    onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | null
+  ): Promise<MongoClient | TResult> {
+    return getMongoClient().catch(onrejected);
+  }
+} as unknown as Promise<MongoClient>;
 
 export default clientPromise;

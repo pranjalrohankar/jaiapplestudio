@@ -94,15 +94,13 @@ export default function LaunchBanner() {
 
               {/* Call to Actions */}
               <div className="mt-8 flex flex-wrap items-center gap-4">
-                <a
-                  href={banner.ctaLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group inline-flex items-center gap-2.5 rounded-full bg-gradient-to-r from-[#25D366] to-[#128C7E] px-7 py-3.5 text-base font-bold text-white shadow-lg shadow-emerald-950/40 transition hover:brightness-110 active:scale-95"
+                <Link
+                  href={banner.ctaLink || "/product/iphone-18-pro"}
+                  className="group inline-flex items-center gap-2.5 rounded-full bg-white px-7 py-3.5 text-base font-bold text-ink shadow-lg shadow-white/10 transition hover:bg-slate-100 active:scale-95"
                 >
-                  <WhatsAppIcon width={20} height={20} className="transition group-hover:scale-110" />
-                  {banner.ctaText}
-                </a>
+                  {banner.ctaText || "Pre-Order iPhone 18"}
+                  <ChevronRightIcon width={18} height={18} className="transition group-hover:translate-x-1" />
+                </Link>
 
                 {banner.secondaryCtaLink && banner.secondaryCtaText ? (
                   <Link

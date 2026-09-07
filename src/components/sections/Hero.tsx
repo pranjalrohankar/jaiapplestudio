@@ -19,15 +19,9 @@ export default function Hero() {
           <Link href="/iphone" className="btn-apple">
             Explore the lineup
           </Link>
-          <a
-            href={waLink(`Hi ${store.name}! I'd like to know the latest prices and offers.`)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-wa"
-          >
-            <WhatsAppIcon width={18} height={18} />
-            WhatsApp us
-          </a>
+          <Link href="/cart" className="btn-ghost">
+            View Cart & Orders
+          </Link>
           <a href="tel:+918888683101" className="btn-ghost">
             <PhoneIcon width={18} height={18} />
             {store.phoneDisplay}

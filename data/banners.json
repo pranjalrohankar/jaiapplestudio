@@ -5,13 +5,13 @@
     "badge": "LATEST LAUNCH • COMING SOON",
     "title": "iPhone 18 Pro & iPhone 18",
     "tagline": "The Next Era of Apple Intelligence",
-    "description": "Engineered with titanium quantum architecture, revolutionary A20 Pro chip, and next-generation holographic ProMotion display. Pre-bookings now open at Jai Apple Store.",
-    "announcement": "🚀 Latest Launch: Apple iPhone 18 Series is coming soon! Pre-booking now open at Jai Apple Store, Pimpri-Chinchwad.",
+    "description": "Engineered with titanium quantum architecture, revolutionary A20 Pro chip, and next-generation holographic ProMotion display. Choose your finish and pre-order to cart.",
+    "announcement": "🚀 Latest Launch: Apple iPhone 18 Series is coming soon! Select options and pre-order in cart.",
     "image": "/images/iphone-18-hero-banner.jpg",
-    "ctaText": "Pre-Book on WhatsApp",
-    "ctaLink": "https://wa.me/918888683101?text=Hi%20Jai%20Apple%20Store!%20I%20want%20to%20pre-book%20the%20new%20iPhone%2018%20series.",
-    "secondaryCtaText": "Explore iPhone 18",
-    "secondaryCtaLink": "/product/iphone-18-pro",
-    "theme": "cosmic-titanium"
+    "ctaText": "Pre-Order iPhone 18",
+    "ctaLink": "/product/iphone-18-pro",
+    "secondaryCtaText": "Explore All iPhones",
+    "secondaryCtaLink": "/iphone",
+    "theme": "dark-aurora"
   }
 }

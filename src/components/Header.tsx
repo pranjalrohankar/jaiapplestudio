@@ -5,6 +5,7 @@ import Link from "next/link";
 import { store, waLink } from "@/lib/store";
 import { categories } from "@/lib/products";
 import { defaultBanner, type BannerConfig } from "@/lib/banners";
+import { useAuth } from "@/lib/auth-context";
 import CartIcon from "@/components/CartIcon";
 import { MenuIcon, CloseIcon, WhatsAppIcon, MailIcon, ChevronRightIcon } from "@/lib/icons";
 
@@ -13,6 +14,7 @@ const nav = categories.map((c) => ({ href: `/${c.slug}`, label: c.name }));
 export default function Header() {
   const [open, setOpen] = useState(false);
   const [banner, setBanner] = useState<BannerConfig>(defaultBanner);
+  const { customer, admin } = useAuth();
 
   useEffect(() => {
     async function fetchBanner() {
@@ -35,14 +37,12 @@ export default function Header() {
         <div className="bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-950 px-4 py-2 text-center text-[13px] font-medium text-white shadow-inner">
           <div className="container-px flex items-center justify-center gap-2">
             <span className="truncate">{banner.announcement}</span>
-            <a
-              href={banner.ctaLink || waLink("Hi! I want to pre-book iPhone 18")}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href={banner.secondaryCtaLink || "/product/iphone-18-pro"}
               className="inline-flex items-center gap-0.5 rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-bold text-white transition hover:bg-white/30"
             >
-              Pre-Book <ChevronRightIcon width={12} height={12} />
-            </a>
+              Explore & Pre-Order <ChevronRightIcon width={12} height={12} />
+            </Link>
           </div>
         </div>
       ) : (
@@ -82,19 +82,22 @@ export default function Header() {
             >
               Contact
             </Link>
+            <Link
+              href="/login"
+              className="text-sm font-semibold text-ink/80 transition hover:text-apple"
+            >
+              {admin ? "⚙️ Admin" : customer ? `👤 ${customer.name.split(" ")[0]}` : "Login"}
+            </Link>
           </nav>
 
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             <CartIcon />
-            <a
-              href={waLink(`Hi ${store.name}! I'd like to know more about your products.`)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden items-center gap-2 rounded-full bg-wa px-4 py-2 text-sm font-semibold text-white transition hover:bg-wa-dark sm:inline-flex"
+            <Link
+              href="/cart"
+              className="hidden items-center gap-1.5 rounded-full bg-ink px-4 py-2 text-xs font-bold text-white transition hover:bg-ink/85 sm:inline-flex"
             >
-              <WhatsAppIcon width={16} height={16} />
-              WhatsApp
-            </a>
+              Cart & Buy Now &rarr;
+            </Link>
             <button
               className="grid h-10 w-10 place-items-center rounded-full text-ink lg:hidden"
               onClick={() => setOpen((v) => !v)}
@@ -122,19 +125,19 @@ export default function Header() {
             <Link href="/contact" className="text-lg font-semibold text-ink/90" onClick={() => setOpen(false)}>
               Contact
             </Link>
+            <Link href="/login" className="text-lg font-semibold text-ink/90" onClick={() => setOpen(false)}>
+              {admin ? "⚙️ Admin Portal" : customer ? `👤 ${customer.name} (Account)` : "Login / Account"}
+            </Link>
             <div className="mt-1 flex flex-col gap-3 border-t border-black/10 pt-4">
-              <a
-                href={waLink(`Hi ${store.name}!`)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-wa"
+              <Link
+                href="/cart"
+                onClick={() => setOpen(false)}
+                className="btn-apple"
               >
-                <WhatsAppIcon width={18} height={18} />
-                Chat on WhatsApp
-              </a>
-              <a href={`mailto:${store.email}`} className="btn-ghost">
-                <MailIcon width={18} height={18} />
-                {store.email}
+                View Cart & Buy Now
+              </Link>
+              <a href={`tel:${store.phoneIntl}`} className="btn-ghost">
+                Call Store: {store.phoneDisplay}
               </a>
             </div>
           </div>

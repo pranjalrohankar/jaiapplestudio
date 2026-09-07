@@ -1,7 +1,15 @@
 const { MongoClient } = require('mongodb');
 const fs = require('fs');
 
-const uri = 'mongodb+srv://pvrohankar_db_user:1MeIVUDOkIVzASCW@cluster0.the3xab.mongodb.net/apple_store?retryWrites=true&w=majority';
+let uri = process.env.MONGODB_URI;
+if (!uri && fs.existsSync('.env.local')) {
+  const envContent = fs.readFileSync('.env.local', 'utf8');
+  const match = envContent.match(/MONGODB_URI=(.*)/);
+  if (match) uri = match[1].trim();
+}
+if (!uri) {
+  uri = 'mongodb+srv://pvrohankar_db_user:1MeIVUDOkIVzASCW@cluster0.the3xab.mongodb.net/apple_store?retryWrites=true&w=majority';
+}
 
 async function run() {
   const client = new MongoClient(uri);
