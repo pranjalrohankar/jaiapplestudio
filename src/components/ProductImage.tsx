@@ -5,20 +5,24 @@ export default function ProductImage({
   product,
   className,
   priority = false,
+  overrideImage,
 }: {
   product: Product;
   className?: string;
   priority?: boolean;
+  overrideImage?: string;
 }) {
-  if (product.image) {
+  const imageSrc = overrideImage || product.image;
+
+  if (imageSrc) {
     return (
-      <div className={`relative overflow-hidden bg-transparent flex items-center justify-center p-3 ${className ?? ""}`}>
+      <div className={`relative overflow-hidden bg-transparent flex items-center justify-center ${className ?? ""}`}>
         <Image
-          src={product.image}
-          alt={product.name}
+          src={imageSrc}
+          alt={product.name || "Apple Device"}
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          className="object-contain drop-shadow-[0_8px_20px_rgba(0,0,0,0.08)] transition-transform duration-300 group-hover:scale-105"
+          className="object-contain p-1.5 sm:p-2.5 mix-blend-multiply drop-shadow-[0_8px_20px_rgba(0,0,0,0.06)] transition-all duration-300 group-hover:scale-105"
           priority={priority}
           draggable={false}
         />

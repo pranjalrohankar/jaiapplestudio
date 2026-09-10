@@ -1,64 +1,106 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
 import Reveal from "@/components/Reveal";
-import { featured, categories } from "@/lib/products";
+import { products as defaultProducts, type Product } from "@/lib/products";
+
+const filterTabs = [
+  { label: "Trending Now", category: "all" },
+  { label: "iPhones", category: "iphone" },
+  { label: "MacBooks", category: "mac" },
+  { label: "iPads", category: "ipad" },
+  { label: "Apple Watches", category: "watch" },
+  { label: "AirPods & Audio", category: "airpods" },
+];
 
 export default function Lineup() {
-  const chips = [
-    "No-Cost EMI on all banks",
-    "Exchange your old phone",
-    "Free delivery within Pune",
-    "GST invoice for businesses",
-  ];
+  const [activeTab, setActiveTab] = useState("all");
+  const [productList, setProductList] = useState<Product[]>(defaultProducts);
+
+  useEffect(() => {
+    async function loadProducts() {
+      try {
+        const res = await fetch("/api/products");
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data.products) && data.products.length > 0) {
+            setProductList(data.products);
+          }
+        }
+      } catch {
+        // Fallback to defaultProducts
+      }
+    }
+    loadProducts();
+  }, []);
+
+  const filteredProducts: Product[] =
+    activeTab === "all"
+      ? [
+          productList.find((p) => p.slug === "iphone-duo"),
+          productList.find((p) => p.slug === "iphone-18-pro"),
+          productList.find((p) => p.slug === "iphone-18"),
+          productList.find((p) => p.slug === "iphone-17-pro-max"),
+          productList.find((p) => p.slug === "macbook-air-13"),
+          productList.find((p) => p.slug === "apple-watch-ultra"),
+          productList.find((p) => p.slug === "airpods-pro-3"),
+          productList.find((p) => p.slug === "ipad-air"),
+        ].filter(Boolean) as Product[]
+      : productList.filter((p) => p.category === activeTab).slice(0, 8);
 
   return (
-    <section id="lineup" className="py-20 sm:py-28">
-      <div className="container-px">
+    <section id="trending-products" className="py-16 sm:py-24 bg-white">
+      <div className="container-xl">
         <Reveal>
-          <div className="text-center">
-            <h2 className="text-display-md">Explore the lineup.</h2>
-            <p className="mx-auto mt-3 max-w-lg text-ink/65">
-              Every model, every colour, in stock. Check out the full iPhone range
-              and get the best deal in town.
-            </p>
-            <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
-              {chips.map((c) => (
-                <span key={c} className="chip bg-cloud text-ink/80">
-                  {c}
-                </span>
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+            <div>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-[#111111]">
+                Trending Now
+              </h2>
+              <p className="mt-1 text-sm text-gray-500">
+                Discover the latest Apple devices with best cashback offers and instant delivery
+              </p>
+            </div>
+
+            {/* Filter Tabs */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-2 md:pb-0 no-scrollbar">
+              {filterTabs.map((tab) => (
+                <button
+                  key={tab.category}
+                  type="button"
+                  onClick={() => setActiveTab(tab.category)}
+                  className={`rounded-full px-4 py-2 text-xs sm:text-sm font-semibold transition-all whitespace-nowrap ${
+                    activeTab === tab.category
+                      ? "bg-[#111111] text-white shadow-sm"
+                      : "bg-[#f8f8fa] text-gray-600 hover:bg-gray-200/80 hover:text-black"
+                  }`}
+                >
+                  {tab.label}
+                </button>
               ))}
             </div>
           </div>
         </Reveal>
 
-        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {featured.map((p, i) => (
-            <Reveal key={p.slug} delay={i * 60}>
-              <ProductCard product={p} />
+        {/* Product Cards Grid */}
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {filteredProducts.map((p, i) => (
+            <Reveal key={p!.slug} delay={(i % 4) * 50}>
+              <ProductCard product={p!} />
             </Reveal>
           ))}
-          <Reveal delay={featured.length * 60}>
-            <Link
-              href="/iphone"
-              className="group flex h-full min-h-[220px] flex-col items-start justify-center gap-3 rounded-3xl bg-ink p-8 text-white transition hover:scale-[1.01]"
-            >
-              <span className="text-2xl font-semibold tracking-tight">View all iPhones</span>
-              <span className="text-sm text-white/60">
-                {categories.find((c) => c.slug === "iphone")?.blurb}
-              </span>
-              <span className="mt-2 inline-flex items-center gap-1 font-semibold text-white group-hover:underline">
-                See the lineup →
-              </span>
-            </Link>
-          </Reveal>
         </div>
 
-        <Reveal className="mt-6">
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <Link href="/iphone" className="btn-apple">
-              Browse all products
-            </Link>
-          </div>
+        {/* View All Products Action */}
+        <Reveal className="mt-12 text-center">
+          <Link
+            href={activeTab === "all" ? "/iphone" : `/${activeTab}`}
+            className="btn-dark px-8 py-3.5"
+          >
+            View all {activeTab === "all" ? "Products" : filterTabs.find((t) => t.category === activeTab)?.label}
+          </Link>
         </Reveal>
       </div>
     </section>

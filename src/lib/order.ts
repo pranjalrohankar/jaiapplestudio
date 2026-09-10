@@ -12,6 +12,10 @@ export type OrderItem = {
   price: number;
   priceLabel: string;
   image?: string;
+  badge?: string;
+  status?: string;
+  isPreOrder?: boolean;
+  isComingSoon?: boolean;
 };
 
 export type OrderRecord = {
@@ -71,13 +75,27 @@ function itemLine(item: CartItem, index: number): string {
   const color = item.color ? `Finish: ${item.color}` : "";
   const variant = item.variant ? `Storage/Size: ${item.variant}` : "";
   const specs = [color, variant].filter(Boolean).join(" | ");
-  
+
+  const isPreOrder =
+    item.isPreOrder ||
+    item.status === "pre-order" ||
+    item.badge?.toLowerCase().includes("pre-order") ||
+    item.badge?.toLowerCase().includes("preorder");
+
+  const isComingSoon =
+    item.isComingSoon ||
+    item.status === "coming-soon" ||
+    item.badge?.toLowerCase().includes("coming soon") ||
+    item.priceLabel?.toLowerCase().includes("coming soon");
+
+  const tag = isPreOrder ? " ⚡ [PRE-ORDER]" : isComingSoon ? " 🟣 [COMING SOON / PRE-BOOK]" : "";
+
   const priceDisplay =
     item.price > 0
       ? `${formatINR(item.price * item.qty)} (${formatINR(item.price)} each)`
-      : item.priceLabel || "Coming Soon (Pre-Order)";
+      : item.priceLabel || (isPreOrder ? "Pre-Order Booking" : "Coming Soon");
 
-  return `${index + 1}) *${item.name}* (Qty: ${item.qty})\n   ${specs ? `• ${specs}\n   ` : ""}• Price: ${priceDisplay}`;
+  return `${index + 1}) *${item.name}*${tag} (Qty: ${item.qty})\n   ${specs ? `• ${specs}\n   ` : ""}• Price: ${priceDisplay}`;
 }
 
 export function buildOrderMessage({
@@ -96,15 +114,37 @@ export function buildOrderMessage({
   city?: string;
   customerNote?: string;
 }): string {
-  const hasComingSoon = items.some((i) => i.price === 0);
-  const subtotalDisplay =
-    subtotal > 0
-      ? formatINR(subtotal) + (hasComingSoon ? " (+ Pre-order items)" : "")
-      : "Pre-order (Price to be confirmed)";
+  const hasPreOrder = items.some(
+    (i) =>
+      i.isPreOrder ||
+      i.status === "pre-order" ||
+      i.badge?.toLowerCase().includes("pre-order") ||
+      i.badge?.toLowerCase().includes("preorder")
+  );
+  const hasComingSoon = items.some(
+    (i) =>
+      i.isComingSoon ||
+      i.status === "coming-soon" ||
+      i.badge?.toLowerCase().includes("coming soon") ||
+      i.price === 0
+  );
+
+  let subtotalDisplay = "";
+  if (subtotal > 0) {
+    subtotalDisplay =
+      formatINR(subtotal) +
+      (hasPreOrder ? " (Includes Pre-Order)" : hasComingSoon ? " (+ Pre-order items)" : "");
+  } else {
+    subtotalDisplay = hasPreOrder
+      ? "Pre-Order Advance Booking"
+      : "Coming Soon (Price to be confirmed)";
+  }
 
   const lines: string[] = [
     `👋 Hi ${store.name}!`,
-    `I am interested in placing an order for the following items:`,
+    hasPreOrder
+      ? `I am placing a *PRE-ORDER / ADVANCE BOOKING* for the following items:`
+      : `I am interested in placing an order for the following items:`,
     ``,
     `🛒 *PRODUCTS & DETAILS:*`,
     ...items.map(itemLine),
@@ -117,7 +157,9 @@ export function buildOrderMessage({
     ...(city ? [`• *Location / Area:* ${city}`] : []),
     ...(customerNote ? [`• *Note:* ${customerNote}`] : []),
     ``,
-    `Please confirm product availability, current best price/offers, and pickup or delivery details. Thank you!`,
+    hasPreOrder
+      ? `Please confirm my priority pre-order registration, estimated delivery schedule, and booking confirmation. Thank you!`
+      : `Please confirm product availability, current best price/offers, and pickup or delivery details. Thank you!`,
   ];
 
   return lines.join("\n");

@@ -181,6 +181,94 @@ export default function AdminDashboard() {
         </div>
       </div>
 
+      {/* Quick Navigation Cards */}
+      {/* Quick Navigation Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+        <Link
+          href="/admin/products"
+          className="flex items-center justify-between p-4 rounded-2xl bg-white border border-gray-200 shadow-sm hover:border-gray-900 hover:shadow-md transition group"
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-2xl p-2 bg-gray-100 rounded-xl">📱</span>
+            <div>
+              <p className="text-sm font-bold text-gray-900 group-hover:text-blue-600 transition">Products</p>
+              <p className="text-xs text-gray-500">Prices, specs & stock</p>
+            </div>
+          </div>
+          <span className="text-gray-400 group-hover:text-gray-900">&rarr;</span>
+        </Link>
+
+        <Link
+          href="/admin/slider"
+          className="flex items-center justify-between p-4 rounded-2xl bg-white border border-gray-200 shadow-sm hover:border-purple-600 hover:shadow-md transition group"
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-2xl p-2 bg-purple-50 rounded-xl">🎠</span>
+            <div>
+              <p className="text-sm font-bold text-gray-900 group-hover:text-purple-600 transition">Hero Slider</p>
+              <p className="text-xs text-gray-500">Top banner posters</p>
+            </div>
+          </div>
+          <span className="text-gray-400 group-hover:text-purple-600">&rarr;</span>
+        </Link>
+
+        <Link
+          href="/admin/categories"
+          className="flex items-center justify-between p-4 rounded-2xl bg-white border border-gray-200 shadow-sm hover:border-blue-600 hover:shadow-md transition group"
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-2xl p-2 bg-blue-50 rounded-xl">📁</span>
+            <div>
+              <p className="text-sm font-bold text-gray-900 group-hover:text-blue-600 transition">Categories</p>
+              <p className="text-xs text-gray-500">Homepage icon tiles</p>
+            </div>
+          </div>
+          <span className="text-gray-400 group-hover:text-blue-600">&rarr;</span>
+        </Link>
+
+        <Link
+          href="/admin/banners"
+          className="flex items-center justify-between p-4 rounded-2xl bg-white border border-gray-200 shadow-sm hover:border-emerald-600 hover:shadow-md transition group"
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-2xl p-2 bg-emerald-50 rounded-xl">🎨</span>
+            <div>
+              <p className="text-sm font-bold text-gray-900 group-hover:text-emerald-600 transition">Offer Banners</p>
+              <p className="text-xs text-gray-500">Promo posters & graphics</p>
+            </div>
+          </div>
+          <span className="text-gray-400 group-hover:text-emerald-600">&rarr;</span>
+        </Link>
+
+        <Link
+          href="/admin/social"
+          className="flex items-center justify-between p-4 rounded-2xl bg-white border border-gray-200 shadow-sm hover:border-pink-600 hover:shadow-md transition group"
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-2xl p-2 bg-pink-50 rounded-xl">🌐</span>
+            <div>
+              <p className="text-sm font-bold text-gray-900 group-hover:text-pink-600 transition">Social Links</p>
+              <p className="text-xs text-gray-500">Facebook, Instagram & more</p>
+            </div>
+          </div>
+          <span className="text-gray-400 group-hover:text-pink-600">&rarr;</span>
+        </Link>
+
+        <Link
+          href="/admin/database"
+          className="flex items-center justify-between p-4 rounded-2xl bg-white border border-gray-200 shadow-sm hover:border-cyan-600 hover:shadow-md transition group"
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-2xl p-2 bg-cyan-50 rounded-xl">🗄️</span>
+            <div>
+              <p className="text-sm font-bold text-gray-900 group-hover:text-cyan-600 transition">Database</p>
+              <p className="text-xs text-gray-500">MongoDB Atlas sync</p>
+            </div>
+          </div>
+          <span className="text-gray-400 group-hover:text-cyan-600">&rarr;</span>
+        </Link>
+      </div>
+
       {/* KPI Cards Strip */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="rounded-2xl bg-white p-5 border border-gray-200/80 shadow-sm">
@@ -338,19 +426,45 @@ export default function AdminDashboard() {
                     {/* Items */}
                     <td className="py-4 px-4 max-w-xs">
                       <div className="space-y-1">
-                        {o.items.map((i, idx) => (
-                          <div key={idx} className="flex items-start gap-1.5">
-                            <span className="font-bold text-gray-900">• {i.name}</span>
-                            {(i.variant || i.color) && (
-                              <span className="text-[11px] text-gray-500">
-                                ({[i.variant, i.color].filter(Boolean).join(", ")})
+                        {o.items.map((i, idx) => {
+                          const isPreOrder =
+                            i.isPreOrder ||
+                            i.status === "pre-order" ||
+                            Boolean(
+                              i.badge?.toLowerCase().includes("pre-order") ||
+                              i.badge?.toLowerCase().includes("preorder") ||
+                              i.name.toLowerCase().includes("pre-order")
+                            );
+                          const isComingSoon =
+                            !isPreOrder &&
+                            (i.isComingSoon ||
+                              i.status === "coming-soon" ||
+                              Boolean(i.badge?.toLowerCase().includes("coming soon")));
+
+                          return (
+                            <div key={idx} className="flex flex-wrap items-center gap-1.5">
+                              <span className="font-bold text-gray-900">• {i.name}</span>
+                              {isPreOrder && (
+                                <span className="inline-flex items-center rounded-md bg-blue-100 text-blue-800 px-1.5 py-0.2 text-[10px] font-extrabold ring-1 ring-blue-300">
+                                  Pre-Order
+                                </span>
+                              )}
+                              {isComingSoon && (
+                                <span className="inline-flex items-center rounded-md bg-purple-100 text-purple-800 px-1.5 py-0.2 text-[10px] font-extrabold ring-1 ring-purple-300">
+                                  Coming Soon
+                                </span>
+                              )}
+                              {(i.variant || i.color) && (
+                                <span className="text-[11px] text-gray-500">
+                                  ({[i.variant, i.color].filter(Boolean).join(", ")})
+                                </span>
+                              )}
+                              <span className="text-[11px] font-bold text-gray-700">
+                                × {i.qty}
                               </span>
-                            )}
-                            <span className="text-[11px] font-bold text-gray-700">
-                              × {i.qty}
-                            </span>
-                          </div>
-                        ))}
+                            </div>
+                          );
+                        })}
                       </div>
                       {o.customerNote && (
                         <p className="mt-1 text-[11px] text-amber-700 bg-amber-50 p-1.5 rounded-md line-clamp-1">
@@ -474,19 +588,47 @@ export default function AdminDashboard() {
                 Items ({selectedOrder.items.length})
               </h4>
               <div className="space-y-2 border-y border-gray-100 py-3 text-xs">
-                {selectedOrder.items.map((item, idx) => (
-                  <div key={idx} className="flex justify-between items-center">
-                    <div>
-                      <p className="font-bold text-gray-900">{item.name} × {item.qty}</p>
-                      <p className="text-gray-500 text-[11px]">
-                        {[item.variant, item.color].filter(Boolean).join(" • ")}
-                      </p>
+                {selectedOrder.items.map((item, idx) => {
+                  const isPreOrder =
+                    item.isPreOrder ||
+                    item.status === "pre-order" ||
+                    Boolean(
+                      item.badge?.toLowerCase().includes("pre-order") ||
+                      item.badge?.toLowerCase().includes("preorder") ||
+                      item.name.toLowerCase().includes("pre-order")
+                    );
+                  const isComingSoon =
+                    !isPreOrder &&
+                    (item.isComingSoon ||
+                      item.status === "coming-soon" ||
+                      Boolean(item.badge?.toLowerCase().includes("coming soon")));
+
+                  return (
+                    <div key={idx} className="flex justify-between items-center">
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <p className="font-bold text-gray-900">{item.name} × {item.qty}</p>
+                          {isPreOrder && (
+                            <span className="inline-flex items-center rounded-md bg-blue-100 text-blue-800 px-1.5 py-0.2 text-[10px] font-extrabold ring-1 ring-blue-300">
+                              Pre-Order
+                            </span>
+                          )}
+                          {isComingSoon && (
+                            <span className="inline-flex items-center rounded-md bg-purple-100 text-purple-800 px-1.5 py-0.2 text-[10px] font-extrabold ring-1 ring-purple-300">
+                              Coming Soon
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-gray-500 text-[11px]">
+                          {[item.variant, item.color].filter(Boolean).join(" • ")}
+                        </p>
+                      </div>
+                      <span className="font-extrabold text-gray-900">
+                        {item.price > 0 ? formatINR(item.price * item.qty) : item.priceLabel}
+                      </span>
                     </div>
-                    <span className="font-extrabold text-gray-900">
-                      {item.price > 0 ? formatINR(item.price * item.qty) : item.priceLabel}
-                    </span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
               <div className="flex justify-between items-baseline pt-3">
                 <span className="text-sm font-bold text-gray-700">Estimated Total</span>

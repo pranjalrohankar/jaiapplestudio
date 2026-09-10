@@ -14,6 +14,10 @@ export type CartItem = {
   priceLabel: string;
   image?: string;
   qty: number;
+  badge?: string;
+  status?: string;
+  isPreOrder?: boolean;
+  isComingSoon?: boolean;
 };
 
 export type AddOptions = {
@@ -94,9 +98,34 @@ function addItem(product: Product, qty = 1, options?: AddOptions) {
   const lineKey = lineKeyFor(product, options);
   const label = options?.priceLabel ?? product.price;
 
+  const isPreOrder =
+    product.status === "pre-order" ||
+    Boolean(
+      product.badge?.toLowerCase().includes("pre-order") ||
+      product.badge?.toLowerCase().includes("preorder")
+    );
+
+  const isComingSoon =
+    product.status === "coming-soon" ||
+    Boolean(
+      product.badge?.toLowerCase().includes("coming soon") ||
+      product.price?.toLowerCase().includes("coming soon")
+    );
+
   const found = items.find((i) => i.lineKey === lineKey);
   if (found) {
-    items = items.map((i) => (i.lineKey === lineKey ? { ...i, qty: i.qty + qty } : i));
+    items = items.map((i) =>
+      i.lineKey === lineKey
+        ? {
+            ...i,
+            qty: i.qty + qty,
+            isPreOrder: i.isPreOrder ?? isPreOrder,
+            isComingSoon: i.isComingSoon ?? isComingSoon,
+            badge: i.badge ?? product.badge,
+            status: i.status ?? product.status,
+          }
+        : i
+    );
   } else {
     items = [
       ...items,
@@ -110,6 +139,10 @@ function addItem(product: Product, qty = 1, options?: AddOptions) {
         priceLabel: label,
         image: product.image,
         qty,
+        badge: product.badge,
+        status: product.status,
+        isPreOrder,
+        isComingSoon,
       },
     ];
   }

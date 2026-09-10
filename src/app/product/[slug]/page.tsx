@@ -4,34 +4,41 @@ import { notFound } from "next/navigation";
 import ProductCard from "@/components/ProductCard";
 import ProductDetailConfigurator from "@/components/ProductDetailConfigurator";
 import Reveal from "@/components/Reveal";
-import { productBySlug, products, productsByCategory, categoryBySlug } from "@/lib/products";
+import {
+  getProductBySlug,
+  getAllProducts,
+  getProductsByCategory,
+  getCategoryBySlug,
+} from "@/lib/server-products";
 import { ChevronRightIcon } from "@/lib/icons";
 
 type Params = Promise<{ slug: string }>;
 
-export const dynamicParams = false;
+export const dynamicParams = true;
 
-export function generateStaticParams() {
-  return products.map((p) => ({ slug: p.slug }));
+export async function generateStaticParams() {
+  const allProducts = await getAllProducts();
+  return allProducts.map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { slug } = await params;
-  const product = productBySlug(slug);
-  if (!product) return { title: "Product not found" };
+  const product = await getProductBySlug(slug);
+  if (!product) return { title: "Product not found — Jai Apple Store" };
   return {
     title: `${product.name} — ${product.price} | Jai Apple Store`,
-    description: `${product.tagline} ${product.description} Now at ${product.price}. Buy genuinly at Jai Apple Store, Pimpri-Chinchwad with No-Cost EMI and exchange offers.`,
+    description: `${product.tagline || ""} ${product.description || ""} Now at ${product.price}. Buy genuine Apple products at Jai Apple Store, Pimpri-Chinchwad with No-Cost EMI and exchange offers.`,
   };
 }
 
 export default async function ProductPage({ params }: { params: Params }) {
   const { slug } = await params;
-  const product = productBySlug(slug);
+  const product = await getProductBySlug(slug);
   if (!product) notFound();
 
-  const category = categoryBySlug(product.category);
-  const related = productsByCategory(product.category).filter((p) => p.slug !== slug).slice(0, 3);
+  const category = await getCategoryBySlug(product.category);
+  const allRelated = await getProductsByCategory(product.category);
+  const related = allRelated.filter((p) => p.slug !== product.slug).slice(0, 3);
 
   return (
     <>
@@ -43,7 +50,7 @@ export default async function ProductPage({ params }: { params: Params }) {
           </Link>
           <ChevronRightIcon width={14} height={14} />
           <Link href={`/${product.category}`} className="hover:text-apple transition">
-            {category?.name}
+            {category?.name || product.category}
           </Link>
           <ChevronRightIcon width={14} height={14} />
           <span className="text-ink/85 font-medium">{product.name}</span>
@@ -63,7 +70,7 @@ export default async function ProductPage({ params }: { params: Params }) {
           <div className="container-px">
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-ink">
-                Explore More {category?.name} Models
+                Explore More {category?.name || "Related"} Models
               </h2>
               <Link
                 href={`/${product.category}`}

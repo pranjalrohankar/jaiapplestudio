@@ -38,11 +38,19 @@ export default function SellModal({
 
   const priceLabel = priceForVariant(product, variant);
   const numericUnitPrice = priceValue(priceLabel);
+  const isPreOrder =
+    product.badge?.toLowerCase().includes("pre-order") ||
+    product.badge?.toLowerCase().includes("preorder");
+
   const isComingSoon =
-    product.badge?.toLowerCase().includes("coming soon") ||
-    product.price?.toLowerCase().includes("coming soon");
+    !isPreOrder &&
+    (product.badge?.toLowerCase().includes("coming soon") ||
+      product.price?.toLowerCase().includes("coming soon"));
+
+  const isSpecial = isPreOrder || isComingSoon;
 
   const activeColorObj = product.colors.find((c) => c.name === color) ?? product.colors[0];
+  const displayImage = activeColorObj?.image || product.image;
 
   function handleConfirmAdd() {
     addItem(product, qty, { color, variant, priceLabel });
@@ -86,18 +94,14 @@ export default function SellModal({
             </span>
             {product.badge ? (
               <span
-                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold tracking-wide text-white shadow-sm ${
-                  isComingSoon
-                    ? "bg-gradient-to-r from-purple-600 to-indigo-600 ring-1 ring-purple-300/40"
-                    : "bg-ink"
+                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold text-white shadow-xs ${
+                  isPreOrder
+                    ? "bg-[#0071e3]"
+                    : isComingSoon
+                    ? "bg-[#5856d6]"
+                    : "bg-[#1d1d1f]"
                 }`}
               >
-                {isComingSoon && (
-                  <span className="relative flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-300 opacity-75"></span>
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"></span>
-                  </span>
-                )}
                 {product.badge}
               </span>
             ) : null}
@@ -105,15 +109,20 @@ export default function SellModal({
 
           {/* Product Centerpiece Visual */}
           <div className="relative h-44 sm:h-56 md:h-64 w-full max-w-[280px] my-4 flex items-center justify-center">
-            {product.image ? (
-              <Image
-                src={product.image}
-                alt={product.name}
-                fill
-                sizes="(max-width: 768px) 300px, 400px"
-                className="object-contain drop-shadow-[0_15px_35px_rgba(0,0,0,0.12)] transition duration-300"
-                priority
-              />
+            {displayImage ? (
+              <div
+                key={displayImage}
+                className="relative w-full h-full animate-fadeIn transition-all duration-300 flex items-center justify-center"
+              >
+                <Image
+                  src={displayImage}
+                  alt={`${product.name} - ${color}`}
+                  fill
+                  sizes="(max-width: 768px) 300px, 400px"
+                  className="object-contain p-2.5 drop-shadow-[0_15px_35px_rgba(0,0,0,0.12)] transition duration-300"
+                  priority
+                />
+              </div>
             ) : (
               <div className="flex h-full w-full items-center justify-center font-bold text-ink/30 text-4xl">
                 {product.name.slice(0, 2).toUpperCase()}
@@ -132,6 +141,13 @@ export default function SellModal({
                 <span className="text-xs font-bold text-ink">{activeColorObj.name}</span>
               </div>
             )}
+
+            {/* Invisible Preloader */}
+            <div className="hidden" aria-hidden="true">
+              {product.colors.map((c) =>
+                c.image ? <img key={c.name} src={c.image} alt="" className="hidden" /> : null
+              )}
+            </div>
 
             <div className="hidden sm:grid grid-cols-2 gap-2 pt-2 border-t border-black/5 text-[11px] text-ink/60 text-center">
               <span className="flex items-center justify-center gap-1">
@@ -331,8 +347,10 @@ export default function SellModal({
                   className="w-full flex items-center justify-center gap-2.5 rounded-full bg-ink py-4 text-sm sm:text-base font-bold text-white shadow-xl shadow-black/10 transition hover:bg-zinc-800 active:scale-[0.99]"
                 >
                   <BagIcon width={18} height={18} />
-                  {isComingSoon
+                  {isPreOrder
                     ? "Add Pre-Order to Bag"
+                    : isComingSoon
+                    ? "Add Pre-Booking to Bag"
                     : `Add to Bag — ${
                         numericUnitPrice > 0 ? formatINR(numericUnitPrice * qty) : priceLabel
                       }`}

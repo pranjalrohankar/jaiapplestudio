@@ -2,76 +2,117 @@ import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import fs from "fs/promises";
 import path from "path";
-import fallbackBannerData from "../../../../data/banners.json";
+import fallbackData from "../../../../data/banners.json";
+import { defaultOfferBanners, defaultBannersData, type BannersData, type OfferBanner } from "@/lib/banners";
 
 const bannerFilePath = path.join(process.cwd(), "data", "banners.json");
 
 export async function GET() {
-  // 1. Try to fetch from MongoDB if available
+  // 1. Try local file first (fastest)
+  try {
+    const fileContent = await fs.readFile(bannerFilePath, "utf-8");
+    const data = JSON.parse(fileContent);
+    if (data && (Array.isArray(data.banners) || data.announcement)) {
+      const banners = Array.isArray(data.banners) ? data.banners : defaultOfferBanners;
+      const announcement = data.announcement || defaultBannersData.announcement;
+      const isAnnouncementActive = data.isAnnouncementActive ?? true;
+      return NextResponse.json({
+        banners,
+        announcement,
+        isAnnouncementActive,
+        banner: {
+          isActive: isAnnouncementActive,
+          announcement,
+        },
+      });
+    }
+  } catch (fileError) {
+    // Continue to MongoDB
+  }
+
+  // 2. Try to fetch from MongoDB if available
   if (clientPromise) {
     try {
       const client = await clientPromise;
       const db = client.db("apple_store");
-      const bannerDoc = await db.collection("banners").findOne({}, { projection: { _id: 0 } });
-      if (bannerDoc) {
-        return NextResponse.json({ banner: bannerDoc });
+      const bannerDoc = await db.collection("banners_config").findOne({}, { projection: { _id: 0 } });
+      if (bannerDoc && (Array.isArray(bannerDoc.banners) || bannerDoc.announcement)) {
+        const announcement = bannerDoc.announcement || defaultBannersData.announcement;
+        const isAnnouncementActive = bannerDoc.isAnnouncementActive ?? true;
+        return NextResponse.json({
+          banners: bannerDoc.banners || defaultOfferBanners,
+          announcement,
+          isAnnouncementActive,
+          banner: {
+            isActive: isAnnouncementActive,
+            announcement,
+          },
+        });
       }
     } catch (error) {
-      console.warn("MongoDB fetch failed for banner, falling back to local banners.json:", error);
+      console.warn("MongoDB fetch failed for banner:", error);
     }
   }
 
-  // 2. Fallback to local data/banners.json
-  try {
-    const fileContent = await fs.readFile(bannerFilePath, "utf-8");
-    const data = JSON.parse(fileContent);
-    return NextResponse.json({ banner: data.banner || fallbackBannerData.banner });
-  } catch (fileError) {
-    console.warn("Reading data/banners.json failed, using imported fallback:", fileError);
-    return NextResponse.json({ banner: fallbackBannerData.banner });
-  }
+  // 3. Fallback
+  return NextResponse.json({
+    banners: (fallbackData.banners as OfferBanner[]) || defaultOfferBanners,
+    announcement: fallbackData.announcement || defaultBannersData.announcement,
+    isAnnouncementActive: fallbackData.isAnnouncementActive ?? true,
+    banner: {
+      isActive: fallbackData.isAnnouncementActive ?? true,
+      announcement: fallbackData.announcement || defaultBannersData.announcement,
+    },
+  });
 }
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const bannerData = body.banner || body;
+    
+    // Normalize data structure
+    const banners: OfferBanner[] = Array.isArray(body.banners)
+      ? body.banners
+      : defaultOfferBanners;
 
-    if (!bannerData || typeof bannerData !== "object") {
-      return NextResponse.json({ error: "Invalid banner data" }, { status: 400 });
-    }
+    const announcement = body.announcement ?? defaultBannersData.announcement;
+    const isAnnouncementActive = body.isAnnouncementActive ?? true;
 
-    let savedToMongo = false;
+    const dataToSave: BannersData = {
+      announcement,
+      isAnnouncementActive,
+      banners,
+    };
 
-    // Attempt to save to MongoDB
-    if (clientPromise) {
-      try {
-        const client = await clientPromise;
-        const db = client.db("apple_store");
-
-        await db.collection("banners").deleteMany({});
-        const { _id, ...cleanBanner } = bannerData;
-        await db.collection("banners").insertOne(cleanBanner);
-        savedToMongo = true;
-      } catch (mongoError) {
-        console.warn("Could not save banner to MongoDB, saving locally:", mongoError);
-      }
-    }
-
-    // Always keep data/banners.json updated locally
+    // 1. Save locally to data/banners.json first (instant < 2ms)
     try {
-      await fs.writeFile(
-        bannerFilePath,
-        JSON.stringify({ banner: bannerData }, null, 2),
-        "utf-8"
-      );
+      await fs.writeFile(bannerFilePath, JSON.stringify(dataToSave, null, 2), "utf-8");
     } catch (fsError) {
-      console.warn("Could not write to local banners.json:", fsError);
+      console.warn("Could not save banner config to local file:", fsError);
     }
 
-    return NextResponse.json({ success: true, savedToMongo, banner: bannerData });
-  } catch (error) {
-    console.error("Failed to save banner data:", error);
-    return NextResponse.json({ error: "Failed to save banner" }, { status: 500 });
+    // 2. Background sync to MongoDB (non-blocking, zero client latency)
+    if (clientPromise) {
+      (async () => {
+        try {
+          const client = await clientPromise;
+          const db = client.db("apple_store");
+          await db.collection("banners_config").deleteMany({});
+          await db.collection("banners_config").insertOne({ ...dataToSave });
+        } catch (mongoError) {
+          console.warn("Background MongoDB sync for banners failed:", mongoError);
+        }
+      })();
+    }
+
+    return NextResponse.json({
+      success: true,
+      banners: dataToSave.banners,
+      announcement: dataToSave.announcement,
+      isAnnouncementActive: dataToSave.isAnnouncementActive,
+    });
+  } catch (error: any) {
+    console.error("Banner save error:", error);
+    return NextResponse.json({ error: error.message || "Failed to save banner settings" }, { status: 500 });
   }
 }

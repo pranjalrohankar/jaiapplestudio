@@ -1,0 +1,40 @@
+{
+  "socialLinks": [
+    {
+      "id": "facebook",
+      "platform": "Facebook",
+      "url": "https://facebook.com",
+      "isActive": true
+    },
+    {
+      "id": "instagram",
+      "platform": "Instagram",
+      "url": "https://instagram.com",
+      "isActive": true
+    },
+    {
+      "id": "x",
+      "platform": "X (Twitter)",
+      "url": "",
+      "isActive": false
+    },
+    {
+      "id": "youtube",
+      "platform": "YouTube",
+      "url": "",
+      "isActive": false
+    },
+    {
+      "id": "whatsapp",
+      "platform": "WhatsApp Channel",
+      "url": "",
+      "isActive": false
+    },
+    {
+      "id": "threads",
+      "platform": "Threads",
+      "url": "",
+      "isActive": false
+    }
+  ]
+}

@@ -1,65 +1,110 @@
+import Image from "next/image";
 import Link from "next/link";
-import ChapterNav from "@/components/sections/ChapterNav";
 import ProductCard from "@/components/ProductCard";
 import Reveal from "@/components/Reveal";
-import { categoryBySlug, productsByCategory } from "@/lib/products";
+import { getCategoryBySlug, getProductsByCategory } from "@/lib/server-products";
+import { ChevronRightIcon } from "@/lib/icons";
 
-export default function CategoryView({ slug }: { slug: string }) {
-  const category = categoryBySlug(slug);
+export default async function CategoryView({ slug }: { slug: string }) {
+  const category = await getCategoryBySlug(slug);
   if (!category) return null;
 
-  const products = productsByCategory(slug);
-  const accent = category.tint;
+  const products = await getProductsByCategory(slug);
 
-  // Render a specialized Hero section depending on the category to look like Apple
   return (
-    <div className="bg-[#f5f5f7]">
-      <ChapterNav />
+    <div className="bg-[#f8f8fa] min-h-screen">
+      {/* 1. Category Header & Breadcrumb */}
+      <section className="bg-white border-b border-[#e6e6e6] pt-6 pb-8">
+        <div className="container-xl">
+          {/* Breadcrumb matching iNvent */}
+          <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-6">
+            <Link href="/" className="hover:text-black transition">Home</Link>
+            <ChevronRightIcon width={12} height={12} />
+            <span className="font-semibold text-black">{category.name}</span>
+          </div>
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-white text-center pt-24 pb-16 sm:pt-32 sm:pb-24 border-b border-gray-200">
-        <div className="container-px relative z-10">
+          {/* iNvent Top Model Quick Strip */}
+          {products.length > 0 && (
+            <div className="mb-6 pb-4 border-b border-gray-100 overflow-x-auto no-scrollbar">
+              <div className="flex items-center gap-4 sm:gap-6 min-w-max">
+                {products.slice(0, 8).map((p) => (
+                  <Link
+                    key={p.slug}
+                    href={`/product/${p.slug}`}
+                    className="group flex flex-col items-center text-center p-2 rounded-xl transition hover:bg-[#f8f8fa]"
+                  >
+                    <div className="relative w-14 h-14 sm:w-16 sm:h-16 mb-2 flex items-center justify-center rounded-xl bg-[#f8f8fa] group-hover:bg-white p-1 border border-gray-200/60 transition shadow-2xs">
+                      {p.image ? (
+                        <Image
+                          src={p.image}
+                          alt={p.name}
+                          fill
+                          sizes="64px"
+                          className="object-contain p-1 transition-transform duration-300 group-hover:scale-110"
+                        />
+                      ) : (
+                        <span className="text-xs font-bold text-gray-400">
+                          {p.name.slice(0, 2).toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-xs font-semibold text-gray-800 group-hover:text-[#0071e3] transition line-clamp-1 max-w-[90px]">
+                      {p.name}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Category Banner Title & Summary */}
           <Reveal>
-            <h1 className="text-[56px] sm:text-[80px] font-semibold tracking-tighter leading-none mb-4" style={{ color: accent }}>
-              {category.name}
-            </h1>
-            <p className="text-2xl sm:text-3xl font-medium tracking-tight text-gray-900 max-w-2xl mx-auto mb-8">
-              {category.blurb}
-            </p>
-            <div className="flex flex-wrap justify-center gap-3">
-              <a href="#lineup-models" className="btn-apple">
-                Explore {category.name} Models
-              </a>
-              <Link href="/cart" className="btn-ghost">
-                View Cart & Orders
-              </Link>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-[#111111]">
+                  {category.name}
+                </h1>
+                <p className="mt-1.5 text-xs sm:text-sm text-gray-500 max-w-xl">
+                  Shop Apple {category.name} at lowest prices with Instant Bank Cashback & 1-Year Official Warranty.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <Link href="/cart" className="btn-outline-dark text-xs sm:text-sm">
+                  View Bag & Orders
+                </Link>
+                <a href="#category-products" className="btn-prime text-xs sm:text-sm">
+                  Browse {products.length} Models
+                </a>
+              </div>
             </div>
           </Reveal>
-        </div>
-        {/* Abstract background gradient or image placeholder to give it an Apple feel */}
-        <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none"
-             style={{ background: `radial-gradient(circle at 50% 0%, ${accent} 0%, transparent 70%)` }}>
         </div>
       </section>
 
-      {/* Featured/Compare Section */}
-      <section id="lineup-models" className="py-20 bg-white">
-        <div className="container-px text-center">
-          <Reveal>
-            <h2 className="text-[40px] font-semibold tracking-tighter mb-16">Which {category.name} is right for you?</h2>
-          </Reveal>
-          
+      {/* 2. Product Catalog Grid (matching iNvent .listing-page-products) */}
+      <section id="category-products" className="py-10 sm:py-14">
+        <div className="container-xl">
+          <div className="flex items-center justify-between mb-6 pb-3 border-b border-gray-200/80">
+            <p className="text-xs sm:text-sm font-semibold text-gray-600">
+              Showing <span className="font-bold text-black">{products.length}</span> {category.name} models available
+            </p>
+            <span className="text-xs text-[#0a8848] font-semibold bg-emerald-50 border border-emerald-200/80 px-2.5 py-1 rounded-full">
+              ✓ Instant Cashback Applied
+            </span>
+          </div>
+
           {products.length === 0 ? (
-            <div className="py-20 text-center">
-              <p className="text-gray-500 text-xl font-medium">Catalog loading — check back soon.</p>
-              <Link href="/contact" className="mt-4 inline-block font-semibold text-blue-600 hover:underline">
-                Or ask us what&apos;s in stock
+            <div className="py-20 text-center bg-white rounded-2xl border border-gray-200 p-8">
+              <p className="text-gray-500 text-base font-medium">No products in this category currently.</p>
+              <Link href="/contact" className="mt-3 inline-block font-semibold text-[#0071e3] hover:underline">
+                Contact store for live stock updates &rarr;
               </Link>
             </div>
           ) : (
-            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 justify-center">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
               {products.map((p, i) => (
-                <Reveal key={p.slug} delay={(i % 4) * 50}>
+                <Reveal key={p.slug} delay={(i % 4) * 40}>
                   <ProductCard product={p} />
                 </Reveal>
               ))}
@@ -68,22 +113,25 @@ export default function CategoryView({ slug }: { slug: string }) {
         </div>
       </section>
 
-      {/* Value Proposition Section */}
-      <section className="py-24 bg-[#f5f5f7]">
-        <div className="container-px">
-          <div className="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto items-center">
-            <Reveal delay={100}>
-              <div className="bg-white p-12 rounded-[2rem] shadow-sm text-center">
-                <h3 className="text-2xl font-semibold mb-4">Why buy from Jai Apple Store?</h3>
-                <p className="text-gray-600">Genuine Apple products with official warranties. Best-in-class service, exchange offers, and expert advice right here in Pimpri-Chinchwad.</p>
-              </div>
-            </Reveal>
-            <Reveal delay={200}>
-              <div className="bg-white p-12 rounded-[2rem] shadow-sm text-center">
-                <h3 className="text-2xl font-semibold mb-4">Flexible EMI Options</h3>
-                <p className="text-gray-600">Take home your dream {category.name} today. We offer No-Cost EMI across major credit cards and finance partners.</p>
-              </div>
-            </Reveal>
+      {/* 3. Bottom Assurance Bar (matching Apple Authorized Reseller) */}
+      <section className="bg-white py-12 border-t border-[#e6e6e6]">
+        <div className="container-xl">
+          <div className="grid sm:grid-cols-3 gap-6 text-center">
+            <div className="p-4 rounded-xl bg-[#f8f8fa] border border-gray-200/80">
+              <span className="text-xl">🛡️</span>
+              <h4 className="text-sm font-bold text-black mt-2">1-Year Official Warranty</h4>
+              <p className="text-xs text-gray-500 mt-1">Valid at all Apple Authorized Service Centers pan India</p>
+            </div>
+            <div className="p-4 rounded-xl bg-[#f8f8fa] border border-gray-200/80">
+              <span className="text-xl">💳</span>
+              <h4 className="text-sm font-bold text-black mt-2">No-Cost EMI Options</h4>
+              <p className="text-xs text-gray-500 mt-1">Available across leading banks with zero down payment</p>
+            </div>
+            <div className="p-4 rounded-xl bg-[#f8f8fa] border border-gray-200/80">
+              <span className="text-xl">🚚</span>
+              <h4 className="text-sm font-bold text-black mt-2">Fast Delivery / In-Store Pickup</h4>
+              <p className="text-xs text-gray-500 mt-1">Free same-day delivery in Pune or instant pickup at Jay Plaza</p>
+            </div>
           </div>
         </div>
       </section>

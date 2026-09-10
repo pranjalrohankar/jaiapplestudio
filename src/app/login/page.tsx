@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useAuth } from "@/lib/auth-context";
 import { CheckIcon, BagIcon, ChevronRightIcon } from "@/lib/icons";
 
@@ -45,19 +46,26 @@ function LoginContent() {
 
   return (
     <div className="rounded-[2.5rem] bg-white p-8 shadow-2xl shadow-black/[0.08] ring-1 ring-black/[0.06] sm:p-10">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <Link href="/" className="inline-flex items-center gap-2 mb-4">
-          <span className="grid h-12 w-12 place-items-center rounded-2xl bg-ink text-lg font-bold text-white shadow-md">
-            J
-          </span>
-        </Link>
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-ink">
-          Customer Account
-        </h1>
-        <p className="mt-2 text-xs sm:text-sm text-ink/60">
-          Save your contact details for 1-click checkout and seamless order management
-        </p>
+        {/* Header */}
+        <div className="text-center mb-8">
+          <Link href="/" className="inline-flex items-center justify-center mb-4 group">
+            <div className="relative h-24 w-20 sm:h-28 sm:w-24 shrink-0 transition group-hover:scale-105">
+              <Image
+                src="/images/logo-transparent.png"
+                alt="Jai Apple Store Logo"
+                fill
+                sizes="112px"
+                className="object-contain drop-shadow-[0_4px_16px_rgba(229,169,60,0.3)]"
+                priority
+              />
+            </div>
+          </Link>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-ink">
+            Jai Apple Store
+          </h1>
+          <p className="mt-2 text-xs sm:text-sm text-ink/60">
+            Sign in to access your bag, pre-orders &amp; 1-click checkout
+          </p>
       </div>
 
       {/* Active Customer Profile Box */}
@@ -150,9 +158,6 @@ function LoginContent() {
       <div className="mt-8 border-t border-black/10 pt-4 flex items-center justify-between text-xs font-semibold">
         <Link href="/" className="text-ink/60 hover:text-apple">
           &larr; Back to Store
-        </Link>
-        <Link href="/admin/login" className="text-ink/40 hover:text-ink">
-          Store Admin Portal &rarr;
         </Link>
       </div>
     </div>

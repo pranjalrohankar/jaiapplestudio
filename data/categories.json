@@ -1,0 +1,58 @@
+{
+  "categories": [
+    {
+      "id": "iphone",
+      "name": "iPhone",
+      "slug": "iphone",
+      "subtitle": "Explore all models",
+      "image": "https://inventstore.in/wp-content/uploads/2025/09/iphone.png",
+      "imageFit": "contain",
+      "isActive": true
+    },
+    {
+      "id": "mac",
+      "name": "MacBook & Mac",
+      "slug": "mac",
+      "subtitle": "Air, Pro & Studio",
+      "image": "https://inventstore.in/wp-content/uploads/2025/09/macbook.png",
+      "imageFit": "contain",
+      "isActive": true
+    },
+    {
+      "id": "ipad",
+      "name": "iPad",
+      "slug": "ipad",
+      "subtitle": "Pro, Air & mini",
+      "image": "https://inventstore.in/wp-content/uploads/2025/09/iPad.png",
+      "imageFit": "contain",
+      "isActive": true
+    },
+    {
+      "id": "watch",
+      "name": "Apple Watch",
+      "slug": "watch",
+      "subtitle": "Series 11, Ultra & SE",
+      "image": "https://inventstore.in/wp-content/uploads/2025/09/watch.png",
+      "imageFit": "contain",
+      "isActive": true
+    },
+    {
+      "id": "airpods",
+      "name": "Audio & AirPods",
+      "slug": "airpods",
+      "subtitle": "AirPods 4 & Max",
+      "image": "https://inventstore.in/wp-content/uploads/2025/09/audio.png",
+      "imageFit": "contain",
+      "isActive": true
+    },
+    {
+      "id": "accessories",
+      "name": "Accessories",
+      "slug": "accessories",
+      "subtitle": "Cases, MagSafe & Power",
+      "image": "https://inventstore.in/wp-content/uploads/2025/09/accessories.png",
+      "imageFit": "contain",
+      "isActive": true
+    }
+  ]
+}

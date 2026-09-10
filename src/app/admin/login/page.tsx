@@ -3,6 +3,7 @@
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useAuth } from "@/lib/auth-context";
 
 function AdminLoginContent() {
@@ -21,7 +22,6 @@ function AdminLoginContent() {
     e.preventDefault();
     setError(null);
     setLoading(true);
-
     const success = loginAdmin(username, password);
     if (success) {
       router.push(redirectPath);
@@ -40,19 +40,28 @@ function AdminLoginContent() {
       <div className="relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 mb-4">
-            <span className="grid h-12 w-12 place-items-center rounded-2xl bg-white text-lg font-bold text-ink shadow-lg">
-              J
-            </span>
+          <Link href="/" className="inline-flex items-center justify-center mb-4 group">
+            <div className="relative h-24 w-20 sm:h-28 sm:w-24 shrink-0 transition group-hover:scale-105">
+              <Image
+                src="/images/logo-transparent.png"
+                alt="Jai Apple Store Logo"
+                fill
+                sizes="112px"
+                className="object-contain drop-shadow-[0_4px_20px_rgba(229,169,60,0.4)]"
+                priority
+              />
+            </div>
           </Link>
-          <div className="inline-block rounded-full bg-blue-500/10 px-3 py-1 text-xs font-bold text-blue-400 ring-1 ring-blue-500/30 mb-2">
-            RESTRICTED ACCESS
+          <div className="block">
+            <div className="inline-block rounded-full bg-blue-500/10 px-3 py-1 text-xs font-bold text-blue-400 ring-1 ring-blue-500/30 mb-2">
+              RESTRICTED ACCESS
+            </div>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
             Jai Apple Store Admin
           </h1>
-          <p className="mt-2 text-xs sm:text-sm text-white/60">
-            Sign in with store administrator credentials to manage orders, products & banners
+          <p className="mt-2 text-xs sm:text-sm text-white/80">
+            Sign in with store administrator credentials to manage orders, products &amp; banners
           </p>
         </div>
 
@@ -112,13 +121,6 @@ function AdminLoginContent() {
                 placeholder="••••••••••••"
                 className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/30 outline-none transition focus:border-blue-500 focus:bg-white/10"
               />
-            </div>
-
-            <div className="rounded-xl bg-white/[0.04] p-3 text-xs text-white/50 border border-white/5">
-              <span className="font-semibold text-white/80">Credentials:</span>{" "}
-              <code className="text-cyan-300 font-mono font-bold">admin</code> /{" "}
-              <code className="text-cyan-300 font-mono font-bold">JaiStore@2026</code> (or{" "}
-              <code className="text-cyan-300 font-mono font-bold">apple2026</code>)
             </div>
 
             <button

@@ -28,11 +28,17 @@ export default function ProductDetailConfigurator({ product }: { product: Produc
 
   const priceLabel = priceForVariant(product, variant);
   const numericUnitPrice = priceValue(priceLabel);
+  const isPreOrder =
+    product.badge?.toLowerCase().includes("pre-order") ||
+    product.badge?.toLowerCase().includes("preorder");
+
   const isComingSoon =
-    product.badge?.toLowerCase().includes("coming soon") ||
-    product.price?.toLowerCase().includes("coming soon");
+    !isPreOrder &&
+    (product.badge?.toLowerCase().includes("coming soon") ||
+      product.price?.toLowerCase().includes("coming soon"));
 
   const activeColorObj = product.colors.find((c) => c.name === color) ?? product.colors[0];
+  const displayImage = activeColorObj?.image || product.image;
 
   const totalPrice =
     numericUnitPrice > 0 ? formatINR(numericUnitPrice * qty) : priceLabel;
@@ -60,33 +66,34 @@ export default function ProductDetailConfigurator({ product }: { product: Produc
           {/* Badge */}
           {product.badge && (
             <span
-              className={`absolute top-6 left-6 inline-flex items-center gap-1.5 rounded-full px-3.5 py-1 text-xs font-bold tracking-wide text-white shadow-sm ${
-                isComingSoon
-                  ? "bg-gradient-to-r from-purple-600 to-indigo-600 ring-1 ring-purple-300/40"
-                  : "bg-ink"
+              className={`absolute top-6 left-6 inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold text-white shadow-xs ${
+                isPreOrder
+                  ? "bg-[#0071e3]"
+                  : isComingSoon
+                  ? "bg-[#5856d6]"
+                  : "bg-[#1d1d1f]"
               }`}
             >
-              {isComingSoon && (
-                <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-300 opacity-75"></span>
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"></span>
-                </span>
-              )}
               {product.badge}
             </span>
           )}
 
           {/* Product Centerpiece */}
-          <div className="relative aspect-square w-full max-w-[340px] sm:max-w-[420px] my-auto">
-            {product.image ? (
-              <Image
-                src={product.image}
-                alt={`${product.name} - ${color}`}
-                fill
-                priority
-                sizes="(max-width: 768px) 100vw, 500px"
-                className="object-contain drop-shadow-[0_20px_45px_rgba(0,0,0,0.15)] transition-all duration-300 hover:scale-[1.02]"
-              />
+          <div className="relative aspect-square w-full max-w-[340px] sm:max-w-[420px] my-auto flex items-center justify-center">
+            {displayImage ? (
+              <div
+                key={displayImage}
+                className="relative w-full h-full animate-fadeIn transition-all duration-300 flex items-center justify-center"
+              >
+                <Image
+                  src={displayImage}
+                  alt={`${product.name} - ${color}`}
+                  fill
+                  priority
+                  sizes="(max-width: 768px) 100vw, 500px"
+                  className="object-contain p-3 sm:p-4 drop-shadow-[0_20px_45px_rgba(0,0,0,0.12)] transition-all duration-300 hover:scale-[1.03]"
+                />
+              </div>
             ) : (
               <div className="flex h-full w-full items-center justify-center text-5xl font-bold text-ink/30">
                 {product.name.slice(0, 2).toUpperCase()}
@@ -106,6 +113,41 @@ export default function ProductDetailConfigurator({ product }: { product: Produc
               </span>
             </div>
           )}
+
+          {/* Interactive Color Finish Mini Bar for Instant Switching */}
+          {product.colors.length > 1 && (
+            <div className="mt-3 flex items-center justify-center gap-2 flex-wrap max-w-full">
+              {product.colors.map((c) => {
+                const isSelected = (activeColorObj?.name || color) === c.name;
+                return (
+                  <button
+                    key={c.name}
+                    type="button"
+                    onClick={() => setColor(c.name)}
+                    title={`Switch to ${c.name}`}
+                    className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold transition-all cursor-pointer ${
+                      isSelected
+                        ? "bg-white text-[#0071e3] ring-2 ring-[#0071e3] shadow-xs scale-105"
+                        : "bg-white/70 text-gray-700 hover:bg-white hover:scale-102 ring-1 ring-black/10"
+                    }`}
+                  >
+                    <span
+                      className="h-3 w-3 rounded-full ring-1 ring-black/15 shadow-inner"
+                      style={{ backgroundColor: c.hex }}
+                    />
+                    <span>{c.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Invisible Preloader for zero-latency color switching */}
+          <div className="hidden" aria-hidden="true">
+            {product.colors.map((c) =>
+              c.image ? <img key={c.name} src={c.image} alt="" className="hidden" /> : null
+            )}
+          </div>
         </div>
 
         {/* Apple Value Guarantee Strip */}
@@ -140,44 +182,60 @@ export default function ProductDetailConfigurator({ product }: { product: Produc
           </p>
 
           {/* Pricing & EMI Card */}
-          <div className="mt-5 rounded-2xl bg-gradient-to-br from-[#f8f8fa] to-[#f0f0f3] p-5 ring-1 ring-black/5">
+          <div className="mt-5 rounded-2xl bg-[#f8f8fa] p-5 border border-[#e6e6e6]">
             <div className="flex flex-wrap items-baseline justify-between gap-3">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-ink/50 block">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-gray-500 block">
                   Store Price
                 </span>
                 <div className="flex items-baseline gap-3 mt-1">
                   <span
                     className={`text-3xl sm:text-4xl font-extrabold ${
-                      isComingSoon ? "text-purple-700" : "text-ink"
+                      isComingSoon ? "text-purple-700" : "text-[#111111]"
                     }`}
                   >
                     {priceLabel}
                   </span>
                   {product.oldPrice && (
-                    <span className="text-base text-ink/40 line-through font-semibold">
+                    <span className="text-base text-gray-400 line-through font-semibold">
                       {product.oldPrice}
                     </span>
                   )}
                 </div>
+
+                {numericUnitPrice > 0 && !isComingSoon && (
+                  <p className="mt-1.5 text-xs sm:text-sm font-bold text-[#0a8848]">
+                    <span>Price After Cashback: </span>
+                    <span className="text-base">
+                      {formatINR(
+                        numericUnitPrice -
+                          (numericUnitPrice > 80000
+                            ? 5000
+                            : numericUnitPrice > 40000
+                            ? 4000
+                            : 2000)
+                      )}
+                    </span>
+                  </p>
+                )}
               </div>
 
               {emiPerMonth && (
                 <div className="text-right">
-                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 text-xs font-bold text-emerald-800">
                     No-Cost EMI
                   </span>
-                  <p className="text-xs font-bold text-emerald-950 mt-1">
+                  <p className="text-xs font-bold text-gray-900 mt-1">
                     From {emiPerMonth}/mo*
                   </p>
                 </div>
               )}
             </div>
 
-            <p className="mt-3 text-xs text-ink/55 leading-relaxed">
+            <p className="mt-3 text-xs text-gray-500 leading-relaxed border-t border-gray-200/80 pt-2.5">
               {isComingSoon
-                ? "*Pre-booking open now. Priority allocation on official launch day."
-                : "*Prices are indicative. Final best price, card discounts & exchange bonus confirmed on checkout."}
+                ? "*Pre-booking open now. Zero advance fee with priority allocation on official launch day."
+                : "*Prices are inclusive of all taxes. Final best price, instant bank cashback & exchange bonus applied at checkout."}
             </p>
           </div>
 
@@ -313,7 +371,7 @@ export default function ProductDetailConfigurator({ product }: { product: Produc
               ) : (
                 <>
                   <BagIcon width={18} height={18} />
-                  {isComingSoon ? "Pre-Order to Cart" : `Add to Cart — ${totalPrice}`}
+                  {isPreOrder ? `Pre-Order Now — ${totalPrice}` : isComingSoon ? "Pre-Book to Cart" : `Add to Cart — ${totalPrice}`}
                 </>
               )}
             </button>
@@ -324,7 +382,7 @@ export default function ProductDetailConfigurator({ product }: { product: Produc
               className="flex-1 flex items-center justify-center gap-2 rounded-full bg-ink py-4 px-6 text-base font-bold text-white shadow-xl shadow-black/10 transition hover:bg-zinc-800 active:scale-[0.99]"
             >
               <BagIcon width={18} height={18} />
-              Buy Now &rarr;
+              {isPreOrder ? "Instant Pre-Booking →" : "Buy Now →"}
             </button>
           </div>
 

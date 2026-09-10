@@ -1,210 +1,278 @@
 {
   "products": [
     {
-      "slug": "iphone-18-pro",
-      "name": "iPhone 18 Pro",
-      "tagline": "The future of Apple Intelligence.",
-      "description": "Groundbreaking A20 Pro chip, revolutionary under-display camera architecture, and aerospace-grade liquid titanium casing. Pre-booking now open.",
+      "slug": "iphone-duo",
+      "name": "iPhone Duo",
       "category": "iphone",
-      "price": "Coming Soon",
-      "badge": "Coming Soon",
+      "price": "₹2,99,900",
+      "badge": "Pre-Order",
+      "tagline": "Dual-screen flagship with premium storage options.",
+      "description": "Available in 256GB, 512GB, 1TB and 2TB. Colours: Star White, Night Sky.",
       "colors": [
         {
-          "name": "Cosmic Obsidian",
-          "hex": "#1e2024"
+          "name": "Star White",
+          "hex": "#f5f5f5",
+          "image": "/images/iphone-duo.jpg"
         },
         {
-          "name": "Liquid Titanium",
-          "hex": "#b0b3b8"
-        },
-        {
-          "name": "Celestial Gold",
-          "hex": "#ebd2a7"
-        },
-        {
-          "name": "Deep Emerald",
-          "hex": "#1e392e"
+          "name": "Night Sky",
+          "hex": "#1a1f2b",
+          "image": "/images/iphone-duo.jpg"
         }
       ],
-      "image": "/images/iphone-18-pro.jpg",
       "highlights": [
-        "A20 Pro Quantum Bionic processor",
-        "ProMotion 2.0 Ultra XDR holographic display",
-        "Next-gen 200MP fusion camera with 10x optical zoom",
-        "All-day-plus battery life with 65W MagSafe 2"
-      ]
+        "256GB ₹2,99,900",
+        "512GB ₹3,24,900",
+        "1TB ₹3,74,900",
+        "2TB ₹4,49,900"
+      ],
+      "image": "/images/iphone-duo.jpg"
     },
     {
-      "slug": "iphone-18",
-      "name": "iPhone 18",
-      "tagline": "Supercharged. Futuristic. Unstoppable.",
-      "description": "Equipped with A20 Bionic performance, all-new unified Dynamic Island, and vibrant aerospace finishes. Coming soon to Jai Apple Store.",
+      "slug": "iphone-18-pro-max",
+      "name": "iPhone 18 Pro Max",
       "category": "iphone",
-      "price": "Coming Soon",
-      "badge": "Coming Soon",
+      "price": "₹1,79,900",
+      "badge": "Pre-Order",
+      "tagline": "Largest Pro iPhone with multiple storage variants.",
+      "description": "Available in 256GB, 512GB, 1TB and 2TB. Colours: Deep Black, Glacier, Silver, Burgundy.",
       "colors": [
         {
-          "name": "Cyber Teal",
-          "hex": "#2dd4bf"
+          "name": "Deep Black",
+          "hex": "#000000",
+          "image": "/images/iphone-18-pro.jpg"
         },
         {
-          "name": "Sunset Pink",
-          "hex": "#f472b6"
+          "name": "Glacier",
+          "hex": "#dfe7ee",
+          "image": "https://inventstore.in/wp-content/uploads/2024/09/iphone-16-pro-max.png"
         },
         {
-          "name": "Starlight White",
-          "hex": "#f8fafc"
+          "name": "Silver",
+          "hex": "#d9d9d9",
+          "image": "https://inventstore.in/wp-content/uploads/2024/09/iphone-16-pro-max.png"
         },
         {
-          "name": "Midnight Black",
-          "hex": "#0f172a"
+          "name": "Burgundy",
+          "hex": "#6d1022",
+          "image": "/images/iphone-18-pro-max.jpg"
         }
       ],
-      "image": "/images/iphone-18.jpg",
       "highlights": [
-        "A20 Bionic processor with enhanced Apple Intelligence",
-        "Advanced Dual-Fusion 64MP Camera system",
-        "Ceramic Shield Gen 3 with extreme scratch resistance",
-        "USB-C with Thunderbolt speed & Superfast MagSafe"
+        "256GB ₹1,79,900",
+        "512GB ₹2,04,900",
+        "1TB ₹2,54,900",
+        "2TB ₹3,29,900"
+      ],
+      "image": "/images/iphone-18-pro-max.jpg"
+    },
+    {
+      "slug": "iphone-18-pro",
+      "name": "iPhone 18 Pro",
+      "category": "iphone",
+      "price": "₹1,64,900",
+      "badge": "Pre-Order",
+      "tagline": "Professional performance with multiple storage variants.",
+      "description": "Available in 256GB, 512GB, 1TB and 2TB. Colours: Deep Black, Glacier, Silver, Burgundy.",
+      "colors": [
+        {
+          "name": "Deep Black",
+          "hex": "#000000",
+          "image": "/images/iphone-18-pro.jpg"
+        },
+        {
+          "name": "Glacier",
+          "hex": "#dfe7ee",
+          "image": "https://inventstore.in/wp-content/uploads/2024/09/iphone-16-pro.png"
+        },
+        {
+          "name": "Silver",
+          "hex": "#d9d9d9",
+          "image": "https://inventstore.in/wp-content/uploads/2024/09/iphone-16-pro.png"
+        },
+        {
+          "name": "Burgundy",
+          "hex": "#6d1022",
+          "image": "/images/iphone-18-pro-max.jpg"
+        }
+      ],
+      "highlights": [
+        "256GB ₹1,64,900",
+        "512GB ₹1,89,900",
+        "1TB ₹2,39,900",
+        "2TB ₹3,14,900"
+      ],
+      "image": "/images/iphone-18-pro.jpg"
+    },
+    {
+      "slug": "iphone-17-pro-max",
+      "name": "iPhone 17 Pro Max",
+      "category": "iphone",
+      "price": "₹1,39,900",
+      "oldPrice": "₹1,49,900",
+      "badge": "Save ₹10,000",
+      "tagline": "The ultimate pro camera system.",
+      "description": "17.42 cm (6.9″) Super Retina XDR display with ProMotion (120Hz). A19 Pro chip with 6-core CPU and 6-core GPU. Advanced 48MP Fusion main camera with 2x Telephoto. Up to 37 hours of video playback. Aluminium unibody with Apple Intelligence built in.",
+      "image": "https://inventstore.in/wp-content/uploads/2025/09/orange-1536x1536-1.webp",
+      "colors": [
+        {
+          "name": "Cosmic Orange",
+          "hex": "#c05a35"
+        },
+        {
+          "name": "Deep Blue",
+          "hex": "#1c2b4a"
+        },
+        {
+          "name": "Silver",
+          "hex": "#e4e4e2"
+        }
+      ],
+      "highlights": [
+        "A19 Pro chip"
       ]
     },
     {
       "slug": "iphone-17-pro",
       "name": "iPhone 17 Pro",
-      "tagline": "Most advanced iPhone ever.",
-      "description": "Titanium design, Pro camera system and all-day battery life. The ultimate iPhone.",
       "category": "iphone",
-      "price": "₹1,44,900",
-      "badge": "New",
+      "price": "₹1,26,900",
+      "oldPrice": "₹1,34,900",
+      "badge": "Save ₹8,000",
+      "tagline": "Innovative design for exceptional pro performance.",
+      "description": "15.93 cm (6.3″) Super Retina XDR display with ProMotion (120Hz). A19 Pro chip. Advanced 48MP Fusion main camera with 2x Telephoto. Up to 31 hours of video playback. Heat-forged aluminium unibody.",
+      "image": "https://inventstore.in/wp-content/uploads/2025/09/orange-scaled.webp",
       "colors": [
         {
           "name": "Cosmic Orange",
-          "hex": "#a8563c"
+          "hex": "#c05a35"
         },
         {
           "name": "Deep Blue",
-          "hex": "#0b1736"
+          "hex": "#1c2b4a"
         },
         {
           "name": "Silver",
-          "hex": "#e2e2de"
+          "hex": "#e4e4e2"
         }
       ],
-      "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-17-pro-model-unselect-gallery-1-202509?wid=5120&hei=2880&fmt=webp&qlt=90&.v=dU9qRExIQUlQTzVKeDd1V1dtUE1MUWFRQXQ2R0JQTk5udUZxTkR3ZVlpS1ZKNzlseDJva0h5NlRjOVNob0hSVjBoUVhuTWlrY2hIK090ZGZZbk9HeEJWb1BiTjRORlc1Y1lKU3JWempySklRNmNHZmh4VCt0eWNpdXFKdGlmMVRmbW94YnYxc1YvNXZ4emJGL0IxNFp3&traceId=1",
       "highlights": [
-        "Up to 1TB storage",
-        "Best-in-class Pro camera system with 8x optical-quality zoom",
-        "All-day battery life"
-      ]
-    },
-    {
-      "slug": "iphone-17-air",
-      "name": "iPhone 17 Air",
-      "tagline": "The thinnest iPhone ever.",
-      "description": "Beautifully thin with a stunning large display. The power of Pro inside.",
-      "category": "iphone",
-      "price": "₹1,29,900",
-      "badge": "New",
-      "colors": [
-        {
-          "name": "Sky Blue",
-          "hex": "#9ec5e8"
-        },
-        {
-          "name": "Light Gold",
-          "hex": "#f0e6d3"
-        },
-        {
-          "name": "Cloud White",
-          "hex": "#f0f0f2"
-        },
-        {
-          "name": "Space Black",
-          "hex": "#2b2b2f"
-        }
-      ],
-      "image": "https://www.apple.com/v/iphone/home/cj/images/overview/select/iphone_air__b5qmgl05ojyq_large.jpg",
-      "highlights": [
-        "Thinnest iPhone ever made",
-        "Fusion camera system with 2-in-1 lens",
-        "Lightweight aluminium body"
+        "A19 Pro chip"
       ]
     },
     {
       "slug": "iphone-17",
       "name": "iPhone 17",
-      "tagline": "Even more delightful. Even more durable.",
-      "description": "Super Retina display, advanced dual-camera system and Ceramic Shield front glass.",
       "category": "iphone",
-      "price": "₹79,900",
-      "badge": "New",
+      "price": "₹77,900",
+      "oldPrice": "₹82,900",
+      "badge": "Save ₹5,000",
+      "tagline": "Magichromatic.",
+      "description": "15.93 cm (6.3″) Super Retina XDR display with ProMotion (120Hz). A19 chip with 6-core CPU. Advanced 48MP Fusion main camera with 2x Telephoto. Up to 30 hours of video playback. Ceramic Shield 2 front, 3x better scratch resistance.",
+      "image": "https://inventstore.in/wp-content/uploads/2025/09/lavendar-scaled.webp",
       "colors": [
         {
-          "name": "Lavender",
-          "hex": "#c9b1c9"
+          "name": "Black",
+          "hex": "#1c1c1e"
         },
         {
-          "name": "Sage",
-          "hex": "#b9c4b2"
+          "name": "Lavender",
+          "hex": "#cbb9d8"
         },
         {
           "name": "Mist Blue",
-          "hex": "#aec5d4"
+          "hex": "#a9c2d9"
+        },
+        {
+          "name": "Sage",
+          "hex": "#b6c2ab"
         },
         {
           "name": "White",
-          "hex": "#fafafa"
-        },
-        {
-          "name": "Black",
-          "hex": "#333"
+          "hex": "#f5f5f2"
         }
       ],
-      "image": "https://www.apple.com/in/iphone/home/images/overview/select/iphone_17__fb1277oq3eaa_large.jpg",
       "highlights": [
-        "Advanced dual-camera system",
-        "Ceramic Shield 2 front glass",
-        "Super Retina XDR display"
+        "A19 chip",
+        "48MP Fusion Main camera with 2x Telephoto",
+        "Up to 30 hours video playback",
+        "Ceramic Shield 2 front"
       ]
     },
     {
       "slug": "iphone-17e",
       "name": "iPhone 17e",
-      "tagline": "Feature stacked. Value packed.",
-      "description": "The essentials, done incredibly well. Big battery, great camera and A-series performance.",
       "category": "iphone",
-      "price": "₹55,900",
-      "badge": "New",
+      "price": "₹63,900",
+      "oldPrice": "₹64,900",
+      "badge": "Save ₹1,000",
+      "tagline": "Feature stacked. Value packed.",
+      "description": "4-core A19 chip. 6.1″ 60Hz Super Retina XDR display. 256GB base storage. 48MP rear camera with 2x Telephoto plus 12MP front camera. 15W MagSafe wireless charging. Ceramic Shield 2.",
+      "image": "https://inventstore.in/wp-content/uploads/2026/03/17e-pink.png",
       "colors": [
         {
+          "name": "Black",
+          "hex": "#1c1c1e"
+        },
+        {
           "name": "Soft Pink",
-          "hex": "#f2cfd4"
+          "hex": "#f0d3d8"
         },
         {
           "name": "White",
-          "hex": "#fafafa"
-        },
-        {
-          "name": "Black",
-          "hex": "#333"
+          "hex": "#f5f5f2"
         }
       ],
-      "image": "https://www.apple.com/in/iphone/home/images/overview/select/iphone_17e__cq5ygzct314y_large.jpg",
       "highlights": [
-        "Great all-day battery life",
-        "48MP Fusion camera",
-        "Powerful A-series chip"
+        "A19 chip",
+        "48MP Fusion camera with 2x Telephoto",
+        "256GB starting storage",
+        "15W MagSafe wireless charging"
       ]
     },
     {
-      "slug": "iphone-16",
-      "name": "iPhone 16",
-      "tagline": "Amazing performance. Durable design.",
-      "description": "Everything to love about iPhone at a more accessible price.",
+      "slug": "iphone-air",
+      "name": "iPhone Air",
       "category": "iphone",
-      "price": "₹69,900",
+      "price": "₹99,900",
+      "oldPrice": "₹1,19,900",
+      "badge": "Save ₹20,000",
+      "tagline": "Super thin. Strikingly light. Shockingly strong.",
+      "description": "16.63 cm (6.5″) Super Retina XDR display with ProMotion (120Hz). A19 Pro chip and C1X modem. Advanced 48MP Fusion main camera. Up to 27 hours of video playback. Titanium frame — the thinnest iPhone ever made.",
+      "image": "https://inventstore.in/wp-content/uploads/2025/09/skyyblue-scaled.webp",
+      "colors": [
+        {
+          "name": "Cloud White",
+          "hex": "#f5f5f2"
+        },
+        {
+          "name": "Light Gold",
+          "hex": "#e8d9bd"
+        },
+        {
+          "name": "Sky Blue",
+          "hex": "#a9c9de"
+        },
+        {
+          "name": "Space Black",
+          "hex": "#1c1c1e"
+        }
+      ],
+      "highlights": [
+        "A19 Pro chip and C1X modem",
+        "Titanium frame"
+      ]
+    },
+    {
+      "slug": "iphone-16-plus",
+      "name": "iPhone 16 Plus",
+      "category": "iphone",
+      "price": "₹78,900",
       "oldPrice": "₹79,900",
-      "badge": "Save ₹10,000",
+      "badge": "Save ₹1,000",
+      "tagline": "Big and bright. Big on battery.",
+      "description": "6.7″ Super Retina XDR display. A18 chip. Advanced dual-camera system with Camera Control. All-day battery life.",
+      "image": "https://inventstore.in/wp-content/uploads/2024/09/iphone-16-plus.png",
       "colors": [
         {
           "name": "Ultramarine",
@@ -212,60 +280,99 @@
         },
         {
           "name": "Teal",
-          "hex": "#008080"
+          "hex": "#3f7a74"
         },
         {
           "name": "Pink",
-          "hex": "#f5bbc9"
+          "hex": "#f2c2cb"
         },
         {
           "name": "White",
-          "hex": "#fafafa"
+          "hex": "#f5f5f2"
         },
         {
           "name": "Black",
-          "hex": "#333"
+          "hex": "#1c1c1e"
         }
       ],
-      "image": "https://www.apple.com/in/iphone/home/images/overview/select/iphone_16__b6tkv86m2gc2_large.jpg",
       "highlights": [
+        "A18 chip",
         "Advanced dual-camera system",
-        "A18 chip with fast performance",
-        "Vibrant Super Retina display"
+        "Camera Control",
+        "All-day battery life"
       ]
     },
     {
-      "slug": "iphone-15",
-      "name": "iPhone 15",
-      "tagline": "A beautiful way to stay in touch.",
-      "description": "Dynamic Island, excellent camera and USB-C in a lightweight aluminium design.",
+      "slug": "iphone-16",
+      "name": "iPhone 16",
       "category": "iphone",
-      "price": "₹59,900",
+      "price": "₹68,900",
       "oldPrice": "₹69,900",
-      "badge": "Save ₹10,000",
+      "badge": "Save ₹1,000",
+      "tagline": "Amazing performance. Durable design.",
+      "description": "6.1″ Super Retina XDR display. A18 chip. Advanced dual-camera system with Camera Control. Ceramic Shield front and back.",
+      "image": "https://inventstore.in/wp-content/uploads/2024/09/iphone-16-1.png",
       "colors": [
         {
-          "name": "Black",
-          "hex": "#333"
+          "name": "Ultramarine",
+          "hex": "#4169e1"
         },
         {
-          "name": "Blue",
-          "hex": "#4a7bb5"
-        },
-        {
-          "name": "Green",
-          "hex": "#73a67e"
-        },
-        {
-          "name": "Yellow",
-          "hex": "#f0d060"
+          "name": "Teal",
+          "hex": "#3f7a74"
         },
         {
           "name": "Pink",
-          "hex": "#f2c1c8"
+          "hex": "#f2c2cb"
+        },
+        {
+          "name": "White",
+          "hex": "#f5f5f2"
+        },
+        {
+          "name": "Black",
+          "hex": "#1c1c1e"
         }
       ],
-      "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-15-finish-select-202309-6-1inch-blue?wid=940&hei=1112&fmt=png-alpha",
+      "highlights": [
+        "A18 chip",
+        "Advanced dual-camera system",
+        "Camera Control",
+        "Ceramic Shield front and back"
+      ]
+    },
+    {
+      "slug": "apple-iphone-15",
+      "name": "iPhone 15",
+      "category": "iphone",
+      "price": "₹58,900",
+      "oldPrice": "₹59,900",
+      "badge": "Save ₹1,000",
+      "tagline": "A beautiful way to stay in touch.",
+      "description": "Dynamic Island, a 48MP main camera and USB-C in a durable, colour-infused glass and aluminium design.",
+      "image": "https://inventstore.in/wp-content/uploads/2023/09/3.png",
+      "colors": [
+        {
+          "name": "Black",
+          "hex": "#1c1c1e"
+        },
+        {
+          "name": "Blue",
+          "hex": "#5f80a8"
+        },
+        {
+          "name": "Green",
+          "hex": "#7ba488"
+        },
+        {
+          "name": "Yellow",
+          "hex": "#e9d78d"
+        },
+        {
+          "name": "Pink",
+          "hex": "#f0c8cf"
+        }
+      ],
       "highlights": [
         "Dynamic Island",
         "48MP main camera",
@@ -273,45 +380,143 @@
       ]
     },
     {
-      "slug": "iphone-14",
-      "name": "iPhone 14",
-      "tagline": "The value iPhone.",
-      "description": "A solid all-rounder. Great price, reliable performance.",
-      "category": "iphone",
-      "price": "₹49,900",
+      "slug": "ipad-pro-m5-13-inch",
+      "name": "iPad Pro M5 – 13″",
+      "category": "ipad",
+      "price": "₹1,89,905",
+      "oldPrice": "₹1,99,900",
+      "badge": "5% Off",
+      "tagline": "The ultimate iPad experience.",
+      "description": "M5 chip. Ultra Retina XDR (OLED) display. Thinnest Apple device ever made, with desktop-class performance.",
+      "image": "https://inventstore.in/wp-content/uploads/2024/05/2.png",
       "colors": [
         {
-          "name": "Midnight",
-          "hex": "#1f2430"
+          "name": "Silver",
+          "hex": "#e4e4e2"
+        },
+        {
+          "name": "Space Black",
+          "hex": "#1c1c1e"
+        }
+      ],
+      "highlights": [
+        "M5 chip",
+        "Ultra Retina XDR display",
+        "Thinnest Apple device ever"
+      ]
+    },
+    {
+      "slug": "ipad-air-m4-13-inch",
+      "name": "iPad Air M4 – 13″",
+      "category": "ipad",
+      "price": "₹1,13,905",
+      "oldPrice": "₹1,19,900",
+      "badge": "5% Off",
+      "tagline": "A big splash of genius.",
+      "description": "M4 chip. Liquid Retina display. Apple Pencil Pro support. Powerful, colourful and incredibly versatile.",
+      "image": "https://inventstore.in/wp-content/uploads/2024/05/1.png",
+      "colors": [
+        {
+          "name": "Blue",
+          "hex": "#8ea8e8"
         },
         {
           "name": "Purple",
-          "hex": "#a3a1d6"
+          "hex": "#c3b1e0"
         },
         {
           "name": "Starlight",
           "hex": "#f2efe9"
         },
         {
-          "name": "Red",
-          "hex": "#c91f2e"
+          "name": "Space Gray",
+          "hex": "#4a4a52"
         }
       ],
-      "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-14-midnight-select-202209?wid=940&hei=1112&fmt=png-alpha",
       "highlights": [
-        "Dual-camera system with low-light improvements",
-        "All-day battery",
-        "Emergency SOS via satellite"
+        "M4 chip",
+        "Liquid Retina display",
+        "Apple Pencil Pro support"
       ]
     },
     {
-      "slug": "macbook-air-13",
-      "name": "MacBook Air 13",
-      "tagline": "Seriously thin. Seriously fast.",
-      "description": "The world's most loved laptop, now with even more performance and battery life.",
+      "slug": "ipad-a16",
+      "name": "iPad A16",
+      "category": "ipad",
+      "price": "₹47,405",
+      "oldPrice": "₹49,900",
+      "badge": "5% Off",
+      "tagline": "The everyday favourite.",
+      "description": "A16 chip. 10.9″ Liquid Retina display. Great value for learning, watching and creating.",
+      "image": "https://inventstore.in/wp-content/uploads/2025/07/ipad-a16.png",
+      "colors": [
+        {
+          "name": "Blue",
+          "hex": "#8ea8e8"
+        },
+        {
+          "name": "Pink",
+          "hex": "#f2c1c8"
+        },
+        {
+          "name": "Yellow",
+          "hex": "#f0d060"
+        },
+        {
+          "name": "Silver",
+          "hex": "#e2e2de"
+        }
+      ],
+      "highlights": [
+        "A16 chip",
+        "Great value",
+        "10.9″ Liquid Retina display"
+      ]
+    },
+    {
+      "slug": "ipad-mini",
+      "name": "iPad mini",
+      "category": "ipad",
+      "price": "₹66,405",
+      "oldPrice": "₹69,900",
+      "badge": "5% Off",
+      "tagline": "Mini. Mighty. Magic.",
+      "description": "Full iPad power in a pocket-sized frame, with Apple Pencil support.",
+      "image": "https://inventstore.in/wp-content/uploads/2023/05/iPad-Mini.png",
+      "colors": [
+        {
+          "name": "Space Gray",
+          "hex": "#4a4a52"
+        },
+        {
+          "name": "Starlight",
+          "hex": "#f2efe9"
+        },
+        {
+          "name": "Pink",
+          "hex": "#f2c1c8"
+        },
+        {
+          "name": "Purple",
+          "hex": "#c3b1e0"
+        }
+      ],
+      "highlights": [
+        "Full iPad power in a compact frame",
+        "Apple Pencil support",
+        "8.3″ Liquid Retina display"
+      ]
+    },
+    {
+      "slug": "macbook-air-m5-13-inch",
+      "name": "MacBook Air M5 – 13″",
       "category": "mac",
-      "price": "₹99,900",
-      "badge": "Newest chip",
+      "price": "₹1,37,908",
+      "oldPrice": "₹1,49,900",
+      "badge": "8% Off",
+      "tagline": "Seriously thin. Seriously fast.",
+      "description": "M5 chip. Up to 18 hours of battery life. Fanless, silent design in a 13-inch Liquid Retina display.",
+      "image": "https://inventstore.in/wp-content/uploads/2023/05/macbook-air.png",
       "colors": [
         {
           "name": "Midnight",
@@ -324,22 +529,29 @@
         {
           "name": "Silver",
           "hex": "#e2e2de"
+        },
+        {
+          "name": "Sky Blue",
+          "hex": "#a9c9de"
         }
       ],
-      "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/macbook-air-midnight-select-202402?wid=904&hei=840&fmt=jpeg&qlt=90",
       "highlights": [
+        "M5 chip",
         "Up to 18 hr battery life",
         "Liquid Retina display",
         "Fanless silent design"
       ]
     },
     {
-      "slug": "macbook-air-15",
-      "name": "MacBook Air 15",
-      "tagline": "Bigger screen. Same Air feel.",
-      "description": "All the Air brilliance, now in a 15-inch display.",
+      "slug": "macbook-air-m5-15-inch",
+      "name": "MacBook Air M5 – 15″",
       "category": "mac",
-      "price": "₹1,14,900",
+      "price": "₹1,65,508",
+      "oldPrice": "₹1,79,900",
+      "badge": "8% Off",
+      "tagline": "Bigger screen. Same Air feel.",
+      "description": "M5 chip. 15.3″ Liquid Retina display. Six-speaker sound system in the thin, light Air design.",
+      "image": "https://inventstore.in/wp-content/uploads/2023/05/macbook-air.png",
       "colors": [
         {
           "name": "Midnight",
@@ -352,46 +564,54 @@
         {
           "name": "Silver",
           "hex": "#e2e2de"
+        },
+        {
+          "name": "Sky Blue",
+          "hex": "#a9c9de"
         }
       ],
-      "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/macbook-air-15-midnight-select-202402?wid=904&hei=840&fmt=jpeg&qlt=90",
       "highlights": [
-        "15.3\" Liquid Retina display",
-        "Powerful M-series chip",
+        "M5 chip",
+        "15.3″ Liquid Retina display",
         "6-speaker sound system"
       ]
     },
     {
-      "slug": "macbook-pro-14",
-      "name": "MacBook Pro 14",
-      "tagline": "Pro performance in a mobile frame.",
-      "description": "A muscular laptop for creative pros, developers and power users.",
+      "slug": "macbook-neo",
+      "name": "MacBook Neo",
       "category": "mac",
-      "price": "₹1,69,900",
+      "price": "₹73,508",
+      "oldPrice": "₹79,900",
+      "badge": "8% Off",
+      "tagline": "The new essential Mac.",
+      "description": "A fresh, lightweight MacBook built for everyday work — browsing, streaming and study, all day long.",
+      "image": "https://inventstore.in/wp-content/uploads/2026/03/neo.png",
       "colors": [
-        {
-          "name": "Space Black",
-          "hex": "#2b2b2f"
-        },
         {
           "name": "Silver",
           "hex": "#e2e2de"
+        },
+        {
+          "name": "Midnight",
+          "hex": "#1f2430"
         }
       ],
-      "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mbp14-spaceblack-select-202310?wid=904&hei=840&fmt=jpeg&qlt=90",
       "highlights": [
-        "Up to 24 hr battery life",
-        "Liquid Retina XDR display",
-        "Pro-class chip"
+        "Lightweight everyday design",
+        "All-day battery life",
+        "Compact build"
       ]
     },
     {
-      "slug": "macbook-pro-16",
-      "name": "MacBook Pro 16",
+      "slug": "16-macbook-pro-m5-max-chip",
+      "name": "16″ MacBook Pro – M5 Max Chip",
+      "category": "mac",
+      "price": "₹4,85,910",
+      "oldPrice": "₹5,39,900",
+      "badge": "10% Off",
       "tagline": "The most powerful MacBook ever.",
-      "description": "Ultimate performance for the most demanding workflows.",
-      "category": "mac",
-      "price": "₹2,49,900",
+      "description": "M5 Max chip. Liquid Retina XDR display. Studio-quality mics. Built for the most demanding creative workflows.",
+      "image": "https://inventstore.in/wp-content/uploads/2026/03/mac-book-pro-black.png",
       "colors": [
         {
           "name": "Space Black",
@@ -402,20 +622,23 @@
           "hex": "#e2e2de"
         }
       ],
-      "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mbp16-spaceblack-select-202310?wid=904&hei=840&fmt=jpeg&qlt=90",
       "highlights": [
-        "Largest ever MacBook display",
-        "Maximum CPU/GPU performance",
-        "Studio-quality mics"
+        "M5 Max chip",
+        "Liquid Retina XDR display",
+        "Studio-quality mics",
+        "Maximum CPU/GPU performance"
       ]
     },
     {
-      "slug": "imac",
-      "name": "iMac",
-      "tagline": "A work of art that works.",
-      "description": "All-in-one desktop brilliance in seven vibrant colours.",
+      "slug": "24-inch-imac-m4",
+      "name": "iMac (M4) 24″",
       "category": "mac",
-      "price": "₹1,34,900",
+      "price": "₹1,28,155",
+      "oldPrice": "₹1,34,900",
+      "badge": "Get ₹5000 cashback",
+      "tagline": "A work of art that works.",
+      "description": "M4 chip, built for Apple Intelligence. 24″ 4.5K Retina display. 12MP Center Stage camera with Desk View. Six-speaker sound system with Spatial Audio.",
+      "image": "https://inventstore.in/wp-content/uploads/2024/11/9-scaled.webp",
       "colors": [
         {
           "name": "Blue",
@@ -430,190 +653,75 @@
           "hex": "#f0a7b0"
         },
         {
-          "name": "Orange",
-          "hex": "#ef8a4a"
+          "name": "Silver",
+          "hex": "#e2e2de"
         }
       ],
-      "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/imac-24-blue-selection-hero-202310?wid=904&hei=840&fmt=jpeg&qlt=90",
       "highlights": [
-        "24\" 4.5K Retina display",
-        "1090p FaceTime camera",
-        "Three mics + six speakers"
+        "M4 chip",
+        "24″ 4.5K Retina display",
+        "12MP Center Stage camera",
+        "Six-speaker sound system"
       ]
     },
     {
-      "slug": "mac-mini",
-      "name": "Mac Mini",
-      "tagline": "Tiny. Mighty. Mac.",
-      "description": "Desktop-class power in a pocket-sized aluminium box.",
+      "slug": "mac-studio",
+      "name": "Mac Studio",
       "category": "mac",
-      "price": "₹59,900",
+      "price": "₹1,74,708",
+      "oldPrice": "₹1,89,900",
+      "badge": "8% Off",
+      "tagline": "Tiny. Mighty. Mac.",
+      "description": "Desktop-class power in a compact aluminium enclosure, with extensive Thunderbolt connectivity.",
+      "image": "https://inventstore.in/wp-content/uploads/2023/05/mac-studio.png",
       "colors": [
         {
           "name": "Silver",
           "hex": "#e2e2de"
         }
       ],
-      "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-mini-select-202301?wid=904&hei=840&fmt=jpeg&qlt=90",
       "highlights": [
-        "Small footprint, massive power",
-        "Lots of ports",
+        "Compact powerhouse desktop",
+        "Extensive port selection",
         "Quiet by design"
       ]
     },
     {
-      "slug": "ipad-pro",
-      "name": "iPad Pro",
-      "tagline": "The ultimate iPad experience.",
-      "description": "OLED display and desktop-class performance in a thin, light frame.",
-      "category": "ipad",
-      "price": "₹99,900",
-      "badge": "Pro",
-      "colors": [
-        {
-          "name": "Silver",
-          "hex": "#e2e2de"
-        },
-        {
-          "name": "Space Black",
-          "hex": "#2b2b2f"
-        }
-      ],
-      "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-pro-13-select-wifi-spaceblack-202405?wid=940&hei=1112&fmt=png-alpha",
-      "highlights": [
-        "Ultra Retina XDR display",
-        "M-series chip",
-        "Thinnest Apple device ever"
-      ]
-    },
-    {
-      "slug": "ipad-air",
-      "name": "iPad Air",
-      "tagline": "A big splash of genius.",
-      "description": "Powerful, colourful and incredibly versatile.",
-      "category": "ipad",
-      "price": "₹59,900",
-      "colors": [
-        {
-          "name": "Blue",
-          "hex": "#8ea8e8"
-        },
-        {
-          "name": "Purple",
-          "hex": "#c3b1e0"
-        },
-        {
-          "name": "Starlight",
-          "hex": "#f2efe9"
-        },
-        {
-          "name": "Space Gray",
-          "hex": "#4a4a52"
-        }
-      ],
-      "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-air-11-select-wifi-spacegray-202405?wid=940&hei=1112&fmt=png-alpha",
-      "highlights": [
-        "Liquid Retina display",
-        "Fast M-series chip",
-        "Apple Pencil Pro support"
-      ]
-    },
-    {
-      "slug": "ipad",
-      "name": "iPad",
-      "tagline": "The everyday favourite.",
-      "description": "Tablet essential — great for learning, watching and creating.",
-      "category": "ipad",
-      "price": "₹39,900",
-      "colors": [
-        {
-          "name": "Blue",
-          "hex": "#8ea8e8"
-        },
-        {
-          "name": "Pink",
-          "hex": "#f2c1c8"
-        },
-        {
-          "name": "Yellow",
-          "hex": "#f0d060"
-        },
-        {
-          "name": "Silver",
-          "hex": "#e2e2de"
-        }
-      ],
-      "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-10th-gen-finish-select-202212-blue?wid=940&hei=1112&fmt=png-alpha",
-      "highlights": [
-        "Great value",
-        "Vibrant 10.9\" display",
-        "USB-C + Apple Pencil support"
-      ]
-    },
-    {
-      "slug": "ipad-mini",
-      "name": "iPad mini",
-      "tagline": "Mini. Mighty. Magic.",
-      "description": "Full iPad power in a pocket-sized frame.",
-      "category": "ipad",
-      "price": "₹49,900",
-      "colors": [
-        {
-          "name": "Space Gray",
-          "hex": "#4a4a52"
-        },
-        {
-          "name": "Starlight",
-          "hex": "#f2efe9"
-        },
-        {
-          "name": "Pink",
-          "hex": "#f2c1c8"
-        },
-        {
-          "name": "Purple",
-          "hex": "#c3b1e0"
-        }
-      ],
-      "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-select-wifi-spacegray-202410?wid=940&hei=1112&fmt=png-alpha",
-      "highlights": [
-        "8.3\" Liquid Retina display",
-        "A-series performance",
-        "Apple Pencil support"
-      ]
-    },
-    {
-      "slug": "apple-watch-ultra",
-      "name": "Apple Watch Ultra",
-      "tagline": "Adventure waits.",
-      "description": "The most rugged and capable Apple Watch for every extreme.",
+      "slug": "apple-watch-ultra-3",
+      "name": "Apple Watch Ultra 3",
       "category": "watch",
-      "price": "₹89,900",
-      "badge": "Premium",
+      "price": "₹79,900",
+      "oldPrice": "₹89,900",
+      "badge": "5% Off",
+      "tagline": "Adventure waits.",
+      "description": "Natural Titanium case. GPS + Cellular. Precision dual-frequency GPS. The most rugged and capable Apple Watch for every extreme.",
+      "image": "https://inventstore.in/wp-content/uploads/2025/09/Apple-Watch-Ultra-3.png",
       "colors": [
         {
           "name": "Natural Titanium",
           "hex": "#c9c4bd"
         },
         {
-          "name": "Black",
-          "hex": "#333"
+          "name": "Black Titanium",
+          "hex": "#2b2b2f"
         }
       ],
-      "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ultra-case-unselect-gallery-1-202409?wid=940&hei=1112&fmt=png-alpha",
       "highlights": [
         "Most durable Watch ever",
-        "Precision GPS",
+        "Precision dual-frequency GPS",
         "Extended battery life"
       ]
     },
     {
-      "slug": "apple-watch-series",
-      "name": "Apple Watch Series",
-      "tagline": "Stronger together.",
-      "description": "Health, safety and connectivity in a bright all-around display.",
+      "slug": "apple-watch-series-11",
+      "name": "Apple Watch Series 11",
       "category": "watch",
-      "price": "₹46,900",
+      "price": "₹33,500",
+      "oldPrice": "₹46,900",
+      "badge": "Upto ₹13,400 Off",
+      "tagline": "Stronger together.",
+      "description": "Bright always-on display. Advanced health sensors. Crash and fall detection. Health, safety and connectivity in one watch.",
+      "image": "https://inventstore.in/wp-content/uploads/2025/09/jetblack-scaled.jpeg",
       "colors": [
         {
           "name": "Jet Black",
@@ -628,11 +736,10 @@
           "hex": "#e2e2de"
         },
         {
-          "name": "Midnight",
-          "hex": "#1f2430"
+          "name": "Space Grey",
+          "hex": "#5a5a5f"
         }
       ],
-      "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/s10-case-unselect-gallery-1-202409?wid=940&hei=1112&fmt=png-alpha",
       "highlights": [
         "Bright always-on display",
         "Advanced health sensors",
@@ -640,12 +747,15 @@
       ]
     },
     {
-      "slug": "apple-watch-se",
-      "name": "Apple Watch SE",
-      "tagline": "All the essentials.",
-      "description": "A great all-rounder with the essentials, at a great price.",
+      "slug": "apple-watch-se-3",
+      "name": "Apple Watch SE 3",
       "category": "watch",
-      "price": "₹26,900",
+      "price": "₹25,123",
+      "oldPrice": "₹25,900",
+      "badge": "5% Off",
+      "tagline": "All the essentials.",
+      "description": "Aluminium case with Sport Band. Essential health features and all-day battery life at a great price.",
+      "image": "https://inventstore.in/wp-content/uploads/2025/09/Apple-Watch-SE-3-Aluminium-Case-with-Sport-Band.png",
       "colors": [
         {
           "name": "Midnight",
@@ -660,52 +770,51 @@
           "hex": "#e2e2de"
         }
       ],
-      "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/se-case-unselect-gallery-1-202409?wid=940&hei=1112&fmt=png-alpha",
       "highlights": [
         "Essential health features",
-        "All-day battery",
+        "All-day battery life",
         "Family Setup support"
       ]
     },
     {
       "slug": "airpods-pro-3",
       "name": "AirPods Pro 3",
-      "tagline": "Pro sound. Pro found.",
-      "description": "Best-in-class Active Noise Cancellation with a personalised sound experience.",
       "category": "airpods",
-      "price": "₹25,900",
-      "badge": "Best seller",
+      "price": "₹25,000",
+      "oldPrice": "₹25,900",
+      "badge": "Best Seller",
+      "tagline": "The world's best in-ear Active Noise Cancellation.",
+      "description": "Up to 2x more Active Noise Cancellation than AirPods Pro 2. All-new heart rate sensing during workouts. IP57 dust, sweat and water resistance. Live Translation. Up to 8 hours of ANC on a single charge.",
+      "image": "https://inventstore.in/wp-content/uploads/2025/09/airpods-pro-3-hero-select-202509_FMT_WHH.jpeg",
       "colors": [
         {
-          "name": "Mica",
-          "hex": "#cfd2da"
-        },
-        {
           "name": "White",
-          "hex": "#fafafa"
+          "hex": "#f5f5f2"
         }
       ],
-      "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/MQD83?wid=940&hei=1112&fmt=png-alpha",
       "highlights": [
         "Up to 2x more Active Noise Cancellation",
-        "Adaptive Audio",
-        "USB-C + wireless charging"
+        "All-new heart rate sensing",
+        "IP57 water resistance",
+        "Live Translation"
       ]
     },
     {
       "slug": "airpods-4",
       "name": "AirPods 4",
-      "tagline": "So light. So right.",
-      "description": "Comfortable all-day fit with great sound and effortless pairing.",
       "category": "airpods",
-      "price": "₹19,900",
+      "price": "₹12,500",
+      "oldPrice": "₹12,900",
+      "badge": "",
+      "tagline": "So light. So right.",
+      "description": "Comfortable open-ear design. Personalised Spatial Audio. Effortless pairing with USB-C charging case.",
+      "image": "https://inventstore.in/wp-content/uploads/2024/09/airpods-4.png",
       "colors": [
         {
           "name": "White",
-          "hex": "#fafafa"
+          "hex": "#f5f5f2"
         }
       ],
-      "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/airpods-4-anc-select-202409?wid=940&hei=1112&fmt=png-alpha",
       "highlights": [
         "Comfortable open-ear design",
         "Personalised Spatial Audio",
@@ -713,67 +822,19 @@
       ]
     },
     {
-      "slug": "airpods-max",
-      "name": "AirPods Max",
-      "tagline": "This is the sound.",
-      "description": "Over-ear headphones with knock-out sound and Active Noise Cancellation.",
-      "category": "airpods",
-      "price": "₹59,900",
-      "colors": [
-        {
-          "name": "Midnight",
-          "hex": "#1f2430"
-        },
-        {
-          "name": "Blue",
-          "hex": "#5a7bd8"
-        },
-        {
-          "name": "Silver",
-          "hex": "#e2e2de"
-        }
-      ],
-      "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/airpods-max-select-midnight-202409?wid=940&hei=1112&fmt=png-alpha",
-      "highlights": [
-        "High-fidelity audio",
-        "Active Noise Cancellation",
-        "Computational Spatial Audio"
-      ]
-    },
-    {
-      "slug": "magsafe-charger",
-      "name": "MagSafe Charger",
-      "tagline": "Snaps into place. Charges perfectly.",
-      "description": "Wireless fast charging that aligns perfectly, every time.",
-      "category": "accessories",
-      "price": "₹4,900",
-      "colors": [
-        {
-          "name": "White",
-          "hex": "#fafafa"
-        }
-      ],
-      "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/MX6X3?wid=940&hei=1112&fmt=png-alpha",
-      "highlights": [
-        "Fast wireless charging",
-        "Perfect alignment",
-        "Works with most cases"
-      ]
-    },
-    {
       "slug": "20w-usb-c-power-adapter",
-      "name": "20W USB‑C Power Adapter",
+      "name": "20W USB-C Power Adapter",
+      "category": "accessories",
+      "price": "₹2,190",
       "tagline": "Rapid, reliable power.",
       "description": "Fast and safe charging for iPhone, iPad and more.",
-      "category": "accessories",
-      "price": "₹1,900",
+      "image": "https://inventstore.in/wp-content/uploads/2023/06/adapter-20w.png",
       "colors": [
         {
           "name": "White",
-          "hex": "#fafafa"
+          "hex": "#f5f5f2"
         }
       ],
-      "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/MU7V2_GEO_IN?wid=940&hei=1112&fmt=png-alpha",
       "highlights": [
         "20W fast charging",
         "USB-C connector",
@@ -781,52 +842,33 @@
       ]
     },
     {
-      "slug": "airtag",
-      "name": "AirTag",
-      "tagline": "Attach to your stuff. Find it easily.",
-      "description": "Track keys, bags and more in the Find My app.",
+      "slug": "iphone-silicone-case-with-magsafe",
+      "name": "Silicone Case with MagSafe",
       "category": "accessories",
-      "price": "₹2,900",
-      "badge": "Popular",
-      "colors": [
-        {
-          "name": "White",
-          "hex": "#fafafa"
-        }
-      ],
-      "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/MX532?wid=940&hei=1112&fmt=png-alpha",
-      "highlights": [
-        "One-tap setup",
-        "Precision tracking",
-        "Replaceable battery"
-      ]
-    },
-    {
-      "slug": "silicone-case",
-      "name": "Silicone Case",
+      "price": "₹1,490",
+      "oldPrice": "₹4,900",
+      "badge": "69% Off",
       "tagline": "Protection with personality.",
-      "description": "Snug, soft-touch protection in a range of vibrant colours.",
-      "category": "accessories",
-      "price": "₹2,900",
+      "description": "Snug, soft-touch silicone protection with a perfect MagSafe alignment.",
+      "image": "https://inventstore.in/wp-content/uploads/2024/10/Untitled-design-21.png",
       "colors": [
         {
-          "name": "Blue",
-          "hex": "#5a7bd8"
+          "name": "Ultramarine",
+          "hex": "#4169e1"
         },
         {
-          "name": "Pink",
-          "hex": "#f2c1c8"
+          "name": "Fuchsia",
+          "hex": "#c23a6b"
         },
         {
-          "name": "Green",
-          "hex": "#6bb37a"
+          "name": "Plum",
+          "hex": "#6b4a63"
         },
         {
-          "name": "Black",
-          "hex": "#333"
+          "name": "Denim",
+          "hex": "#3a5a78"
         }
       ],
-      "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/MC1Q4?wid=940&hei=1112&fmt=png-alpha",
       "highlights": [
         "Soft-touch silicone",
         "MagSafe compatible",
@@ -834,19 +876,21 @@
       ]
     },
     {
-      "slug": "clear-case",
-      "name": "Clear Case",
-      "tagline": "Show off the colour.",
-      "description": "Crystal-clear protection that shows off your iPhone finish.",
+      "slug": "iphone-clear-case-with-magsafe",
+      "name": "Clear Case with MagSafe",
       "category": "accessories",
-      "price": "₹2,900",
+      "price": "₹1,490",
+      "oldPrice": "₹4,900",
+      "badge": "69% Off",
+      "tagline": "Show off the colour.",
+      "description": "Crystal-clear protection that shows off your iPhone finish while staying MagSafe compatible.",
+      "image": "https://inventstore.in/wp-content/uploads/2026/06/Case-Cover.png",
       "colors": [
         {
           "name": "Clear",
           "hex": "#e6eef5"
         }
       ],
-      "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/MC0P4?wid=940&hei=1112&fmt=png-alpha",
       "highlights": [
         "Optically clear design",
         "Scratch resistant",
@@ -854,52 +898,43 @@
       ]
     },
     {
-      "slug": "usb-c-cable",
-      "name": "USB‑C Charging Cable",
-      "tagline": "Powerful and convenient.",
-      "description": "Durable braided USB-C to USB-C cable for fast charging.",
+      "slug": "usb-c-to-lightning-cable-1m",
+      "name": "USB-C to Lightning Cable (1 m)",
       "category": "accessories",
       "price": "₹1,900",
+      "tagline": "Powerful and convenient.",
+      "description": "Durable cable for fast charging and syncing older Lightning devices.",
+      "image": "https://inventstore.in/wp-content/uploads/2026/06/cable.png",
       "colors": [
         {
           "name": "White",
-          "hex": "#fafafa"
+          "hex": "#f5f5f2"
         }
       ],
-      "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/MQKJ3?wid=940&hei=1112&fmt=png-alpha",
       "highlights": [
         "Fast charging + data",
-        "Braided for durability",
-        "1m / 2m options"
+        "1m length",
+        "USB-C to Lightning"
       ]
     },
     {
-      "slug": "iphone-17-pro-max-test",
-      "name": "iPhone 17 Pro",
-      "tagline": "Most advanced iPhone ever.",
-      "description": "Titanium design, Pro camera system and all-day battery life. The ultimate iPhone.",
-      "category": "iphone",
-      "price": "₹1,44,900",
-      "badge": "New",
+      "slug": "apple-45w-magsafe-2-power-adapter",
+      "name": "Apple 45W MagSafe 2 Power Adapter",
+      "category": "accessories",
+      "price": "₹7,500",
+      "tagline": "Efficient charging for MacBook Air.",
+      "description": "A compact MagSafe 2 adapter built for MacBook Air.",
+      "image": "https://inventstore.in/wp-content/uploads/2026/06/adapter.png",
       "colors": [
         {
-          "name": "Cosmic Orange",
-          "hex": "#a8563c"
-        },
-        {
-          "name": "Deep Blue",
-          "hex": "#0b1736"
-        },
-        {
-          "name": "Silver",
-          "hex": "#e2e2de"
+          "name": "White",
+          "hex": "#f5f5f2"
         }
       ],
-      "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-17pro-digitalmat-gallery-1-202509_GEO_EMEA?wid=728&hei=666&fmt=p-jpg&qlt=95&.v=ekJPc2lPUlRuRk50SkcyOVdnU1d0TjFla0N0Znl3UThxdjB3SW91ZDVJeFptNC9yejJUMWI2dmhrTGRMd2F4ZjhpVENtU1Jsa01tcGtZS0IwM01XVkVaMm9lVjZWaGFvQVRMeWxLakVNdXRpc2lSR1BSMzNQQm5UMU83ZFVxQmFYSVI4ZkRTLy83YU5OdEFVT1FiTW9R",
       "highlights": [
-        "Up to 1TB storage",
-        "Best-in-class Pro camera system with 8x optical-quality zoom",
-        "All-day battery life"
+        "45W fast charging",
+        "MagSafe 2 connector",
+        "For MacBook Air"
       ]
     }
   ],

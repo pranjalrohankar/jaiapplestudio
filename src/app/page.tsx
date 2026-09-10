@@ -1,12 +1,10 @@
 import Hero from "@/components/sections/Hero";
-import LaunchBanner from "@/components/sections/LaunchBanner";
-import ChapterNav from "@/components/sections/ChapterNav";
+import CategoryTiles from "@/components/sections/CategoryTiles";
+import OfferBanners from "@/components/sections/OfferBanners";
 import Lineup from "@/components/sections/Lineup";
 import WhyShop from "@/components/sections/WhyShop";
-import CategoryTiles from "@/components/sections/CategoryTiles";
-import Features from "@/components/sections/Features";
+import StoreBanner from "@/components/sections/StoreBanner";
 import Reviews from "@/components/sections/Reviews";
-import CtaBanner from "@/components/sections/CtaBanner";
 import JsonLd from "@/components/JsonLd";
 import { store, telLink, mailLink } from "@/lib/store";
 
@@ -41,15 +39,28 @@ const jsonLd = {
 export default function HomePage() {
   return (
     <>
+      {/* 1. Hero Slider (Top Product Carousel) */}
       <Hero />
-      <ChapterNav />
-      <LaunchBanner />
-      <Lineup />
-      <WhyShop />
+
+      {/* 2. Explore by Category Icon Strip */}
       <CategoryTiles />
-      <Features />
+
+      {/* 3. Promotional Offer Banners & Posters (Dedicated Section) */}
+      <OfferBanners />
+
+      {/* 4. Trending Now / Featured Products */}
+      <Lineup />
+
+      {/* 5. Why Shop With Us (4-USPs) */}
+      <WhyShop />
+
+      {/* 6. Physical Store Showcase */}
+      <StoreBanner />
+
+      {/* 7. Customer Testimonials & Reviews */}
       <Reviews />
-      <CtaBanner />
+
+      {/* 8. SEO Structured Data */}
       <JsonLd data={jsonLd} />
     </>
   );

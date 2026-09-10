@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useAuth } from "@/lib/auth-context";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -47,13 +48,24 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div className="flex min-h-screen flex-col bg-[#f8f9fa] text-gray-900">
       <header className="sticky top-0 z-40 bg-white border-b border-gray-200 px-6 py-3.5 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-3">
-          <Link href="/admin" className="flex items-center gap-2">
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-black text-xs font-bold text-white">
-              J
-            </span>
-            <span className="text-base sm:text-lg font-extrabold tracking-tight text-gray-900">
-              Jai Apple Store Admin
-            </span>
+          <Link href="/admin" className="flex items-center gap-3">
+            <div className="relative h-11 w-9 sm:h-12 sm:w-10 shrink-0">
+              <Image
+                src="/images/logo-transparent.png"
+                alt="Jai Apple Store Logo"
+                fill
+                sizes="48px"
+                className="object-contain drop-shadow-[0_2px_6px_rgba(229,169,60,0.3)]"
+              />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-base sm:text-lg font-extrabold tracking-tight text-gray-900 leading-tight">
+                Jai Apple Store
+              </span>
+              <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">
+                Admin Portal
+              </span>
+            </div>
           </Link>
           <span className="hidden sm:inline-block text-[11px] bg-emerald-100 text-emerald-800 font-bold px-2.5 py-0.5 rounded-full">
             ● Live Portal
@@ -82,6 +94,26 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             📱 Products
           </Link>
           <Link
+            href="/admin/slider"
+            className={`px-3 py-1.5 rounded-lg transition ${
+              pathname === "/admin/slider"
+                ? "bg-gray-900 text-white"
+                : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+            }`}
+          >
+            🎠 Top Slider
+          </Link>
+          <Link
+            href="/admin/categories"
+            className={`px-3 py-1.5 rounded-lg transition ${
+              pathname === "/admin/categories"
+                ? "bg-gray-900 text-white"
+                : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+            }`}
+          >
+            📁 Categories
+          </Link>
+          <Link
             href="/admin/banners"
             className={`px-3 py-1.5 rounded-lg transition ${
               pathname === "/admin/banners"
@@ -89,7 +121,27 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
             }`}
           >
-            🚀 Banners
+            🎨 Offer Banners
+          </Link>
+          <Link
+            href="/admin/social"
+            className={`px-3 py-1.5 rounded-lg transition ${
+              pathname === "/admin/social"
+                ? "bg-gray-900 text-white"
+                : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+            }`}
+          >
+            🌐 Social Links
+          </Link>
+          <Link
+            href="/admin/database"
+            className={`px-3 py-1.5 rounded-lg transition ${
+              pathname === "/admin/database"
+                ? "bg-gray-900 text-white"
+                : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+            }`}
+          >
+            🗄️ Database
           </Link>
           <Link
             href="/"

@@ -125,7 +125,7 @@ export default function LaunchBanner() {
                 <div className="absolute inset-0 -m-4 rounded-3xl bg-gradient-to-tr from-blue-500/20 via-purple-500/20 to-emerald-500/20 blur-2xl" />
                 <Image
                   src={banner.image || "/images/iphone-18-hero-banner.jpg"}
-                  alt={banner.title}
+                  alt={banner.title || "Jai Apple Store Launch"}
                   fill
                   priority
                   sizes="(max-width: 768px) 100vw, 500px"
