@@ -92,7 +92,12 @@ export default function DatabaseSyncManager() {
             <span className="text-xs font-bold uppercase tracking-wider bg-blue-50 text-blue-700 px-3 py-1 rounded-full border border-blue-200/60">
               MongoDB Atlas Sync &amp; Backend Health
             </span>
-            {status?.connected ? (
+            {loading ? (
+              <span className="text-xs font-bold uppercase tracking-wider bg-gray-100 text-gray-600 px-3 py-1 rounded-full border border-gray-200 flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-gray-400 animate-pulse"></span>
+                Checking Connection...
+              </span>
+            ) : status?.connected ? (
               <span className="text-xs font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full border border-emerald-200/60 flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 Connected
@@ -100,7 +105,7 @@ export default function DatabaseSyncManager() {
             ) : (
               <span className="text-xs font-bold uppercase tracking-wider bg-amber-50 text-amber-800 px-3 py-1 rounded-full border border-amber-200/60 flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-amber-500"></span>
-                IP Whitelist Required
+                Connection Pending
               </span>
             )}
           </div>
@@ -137,8 +142,8 @@ export default function DatabaseSyncManager() {
         </div>
       </div>
 
-      {/* Diagnostics / IP Whitelist Notice (if blocked) */}
-      {!status?.connected && (
+      {/* Diagnostics / IP Whitelist Notice (Only if check is complete and not connected) */}
+      {!loading && status && !status.connected && (
         <div className="bg-amber-50/80 border border-amber-200 rounded-3xl p-6 sm:p-7 shadow-xs">
           <div className="flex items-start gap-4">
             <span className="text-3xl shrink-0">🔒</span>
