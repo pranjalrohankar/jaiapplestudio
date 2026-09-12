@@ -12,7 +12,10 @@ export default function CategoryTiles() {
   useEffect(() => {
     async function fetchCategories() {
       try {
-        const res = await fetch("/api/categories");
+        const res = await fetch(`/api/categories?t=${Date.now()}`, {
+          cache: "no-store",
+          headers: { Pragma: "no-cache" },
+        });
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data.categories) && data.categories.length > 0) {

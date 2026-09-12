@@ -93,7 +93,10 @@ export default function AdminCategoriesManager() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/categories");
+      const res = await fetch(`/api/categories?t=${Date.now()}`, {
+        cache: "no-store",
+        headers: { Pragma: "no-cache" },
+      });
       const json = await res.json();
       if (!res.ok || json.error) {
         throw new Error(json.error || `Failed to fetch categories (HTTP ${res.status})`);

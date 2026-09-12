@@ -9,6 +9,12 @@ export const revalidate = 0;
 
 const dataFilePath = path.join(process.cwd(), "data", "products.json");
 
+const NO_CACHE_HEADERS = {
+  "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+  Pragma: "no-cache",
+  Expires: "0",
+};
+
 export async function GET() {
   // 1. Try MongoDB Atlas first (live admin updates)
   if (clientPromise) {
@@ -21,15 +27,18 @@ export async function GET() {
         return { categories, products };
       })();
 
-      const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 1200));
+      const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000));
       const mongoData = await Promise.race([mongoPromise, timeoutPromise]);
 
       if (mongoData && (mongoData.products.length > 0 || mongoData.categories.length > 0)) {
-        return NextResponse.json({
-          categories: mongoData.categories.length > 0 ? mongoData.categories : fallbackData.categories || [],
-          products: mongoData.products.length > 0 ? mongoData.products : fallbackData.products || [],
-          source: "mongodb",
-        });
+        return NextResponse.json(
+          {
+            categories: mongoData.categories.length > 0 ? mongoData.categories : fallbackData.categories || [],
+            products: mongoData.products.length > 0 ? mongoData.products : fallbackData.products || [],
+            source: "mongodb",
+          },
+          { headers: NO_CACHE_HEADERS }
+        );
       }
     } catch (error) {
       console.warn("MongoDB fetch failed, using fallback:", error);
@@ -41,22 +50,28 @@ export async function GET() {
     const fileContent = await fs.readFile(dataFilePath, "utf-8");
     const data = JSON.parse(fileContent);
     if (data && (Array.isArray(data.products) || Array.isArray(data.categories))) {
-      return NextResponse.json({
-        categories: data.categories || fallbackData.categories || [],
-        products: data.products || fallbackData.products || [],
-        source: "local",
-      });
+      return NextResponse.json(
+        {
+          categories: data.categories || fallbackData.categories || [],
+          products: data.products || fallbackData.products || [],
+          source: "local",
+        },
+        { headers: NO_CACHE_HEADERS }
+      );
     }
   } catch (fileError) {
     // Continue to fallbackData
   }
 
   // 3. Fallback to bundled data
-  return NextResponse.json({
-    categories: fallbackData.categories || [],
-    products: fallbackData.products || [],
-    source: "fallback",
-  });
+  return NextResponse.json(
+    {
+      categories: fallbackData.categories || [],
+      products: fallbackData.products || [],
+      source: "fallback",
+    },
+    { headers: NO_CACHE_HEADERS }
+  );
 }
 
 export async function POST(request: Request) {
@@ -65,7 +80,7 @@ export async function POST(request: Request) {
 
     // Basic validation
     if (!updatedData.products || !Array.isArray(updatedData.products)) {
-      return NextResponse.json({ error: "Invalid data format" }, { status: 400 });
+      return NextResponse.json({ error: "Invalid data format" }, { status: 400, headers: NO_CACHE_HEADERS });
     }
 
     let savedToMongo = false;
@@ -97,11 +112,15 @@ export async function POST(request: Request) {
             if (categoriesToInsert.length > 0) {
               await db.collection("categories").insertMany(categoriesToInsert);
             }
+
+            // Also keep categories_config in sync
+            await db.collection("categories_config").deleteMany({});
+            await db.collection("categories_config").insertOne({ categories: categoriesToInsert });
           }
           return true;
         })();
 
-        const timeoutPromise = new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 2500));
+        const timeoutPromise = new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 5000));
         savedToMongo = await Promise.race([syncPromise, timeoutPromise]);
       } catch (mongoError) {
         console.warn("MongoDB sync failed:", mongoError);
@@ -115,13 +134,16 @@ export async function POST(request: Request) {
       // ignore on read-only environments
     }
 
-    return NextResponse.json({
-      success: true,
-      count: updatedData.products.length,
-      savedToMongo,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        count: updatedData.products.length,
+        savedToMongo,
+      },
+      { headers: NO_CACHE_HEADERS }
+    );
   } catch (error: any) {
     console.error("Failed to save products data:", error);
-    return NextResponse.json({ error: "Failed to save products" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to save products" }, { status: 500, headers: NO_CACHE_HEADERS });
   }
 }

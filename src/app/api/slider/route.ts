@@ -10,6 +10,12 @@ export const revalidate = 0;
 
 const sliderFilePath = path.join(process.cwd(), "data", "slider.json");
 
+const NO_CACHE_HEADERS = {
+  "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+  Pragma: "no-cache",
+  Expires: "0",
+};
+
 export async function GET() {
   // 1. Prioritize MongoDB Atlas (live admin updates)
   if (clientPromise) {
@@ -20,14 +26,17 @@ export async function GET() {
         return await db.collection("slider_config").findOne({}, { projection: { _id: 0 } });
       })();
 
-      const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 1200));
+      const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000));
       const sliderDoc = await Promise.race([mongoPromise, timeoutPromise]);
 
       if (sliderDoc && Array.isArray(sliderDoc.slides) && sliderDoc.slides.length > 0) {
-        return NextResponse.json({
-          slides: sliderDoc.slides,
-          source: "mongodb",
-        });
+        return NextResponse.json(
+          {
+            slides: sliderDoc.slides,
+            source: "mongodb",
+          },
+          { headers: NO_CACHE_HEADERS }
+        );
       }
     } catch (error) {
       console.warn("MongoDB fetch failed for slider:", error);
@@ -39,20 +48,26 @@ export async function GET() {
     const fileContent = await fs.readFile(sliderFilePath, "utf-8");
     const data = JSON.parse(fileContent);
     if (data && Array.isArray(data.slides) && data.slides.length > 0) {
-      return NextResponse.json({
-        slides: data.slides,
-        source: "local",
-      });
+      return NextResponse.json(
+        {
+          slides: data.slides,
+          source: "local",
+        },
+        { headers: NO_CACHE_HEADERS }
+      );
     }
   } catch (fileError) {
     // Continue to fallback
   }
 
   // 3. Bundled Fallback
-  return NextResponse.json({
-    slides: (fallbackData.slides as SliderSlide[]) || defaultSliderSlides,
-    source: "fallback",
-  });
+  return NextResponse.json(
+    {
+      slides: (fallbackData.slides as SliderSlide[]) || defaultSliderSlides,
+      source: "fallback",
+    },
+    { headers: NO_CACHE_HEADERS }
+  );
 }
 
 export async function POST(request: Request) {
@@ -77,7 +92,7 @@ export async function POST(request: Request) {
           return true;
         })();
 
-        const timeoutPromise = new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 2500));
+        const timeoutPromise = new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 5000));
         savedToMongo = await Promise.race([syncPromise, timeoutPromise]);
       } catch (mongoError) {
         console.warn("MongoDB sync for slider failed:", mongoError);
@@ -91,12 +106,18 @@ export async function POST(request: Request) {
       // ignore on read-only environments
     }
 
-    return NextResponse.json({
-      success: true,
-      slides: dataToSave.slides,
-      savedToMongo,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        slides: dataToSave.slides,
+        savedToMongo,
+      },
+      { headers: NO_CACHE_HEADERS }
+    );
   } catch (error: any) {
-    return NextResponse.json({ error: error.message || "Failed to save slider" }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || "Failed to save slider" },
+      { status: 500, headers: NO_CACHE_HEADERS }
+    );
   }
 }

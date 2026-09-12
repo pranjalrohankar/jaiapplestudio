@@ -22,7 +22,10 @@ export default function Lineup() {
   useEffect(() => {
     async function loadProducts() {
       try {
-        const res = await fetch("/api/products");
+        const res = await fetch(`/api/products?t=${Date.now()}`, {
+          cache: "no-store",
+          headers: { Pragma: "no-cache" },
+        });
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data.products) && data.products.length > 0) {

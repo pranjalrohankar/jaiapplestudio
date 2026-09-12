@@ -96,7 +96,10 @@ export default function AdminEnquiriesPage() {
     if (!silent) setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/enquiries");
+      const res = await fetch(`/api/enquiries?t=${Date.now()}`, {
+        cache: "no-store",
+        headers: { Pragma: "no-cache" },
+      });
       const data = await res.json();
       if (res.ok && Array.isArray(data.enquiries)) {
         setEnquiries(data.enquiries);

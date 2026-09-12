@@ -64,12 +64,15 @@ function writeLocalOrders(orders: OrderRecord[]) {
   }
 }
 
+const NO_CACHE_HEADERS = {
+  "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+  Pragma: "no-cache",
+  Expires: "0",
+};
+
 // GET all orders (Instant local response with fast background sync)
 export async function GET() {
-  const localOrders = readLocalOrders();
-  localOrders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
-  // Fast check: If MongoDB is connected and responds in < 300ms, use it; otherwise return local immediately
+  // 1. Try MongoDB Atlas first
   if (clientPromise) {
     try {
       const mongoPromise = (async () => {
@@ -82,18 +85,28 @@ export async function GET() {
           .toArray();
       })();
 
-      const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 300));
+      const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000));
       const mongoOrders = await Promise.race([mongoPromise, timeoutPromise]);
 
       if (mongoOrders && Array.isArray(mongoOrders) && mongoOrders.length > 0) {
-        return NextResponse.json({ orders: mongoOrders, source: "mongodb" });
+        return NextResponse.json(
+          { orders: mongoOrders, source: "mongodb" },
+          { headers: NO_CACHE_HEADERS }
+        );
       }
     } catch (mongoError) {
-      // Continue to local orders
+      console.warn("MongoDB fetch orders failed:", mongoError);
     }
   }
 
-  return NextResponse.json({ orders: localOrders, source: "local" });
+  // 2. Read from local file
+  const localOrders = readLocalOrders();
+  localOrders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+  return NextResponse.json(
+    { orders: localOrders, source: "local" },
+    { headers: NO_CACHE_HEADERS }
+  );
 }
 
 // POST a new order (Saves locally first for instant checkout, then syncs to MongoDB)
@@ -103,7 +116,10 @@ export async function POST(req: Request) {
     const newOrder: OrderRecord = body.order;
 
     if (!newOrder || !newOrder.orderNo) {
-      return NextResponse.json({ error: "Invalid order data" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid order data" },
+        { status: 400, headers: NO_CACHE_HEADERS }
+      );
     }
 
     // 1. Always persist locally first (instant < 2ms)
@@ -132,16 +148,22 @@ export async function POST(req: Request) {
           return true;
         })();
 
-        const timeoutPromise = new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 1500));
+        const timeoutPromise = new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 5000));
         savedToMongo = await Promise.race([syncPromise, timeoutPromise]);
       } catch (mongoError) {
         console.warn("Could not save order to MongoDB, saved locally:", mongoError);
       }
     }
 
-    return NextResponse.json({ success: true, order: newOrder, savedToMongo, orders });
+    return NextResponse.json(
+      { success: true, order: newOrder, savedToMongo, orders },
+      { headers: NO_CACHE_HEADERS }
+    );
   } catch (err: any) {
-    return NextResponse.json({ error: err?.message || "Failed to record order" }, { status: 500 });
+    return NextResponse.json(
+      { error: err?.message || "Failed to record order" },
+      { status: 500, headers: NO_CACHE_HEADERS }
+    );
   }
 }
 
@@ -152,7 +174,10 @@ export async function PATCH(req: Request) {
     const { orderNo, status, adminNote } = body;
 
     if (!orderNo) {
-      return NextResponse.json({ error: "Order number required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Order number required" },
+        { status: 400, headers: NO_CACHE_HEADERS }
+      );
     }
 
     // 1. Update locally first
@@ -176,17 +201,24 @@ export async function PATCH(req: Request) {
           if (status) updateFields.status = status;
           if (adminNote !== undefined) updateFields.adminNote = adminNote;
           await db.collection("orders").updateOne({ orderNo }, { $set: updateFields });
+          return true;
         })();
-        const timeoutPromise = new Promise<void>((resolve) => setTimeout(resolve, 1500));
+        const timeoutPromise = new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 5000));
         await Promise.race([syncPromise, timeoutPromise]);
       } catch (mongoError) {
         console.warn("Could not update order in MongoDB:", mongoError);
       }
     }
 
-    return NextResponse.json({ success: true, order: updatedOrder, orders });
+    return NextResponse.json(
+      { success: true, order: updatedOrder, orders },
+      { headers: NO_CACHE_HEADERS }
+    );
   } catch (err: any) {
-    return NextResponse.json({ error: err?.message || "Failed to update order" }, { status: 500 });
+    return NextResponse.json(
+      { error: err?.message || "Failed to update order" },
+      { status: 500, headers: NO_CACHE_HEADERS }
+    );
   }
 }
 
@@ -197,7 +229,10 @@ export async function DELETE(req: Request) {
     const orderNo = searchParams.get("orderNo");
 
     if (!orderNo) {
-      return NextResponse.json({ error: "Order number required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Order number required" },
+        { status: 400, headers: NO_CACHE_HEADERS }
+      );
     }
 
     // 1. Delete locally first
@@ -212,16 +247,20 @@ export async function DELETE(req: Request) {
           const client = await clientPromise;
           const db = client.db("apple_store");
           await db.collection("orders").deleteOne({ orderNo });
+          return true;
         })();
-        const timeoutPromise = new Promise<void>((resolve) => setTimeout(resolve, 1500));
+        const timeoutPromise = new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 5000));
         await Promise.race([deletePromise, timeoutPromise]);
       } catch (mongoError) {
         console.warn("Could not delete order in MongoDB:", mongoError);
       }
     }
 
-    return NextResponse.json({ success: true, orders });
+    return NextResponse.json({ success: true, orders }, { headers: NO_CACHE_HEADERS });
   } catch (err: any) {
-    return NextResponse.json({ error: err?.message || "Failed to delete order" }, { status: 500 });
+    return NextResponse.json(
+      { error: err?.message || "Failed to delete order" },
+      { status: 500, headers: NO_CACHE_HEADERS }
+    );
   }
 }

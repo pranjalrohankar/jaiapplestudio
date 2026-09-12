@@ -13,7 +13,10 @@ export default function OfferBanners() {
   useEffect(() => {
     async function fetchLiveBanners() {
       try {
-        const res = await fetch("/api/banners");
+        const res = await fetch(`/api/banners?t=${Date.now()}`, {
+          cache: "no-store",
+          headers: { Pragma: "no-cache" },
+        });
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data.banners) && data.banners.length > 0) {

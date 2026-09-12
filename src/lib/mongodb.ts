@@ -30,9 +30,9 @@ const options = {
     strict: true,
     deprecationErrors: true,
   },
-  connectTimeoutMS: 3500,
-  serverSelectionTimeoutMS: 3500,
-  socketTimeoutMS: 6000,
+  connectTimeoutMS: 5000,
+  serverSelectionTimeoutMS: 5000,
+  socketTimeoutMS: 10000,
   maxPoolSize: 10,
 };
 
@@ -41,13 +41,7 @@ declare global {
   var _mongoClientPromise: Promise<MongoClient> | undefined;
   // eslint-disable-next-line no-var
   var _mongoCachedUri: string | undefined;
-  // eslint-disable-next-line no-var
-  var _mongoLastFailureTime: number | undefined;
-  // eslint-disable-next-line no-var
-  var _mongoLastErrorMessage: string | undefined;
 }
-
-const CIRCUIT_BREAKER_COOLDOWN_MS = 5000; // 5s short cooldown
 
 async function connectWithUri(uri: string): Promise<MongoClient> {
   const client = new MongoClient(uri, options);
@@ -57,22 +51,8 @@ async function connectWithUri(uri: string): Promise<MongoClient> {
 export async function getMongoClient(): Promise<MongoClient> {
   const primaryUri = getMongoURI();
 
-  // Short Circuit breaker: If MongoDB failed within the last 5s, throw brief error
-  const now = Date.now();
-  if (
-    global._mongoLastFailureTime &&
-    now - global._mongoLastFailureTime < CIRCUIT_BREAKER_COOLDOWN_MS
-  ) {
-    const remainingSec = Math.ceil(
-      (CIRCUIT_BREAKER_COOLDOWN_MS - (now - global._mongoLastFailureTime)) / 1000
-    );
-    throw new Error(
-      `MongoDB connection cooldown (${remainingSec}s). Last error: ${global._mongoLastErrorMessage || 'Authentication / Network Error'}`
-    );
-  }
-
   // Reuse active promise if available
-  if (global._mongoClientPromise && global._mongoCachedUri) {
+  if (global._mongoClientPromise && global._mongoCachedUri === primaryUri) {
     try {
       const client = await global._mongoClientPromise;
       return client;
@@ -84,8 +64,6 @@ export async function getMongoClient(): Promise<MongoClient> {
   const promise = (async () => {
     try {
       const connectedClient = await connectWithUri(primaryUri);
-      global._mongoLastFailureTime = undefined;
-      global._mongoLastErrorMessage = undefined;
       global._mongoCachedUri = primaryUri;
       return connectedClient;
     } catch (err: any) {
@@ -99,20 +77,14 @@ export async function getMongoClient(): Promise<MongoClient> {
         console.warn('Primary MONGODB_URI had authentication failure. Retrying with default cluster URI...');
         try {
           const fallbackClient = await connectWithUri(FALLBACK_MONGODB_URI);
-          global._mongoLastFailureTime = undefined;
-          global._mongoLastErrorMessage = undefined;
           global._mongoCachedUri = FALLBACK_MONGODB_URI;
           return fallbackClient;
         } catch (fallbackErr: any) {
-          global._mongoLastFailureTime = Date.now();
-          global._mongoLastErrorMessage = fallbackErr?.message || 'Authentication failed on fallback';
           global._mongoClientPromise = undefined;
           throw fallbackErr;
         }
       }
 
-      global._mongoLastFailureTime = Date.now();
-      global._mongoLastErrorMessage = err?.message || 'Connection failed';
       global._mongoClientPromise = undefined;
       throw err;
     }
@@ -122,11 +94,11 @@ export async function getMongoClient(): Promise<MongoClient> {
   return promise;
 }
 
-// Helper to safely execute a MongoDB operation with a strict timeout (e.g. 2s)
+// Helper to safely execute a MongoDB operation with a timeout (e.g. 4000ms)
 export async function withMongo<T>(
   fn: (client: MongoClient) => Promise<T>,
   fallback: T,
-  timeoutMs: number = 2000
+  timeoutMs: number = 4000
 ): Promise<T> {
   try {
     const timeoutPromise = new Promise<never>((_, reject) =>

@@ -35,12 +35,15 @@ function writeLocalEnquiries(enquiries: EnquiryRecord[]) {
   }
 }
 
+const NO_CACHE_HEADERS = {
+  "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+  Pragma: "no-cache",
+  Expires: "0",
+};
+
 // GET all enquiries (Instant local response with fast MongoDB background sync)
 export async function GET() {
-  const localEnquiries = readLocalEnquiries();
-  localEnquiries.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
-  // Fast check: If MongoDB is connected and responds in < 300ms, use it; otherwise return local immediately
+  // 1. Try MongoDB Atlas first
   if (clientPromise) {
     try {
       const mongoPromise = (async () => {
@@ -53,18 +56,28 @@ export async function GET() {
           .toArray();
       })();
 
-      const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 350));
+      const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000));
       const mongoEnquiries = await Promise.race([mongoPromise, timeoutPromise]);
 
       if (mongoEnquiries && Array.isArray(mongoEnquiries) && mongoEnquiries.length > 0) {
-        return NextResponse.json({ enquiries: mongoEnquiries, source: "mongodb" });
+        return NextResponse.json(
+          { enquiries: mongoEnquiries, source: "mongodb" },
+          { headers: NO_CACHE_HEADERS }
+        );
       }
     } catch (mongoError) {
-      // Continue to local enquiries
+      console.warn("MongoDB fetch enquiries failed:", mongoError);
     }
   }
 
-  return NextResponse.json({ enquiries: localEnquiries, source: "local" });
+  // 2. Read from local file
+  const localEnquiries = readLocalEnquiries();
+  localEnquiries.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+  return NextResponse.json(
+    { enquiries: localEnquiries, source: "local" },
+    { headers: NO_CACHE_HEADERS }
+  );
 }
 
 // POST a new customer enquiry
@@ -74,7 +87,10 @@ export async function POST(req: Request) {
     const rawEnquiry = body.enquiry || body;
 
     if (!rawEnquiry || !rawEnquiry.name || !rawEnquiry.phone) {
-      return NextResponse.json({ error: "Name and Phone number are required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Name and Phone number are required" },
+        { status: 400, headers: NO_CACHE_HEADERS }
+      );
     }
 
     const now = new Date();
@@ -132,21 +148,27 @@ export async function POST(req: Request) {
           return true;
         })();
 
-        const timeoutPromise = new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 1500));
+        const timeoutPromise = new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 5000));
         savedToMongo = await Promise.race([syncPromise, timeoutPromise]);
       } catch (mongoError) {
         console.warn("Could not save enquiry to MongoDB, saved locally:", mongoError);
       }
     }
 
-    return NextResponse.json({
-      success: true,
-      enquiry: newEnquiry,
-      savedToMongo,
-      enquiries,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        enquiry: newEnquiry,
+        savedToMongo,
+        enquiries,
+      },
+      { headers: NO_CACHE_HEADERS }
+    );
   } catch (err: any) {
-    return NextResponse.json({ error: err?.message || "Failed to record enquiry" }, { status: 500 });
+    return NextResponse.json(
+      { error: err?.message || "Failed to record enquiry" },
+      { status: 500, headers: NO_CACHE_HEADERS }
+    );
   }
 }
 
@@ -157,7 +179,7 @@ export async function PATCH(req: Request) {
     const { enquiryNo, status, adminNote, priority } = body;
 
     if (!enquiryNo) {
-      return NextResponse.json({ error: "Enquiry number required" }, { status: 400 });
+      return NextResponse.json({ error: "Enquiry number required" }, { status: 400, headers: NO_CACHE_HEADERS });
     }
 
     // 1. Update locally first
@@ -185,17 +207,24 @@ export async function PATCH(req: Request) {
           if (adminNote !== undefined) updateFields.adminNote = adminNote;
           if (priority !== undefined) updateFields.priority = priority;
           await db.collection("enquiries").updateOne({ enquiryNo }, { $set: updateFields });
+          return true;
         })();
-        const timeoutPromise = new Promise<void>((resolve) => setTimeout(resolve, 1500));
+        const timeoutPromise = new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 5000));
         await Promise.race([syncPromise, timeoutPromise]);
       } catch (mongoError) {
         console.warn("Could not update enquiry in MongoDB:", mongoError);
       }
     }
 
-    return NextResponse.json({ success: true, enquiry: updatedEnquiry, enquiries });
+    return NextResponse.json(
+      { success: true, enquiry: updatedEnquiry, enquiries },
+      { headers: NO_CACHE_HEADERS }
+    );
   } catch (err: any) {
-    return NextResponse.json({ error: err?.message || "Failed to update enquiry" }, { status: 500 });
+    return NextResponse.json(
+      { error: err?.message || "Failed to update enquiry" },
+      { status: 500, headers: NO_CACHE_HEADERS }
+    );
   }
 }
 
@@ -206,7 +235,7 @@ export async function DELETE(req: Request) {
     const enquiryNo = searchParams.get("enquiryNo");
 
     if (!enquiryNo) {
-      return NextResponse.json({ error: "Enquiry number required" }, { status: 400 });
+      return NextResponse.json({ error: "Enquiry number required" }, { status: 400, headers: NO_CACHE_HEADERS });
     }
 
     // 1. Delete locally first
@@ -221,16 +250,20 @@ export async function DELETE(req: Request) {
           const client = await clientPromise;
           const db = client.db("apple_store");
           await db.collection("enquiries").deleteOne({ enquiryNo });
+          return true;
         })();
-        const timeoutPromise = new Promise<void>((resolve) => setTimeout(resolve, 1500));
+        const timeoutPromise = new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 5000));
         await Promise.race([deletePromise, timeoutPromise]);
       } catch (mongoError) {
         console.warn("Could not delete enquiry in MongoDB:", mongoError);
       }
     }
 
-    return NextResponse.json({ success: true, enquiries });
+    return NextResponse.json({ success: true, enquiries }, { headers: NO_CACHE_HEADERS });
   } catch (err: any) {
-    return NextResponse.json({ error: err?.message || "Failed to delete enquiry" }, { status: 500 });
+    return NextResponse.json(
+      { error: err?.message || "Failed to delete enquiry" },
+      { status: 500, headers: NO_CACHE_HEADERS }
+    );
   }
 }

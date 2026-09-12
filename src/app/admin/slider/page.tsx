@@ -69,7 +69,10 @@ export default function AdminSliderManager() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/slider");
+      const res = await fetch(`/api/slider?t=${Date.now()}`, {
+        cache: "no-store",
+        headers: { Pragma: "no-cache" },
+      });
       const json = await res.json();
       if (!res.ok || json.error) {
         throw new Error(json.error || `Failed to fetch slider (HTTP ${res.status})`);

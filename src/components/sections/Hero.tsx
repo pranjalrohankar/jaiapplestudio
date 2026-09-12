@@ -15,7 +15,10 @@ export default function Hero() {
   useEffect(() => {
     async function fetchLiveSlides() {
       try {
-        const res = await fetch("/api/slider");
+        const res = await fetch(`/api/slider?t=${Date.now()}`, {
+          cache: "no-store",
+          headers: { Pragma: "no-cache" },
+        });
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data.slides) && data.slides.length > 0) {

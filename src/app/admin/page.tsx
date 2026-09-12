@@ -33,7 +33,10 @@ export default function AdminDashboard() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/orders");
+      const res = await fetch(`/api/orders?t=${Date.now()}`, {
+        cache: "no-store",
+        headers: { Pragma: "no-cache" },
+      });
       const data = await res.json();
       if (res.ok && data.orders) {
         setOrders(data.orders);

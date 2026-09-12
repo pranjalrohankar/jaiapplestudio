@@ -70,7 +70,11 @@ async function main() {
       await db.collection('categories').deleteMany({});
       const cleanCategories = categories.map(({ _id, ...rest }) => rest);
       await db.collection('categories').insertMany(cleanCategories);
-      console.log(`📁 Synced ${cleanCategories.length} Categories to collection "categories"`);
+
+      await db.collection('categories_config').deleteMany({});
+      await db.collection('categories_config').insertOne({ categories: cleanCategories });
+
+      console.log(`📁 Synced ${cleanCategories.length} Categories to collections "categories" & "categories_config"`);
     }
 
     // 3. Top Hero Slider
@@ -88,7 +92,11 @@ async function main() {
       await db.collection('banners_config').deleteMany({});
       const { _id, ...cleanBanners } = bannersData;
       await db.collection('banners_config').insertOne(cleanBanners);
-      console.log(`🎨 Synced ${bannersData.banners?.length || 0} Offer Banners to collection "banners_config"`);
+
+      await db.collection('banners').deleteMany({});
+      await db.collection('banners').insertOne(cleanBanners);
+
+      console.log(`🎨 Synced ${bannersData.banners?.length || 0} Offer Banners to collections "banners_config" & "banners"`);
     }
 
     // 5. Orders

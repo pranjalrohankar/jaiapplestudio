@@ -207,7 +207,10 @@ export default function ProductsManager() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/products");
+      const res = await fetch(`/api/products?t=${Date.now()}`, {
+        cache: "no-store",
+        headers: { Pragma: "no-cache" },
+      });
       const json = await res.json();
       if (!res.ok || json.error) {
         throw new Error(json.error || `Failed to fetch products (HTTP ${res.status})`);

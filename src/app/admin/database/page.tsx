@@ -37,7 +37,10 @@ export default function DatabaseSyncManager() {
   const checkStatus = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/sync-db");
+      const res = await fetch(`/api/sync-db?t=${Date.now()}`, {
+        cache: "no-store",
+        headers: { Pragma: "no-cache" },
+      });
       const json = await res.json();
       setStatus(json);
     } catch (err: any) {

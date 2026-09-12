@@ -16,7 +16,10 @@ export default function Footer() {
   useEffect(() => {
     async function fetchSocial() {
       try {
-        const res = await fetch("/api/social");
+        const res = await fetch(`/api/social?t=${Date.now()}`, {
+          cache: "no-store",
+          headers: { Pragma: "no-cache" },
+        });
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data.socialLinks) && data.socialLinks.length > 0) {

@@ -3,6 +3,9 @@ import { getMongoClient } from "@/lib/mongodb";
 import fs from "fs/promises";
 import path from "path";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const dataDir = path.join(process.cwd(), "data");
 
 async function readJsonFile(filename: string, fallback: any = {}) {

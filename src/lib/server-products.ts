@@ -19,7 +19,7 @@ export async function getAllProducts(): Promise<Product[]> {
           .toArray();
       })();
 
-      const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 1200));
+      const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000));
       const products = await Promise.race([mongoPromise, timeoutPromise]);
 
       if (products && Array.isArray(products) && products.length > 0) {
@@ -51,13 +51,26 @@ export async function getAllCategories(): Promise<Category[]> {
       const mongoPromise = (async () => {
         const client = await clientPromise;
         const db = client.db("apple_store");
-        return await db
+        
+        // Try individual items in categories collection
+        const docs = await db
           .collection("categories")
           .find({}, { projection: { _id: 0 } })
           .toArray();
+        if (Array.isArray(docs) && docs.length > 0) {
+          return docs;
+        }
+
+        // Try config doc in categories_config
+        const configDoc = await db.collection("categories_config").findOne({}, { projection: { _id: 0 } });
+        if (configDoc && Array.isArray(configDoc.categories) && configDoc.categories.length > 0) {
+          return configDoc.categories;
+        }
+
+        return null;
       })();
 
-      const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 1200));
+      const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000));
       const categories = await Promise.race([mongoPromise, timeoutPromise]);
 
       if (categories && Array.isArray(categories) && categories.length > 0) {

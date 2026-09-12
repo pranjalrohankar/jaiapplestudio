@@ -78,7 +78,10 @@ export default function AdminSocialManager() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/social");
+      const res = await fetch(`/api/social?t=${Date.now()}`, {
+        cache: "no-store",
+        headers: { Pragma: "no-cache" },
+      });
       const json = await res.json();
       if (!res.ok || json.error) {
         throw new Error(json.error || `Failed to fetch social links (HTTP ${res.status})`);
