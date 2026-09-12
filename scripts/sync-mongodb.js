@@ -101,7 +101,17 @@ async function main() {
       console.log(`📋 Synced ${cleanOrders.length} Orders to collection "orders"`);
     }
 
-    // 6. Social Links
+    // 6. Enquiries
+    const enquiriesData = readData('enquiries.json', { enquiries: [] });
+    const enquiries = Array.isArray(enquiriesData.enquiries) ? enquiriesData.enquiries : [];
+    if (enquiries.length > 0) {
+      await db.collection('enquiries').deleteMany({});
+      const cleanEnquiries = enquiries.map(({ _id, ...rest }) => rest);
+      await db.collection('enquiries').insertMany(cleanEnquiries);
+      console.log(`💬 Synced ${cleanEnquiries.length} Enquiries to collection "enquiries"`);
+    }
+
+    // 7. Social Links
     const socialData = readData('social.json', { socialLinks: [] });
     if (socialData) {
       await db.collection('social_links').deleteMany({});
