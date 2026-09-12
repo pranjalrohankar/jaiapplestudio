@@ -4,10 +4,39 @@ import fs from "fs/promises";
 import path from "path";
 import fallbackData from "../../../../data/products.json";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const dataFilePath = path.join(process.cwd(), "data", "products.json");
 
 export async function GET() {
-  // 1. Read from local data/products.json (instant < 2ms)
+  // 1. Try MongoDB Atlas first (live admin updates)
+  if (clientPromise) {
+    try {
+      const mongoPromise = (async () => {
+        const client = await clientPromise;
+        const db = client.db("apple_store");
+        const categories = await db.collection("categories").find({}, { projection: { _id: 0 } }).toArray();
+        const products = await db.collection("products").find({}, { projection: { _id: 0 } }).toArray();
+        return { categories, products };
+      })();
+
+      const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 1200));
+      const mongoData = await Promise.race([mongoPromise, timeoutPromise]);
+
+      if (mongoData && (mongoData.products.length > 0 || mongoData.categories.length > 0)) {
+        return NextResponse.json({
+          categories: mongoData.categories.length > 0 ? mongoData.categories : fallbackData.categories || [],
+          products: mongoData.products.length > 0 ? mongoData.products : fallbackData.products || [],
+          source: "mongodb",
+        });
+      }
+    } catch (error) {
+      console.warn("MongoDB fetch failed, using fallback:", error);
+    }
+  }
+
+  // 2. Read from local data/products.json as fallback
   try {
     const fileContent = await fs.readFile(dataFilePath, "utf-8");
     const data = JSON.parse(fileContent);
@@ -15,61 +44,41 @@ export async function GET() {
       return NextResponse.json({
         categories: data.categories || fallbackData.categories || [],
         products: data.products || fallbackData.products || [],
+        source: "local",
       });
     }
   } catch (fileError) {
-    // If local read fails, continue to MongoDB / fallback
+    // Continue to fallbackData
   }
 
-  // 2. Try MongoDB if local file is missing
-  if (clientPromise) {
-    try {
-      const client = await clientPromise;
-      const db = client.db("apple_store");
-      
-      const categories = await db.collection("categories").find({}, { projection: { _id: 0 } }).toArray();
-      const products = await db.collection("products").find({}, { projection: { _id: 0 } }).toArray();
-
-      if (products.length > 0 || categories.length > 0) {
-        return NextResponse.json({ categories, products });
-      }
-    } catch (error) {
-      console.warn("MongoDB fetch failed, using fallback:", error);
-    }
-  }
-
-  // 3. Fallback
+  // 3. Fallback to bundled data
   return NextResponse.json({
     categories: fallbackData.categories || [],
     products: fallbackData.products || [],
+    source: "fallback",
   });
 }
 
 export async function POST(request: Request) {
   try {
     const updatedData = await request.json();
-    
+
     // Basic validation
     if (!updatedData.products || !Array.isArray(updatedData.products)) {
       return NextResponse.json({ error: "Invalid data format" }, { status: 400 });
     }
 
-    // 1. Save locally to data/products.json first (instant < 2ms)
-    try {
-      await fs.writeFile(dataFilePath, JSON.stringify(updatedData, null, 2), "utf-8");
-    } catch (fsError) {
-      console.warn("Could not write to local products.json:", fsError);
-    }
+    let savedToMongo = false;
 
-    // 2. Background sync to MongoDB (non-blocking, zero client latency)
+    // 1. AWAIT save directly into MongoDB Atlas
     if (clientPromise) {
-      (async () => {
-        try {
+      try {
+        const syncPromise = (async () => {
           const client = await clientPromise;
           const db = client.db("apple_store");
 
           await db.collection("products").deleteMany({});
-          
+
           const productsToInsert = updatedData.products.map((p: any) => {
             const { _id, ...rest } = p;
             return rest;
@@ -89,14 +98,29 @@ export async function POST(request: Request) {
               await db.collection("categories").insertMany(categoriesToInsert);
             }
           }
-        } catch (mongoError) {
-          console.warn("Background MongoDB sync for products failed:", mongoError);
-        }
-      })();
+          return true;
+        })();
+
+        const timeoutPromise = new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 2500));
+        savedToMongo = await Promise.race([syncPromise, timeoutPromise]);
+      } catch (mongoError) {
+        console.warn("MongoDB sync failed:", mongoError);
+      }
     }
 
-    return NextResponse.json({ success: true, count: updatedData.products.length });
-  } catch (error) {
+    // 2. Also try local file write for local development
+    try {
+      await fs.writeFile(dataFilePath, JSON.stringify(updatedData, null, 2), "utf-8");
+    } catch (fsError) {
+      // ignore on read-only environments
+    }
+
+    return NextResponse.json({
+      success: true,
+      count: updatedData.products.length,
+      savedToMongo,
+    });
+  } catch (error: any) {
     console.error("Failed to save products data:", error);
     return NextResponse.json({ error: "Failed to save products" }, { status: 500 });
   }

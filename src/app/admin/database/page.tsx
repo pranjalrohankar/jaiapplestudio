@@ -14,6 +14,7 @@ interface SyncStatus {
     slides: number;
     banners: number;
     orders: number;
+    enquiries: number;
     socialLinks: number;
     totalDocuments: number;
   };
@@ -251,12 +252,26 @@ export default function DatabaseSyncManager() {
           <div>
             <span className="text-xs font-bold uppercase tracking-wider text-gray-400 block">Orders Sheet</span>
             <span className="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-1 block">
-              {status?.counts?.orders ?? "5"}
+              {status?.counts?.orders ?? "0"}
             </span>
             <span className="text-xs text-gray-500 mt-0.5 block">Customer bookings &amp; pre-orders</span>
           </div>
           <div className="h-12 w-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl shrink-0">
             📋
+          </div>
+        </div>
+
+        {/* Enquiries */}
+        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+          <div>
+            <span className="text-xs font-bold uppercase tracking-wider text-gray-400 block">Customer Enquiries</span>
+            <span className="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-1 block">
+              {status?.counts?.enquiries ?? "0"}
+            </span>
+            <span className="text-xs text-gray-500 mt-0.5 block">Live customer product leads</span>
+          </div>
+          <div className="h-12 w-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl shrink-0">
+            💬
           </div>
         </div>
 

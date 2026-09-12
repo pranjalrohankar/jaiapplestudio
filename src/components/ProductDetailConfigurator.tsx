@@ -14,7 +14,9 @@ import {
   CheckIcon,
   ChevronRightIcon,
   StarIcon,
+  WhatsAppIcon,
 } from "@/lib/icons";
+import QuickEnquiryModal from "@/components/QuickEnquiryModal";
 
 export default function ProductDetailConfigurator({ product }: { product: Product }) {
   const router = useRouter();
@@ -25,6 +27,7 @@ export default function ProductDetailConfigurator({ product }: { product: Produc
   const [variant, setVariant] = useState<string>(info.variants[0] ?? "");
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
+  const [isEnquiryOpen, setIsEnquiryOpen] = useState(false);
 
   const priceLabel = priceForVariant(product, variant);
   const numericUnitPrice = priceValue(priceLabel);
@@ -386,6 +389,15 @@ export default function ProductDetailConfigurator({ product }: { product: Produc
             </button>
           </div>
 
+          <button
+            type="button"
+            onClick={() => setIsEnquiryOpen(true)}
+            className="w-full flex items-center justify-center gap-2 rounded-full bg-[#f5f5f7] hover:bg-gray-200 py-3 px-4 text-xs font-bold text-ink transition border border-black/5"
+          >
+            <WhatsAppIcon width={16} height={16} className="text-wa-dark" />
+            <span>⚡ Have a Question? Quick Enquiry &amp; EMI Info</span>
+          </button>
+
           <p className="text-center text-xs text-ink/50">
             Free store pickup at Jai Apple Store, Jay Plaza, Pimpri or express delivery across Pune.
           </p>
@@ -408,6 +420,17 @@ export default function ProductDetailConfigurator({ product }: { product: Produc
           </div>
         )}
       </div>
+
+      {/* Quick Product Enquiry Modal */}
+      <QuickEnquiryModal
+        isOpen={isEnquiryOpen}
+        onClose={() => setIsEnquiryOpen(false)}
+        productName={product.name}
+        productSlug={product.slug}
+        variant={variant}
+        color={color}
+        price={totalPrice}
+      />
     </div>
   );
 }

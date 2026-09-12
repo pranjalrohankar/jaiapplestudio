@@ -8,6 +8,9 @@ import Reviews from "@/components/sections/Reviews";
 import JsonLd from "@/components/JsonLd";
 import { store, telLink, mailLink } from "@/lib/store";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "ElectronicsStore",

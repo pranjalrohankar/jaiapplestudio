@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import CategoryView from "@/components/CategoryView";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
-  title: "AirPods — Pro, AirPods 4 & Max",
+  title: "AirPods — Magic Like You've Never Heard",
   description:
-    "Buy genuine AirPods at Jai Apple Store, Pimpri-Chinchwad. AirPods Pro, AirPods 4 and AirPods Max with warranty and EMI options.",
+    "AirPods Pro 2, AirPods 4, AirPods Max with Active Noise Cancellation at Jai Apple Store, Pimpri-Chinchwad.",
 };
 
 export default function AirpodsPage() {

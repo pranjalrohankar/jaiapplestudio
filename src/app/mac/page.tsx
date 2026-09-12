@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import CategoryView from "@/components/CategoryView";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
-  title: "Mac — MacBook Air, Pro, iMac & Mini",
+  title: "Mac — Supercharged by Apple Silicon",
   description:
-    "Buy genuine Mac at Jai Apple Store, Pimpri-Chinchwad. MacBook Air, MacBook Pro, iMac and Mac Mini with EMI options and full warranty.",
+    "MacBook Air, MacBook Pro, Mac mini, iMac in stock at Jai Apple Store, Pimpri-Chinchwad. Student discounts and GST invoices available.",
 };
 
 export default function MacPage() {

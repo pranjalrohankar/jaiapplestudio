@@ -183,7 +183,21 @@ export default function AdminDashboard() {
 
       {/* Quick Navigation Cards */}
       {/* Quick Navigation Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3">
+        <Link
+          href="/admin/enquiries"
+          className="flex items-center justify-between p-4 rounded-2xl bg-white border border-gray-200 shadow-sm hover:border-blue-600 hover:shadow-md transition group"
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-2xl p-2 bg-blue-50 rounded-xl">💬</span>
+            <div>
+              <p className="text-sm font-bold text-gray-900 group-hover:text-blue-600 transition">Enquiries</p>
+              <p className="text-xs text-gray-500">Leads &amp; real-time</p>
+            </div>
+          </div>
+          <span className="text-gray-400 group-hover:text-blue-600">&rarr;</span>
+        </Link>
+
         <Link
           href="/admin/products"
           className="flex items-center justify-between p-4 rounded-2xl bg-white border border-gray-200 shadow-sm hover:border-gray-900 hover:shadow-md transition group"

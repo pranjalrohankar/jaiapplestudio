@@ -2,7 +2,9 @@ import { MongoClient, ServerApiVersion } from 'mongodb';
 import fs from 'fs';
 import path from 'path';
 
-function getMongoURI(): string | undefined {
+const FALLBACK_MONGODB_URI = "mongodb+srv://admin_jai:JaiStore2026Pass@cluster0.the3xab.mongodb.net/apple_store?retryWrites=true&w=majority";
+
+function getMongoURI(): string {
   if (process.env.MONGODB_URI) {
     return process.env.MONGODB_URI;
   }
@@ -11,14 +13,14 @@ function getMongoURI(): string | undefined {
     if (fs.existsSync(envPath)) {
       const content = fs.readFileSync(envPath, 'utf8');
       const match = content.match(/MONGODB_URI=(.*)/);
-      if (match) {
+      if (match && match[1].trim()) {
         return match[1].trim();
       }
     }
   } catch {
     // ignore
   }
-  return undefined;
+  return FALLBACK_MONGODB_URI;
 }
 
 const options = {

@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import CategoryView from "@/components/CategoryView";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "iPhone — Every Model, Every Colour",
   description:

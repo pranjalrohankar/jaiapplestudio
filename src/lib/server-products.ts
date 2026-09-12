@@ -7,7 +7,30 @@ import { type Product, type Category, normalizeSlug, matchProductSlug } from "@/
 const dataFilePath = path.join(process.cwd(), "data", "products.json");
 
 export async function getAllProducts(): Promise<Product[]> {
-  // 1. Read from data/products.json (fastest and always up-to-date locally)
+  // 1. Prioritize MongoDB Atlas (live changes from Admin)
+  if (clientPromise) {
+    try {
+      const mongoPromise = (async () => {
+        const client = await clientPromise;
+        const db = client.db("apple_store");
+        return await db
+          .collection("products")
+          .find({}, { projection: { _id: 0 } })
+          .toArray();
+      })();
+
+      const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 1200));
+      const products = await Promise.race([mongoPromise, timeoutPromise]);
+
+      if (products && Array.isArray(products) && products.length > 0) {
+        return products as unknown as Product[];
+      }
+    } catch (error) {
+      console.warn("MongoDB fetch products failed, using local fallback:", error);
+    }
+  }
+
+  // 2. Read from data/products.json as fallback
   try {
     const fileContent = await fs.readFile(dataFilePath, "utf-8");
     const data = JSON.parse(fileContent);
@@ -15,28 +38,37 @@ export async function getAllProducts(): Promise<Product[]> {
       return data.products;
     }
   } catch (fileError) {
-    // If file read fails, try MongoDB
-  }
-
-  // 2. Try MongoDB if available
-  if (clientPromise) {
-    try {
-      const client = await clientPromise;
-      const db = client.db("apple_store");
-      const products = await db.collection("products").find({}, { projection: { _id: 0 } }).toArray();
-      if (products && products.length > 0) {
-        return products as unknown as Product[];
-      }
-    } catch (error) {
-      console.warn("MongoDB fetch products failed:", error);
-    }
+    // ignore
   }
 
   return (fallbackData.products as Product[]) || [];
 }
 
 export async function getAllCategories(): Promise<Category[]> {
-  // 1. Read from data/products.json
+  // 1. Prioritize MongoDB Atlas
+  if (clientPromise) {
+    try {
+      const mongoPromise = (async () => {
+        const client = await clientPromise;
+        const db = client.db("apple_store");
+        return await db
+          .collection("categories")
+          .find({}, { projection: { _id: 0 } })
+          .toArray();
+      })();
+
+      const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 1200));
+      const categories = await Promise.race([mongoPromise, timeoutPromise]);
+
+      if (categories && Array.isArray(categories) && categories.length > 0) {
+        return categories as unknown as Category[];
+      }
+    } catch (error) {
+      console.warn("MongoDB fetch categories failed, using local fallback:", error);
+    }
+  }
+
+  // 2. Read from data/products.json as fallback
   try {
     const fileContent = await fs.readFile(dataFilePath, "utf-8");
     const data = JSON.parse(fileContent);
@@ -44,21 +76,7 @@ export async function getAllCategories(): Promise<Category[]> {
       return data.categories;
     }
   } catch (fileError) {
-    // If file read fails, try MongoDB
-  }
-
-  // 2. Try MongoDB if available
-  if (clientPromise) {
-    try {
-      const client = await clientPromise;
-      const db = client.db("apple_store");
-      const categories = await db.collection("categories").find({}, { projection: { _id: 0 } }).toArray();
-      if (categories && categories.length > 0) {
-        return categories as unknown as Category[];
-      }
-    } catch (error) {
-      console.warn("MongoDB fetch categories failed:", error);
-    }
+    // ignore
   }
 
   return (fallbackData.categories as Category[]) || [];

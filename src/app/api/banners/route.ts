@@ -5,10 +5,44 @@ import path from "path";
 import fallbackData from "../../../../data/banners.json";
 import { defaultOfferBanners, defaultBannersData, type BannersData, type OfferBanner } from "@/lib/banners";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const bannerFilePath = path.join(process.cwd(), "data", "banners.json");
 
 export async function GET() {
-  // 1. Try local file first (fastest)
+  // 1. Prioritize MongoDB Atlas (live admin updates)
+  if (clientPromise) {
+    try {
+      const mongoPromise = (async () => {
+        const client = await clientPromise;
+        const db = client.db("apple_store");
+        return await db.collection("banners_config").findOne({}, { projection: { _id: 0 } });
+      })();
+
+      const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 1200));
+      const bannerDoc = await Promise.race([mongoPromise, timeoutPromise]);
+
+      if (bannerDoc && (Array.isArray(bannerDoc.banners) || bannerDoc.announcement)) {
+        const announcement = bannerDoc.announcement || defaultBannersData.announcement;
+        const isAnnouncementActive = bannerDoc.isAnnouncementActive ?? true;
+        return NextResponse.json({
+          banners: bannerDoc.banners || defaultOfferBanners,
+          announcement,
+          isAnnouncementActive,
+          banner: {
+            isActive: isAnnouncementActive,
+            announcement,
+          },
+          source: "mongodb",
+        });
+      }
+    } catch (error) {
+      console.warn("MongoDB fetch failed for banner:", error);
+    }
+  }
+
+  // 2. Read from local data/banners.json as fallback
   try {
     const fileContent = await fs.readFile(bannerFilePath, "utf-8");
     const data = JSON.parse(fileContent);
@@ -24,37 +58,14 @@ export async function GET() {
           isActive: isAnnouncementActive,
           announcement,
         },
+        source: "local",
       });
     }
   } catch (fileError) {
-    // Continue to MongoDB
+    // Continue to fallback
   }
 
-  // 2. Try to fetch from MongoDB if available
-  if (clientPromise) {
-    try {
-      const client = await clientPromise;
-      const db = client.db("apple_store");
-      const bannerDoc = await db.collection("banners_config").findOne({}, { projection: { _id: 0 } });
-      if (bannerDoc && (Array.isArray(bannerDoc.banners) || bannerDoc.announcement)) {
-        const announcement = bannerDoc.announcement || defaultBannersData.announcement;
-        const isAnnouncementActive = bannerDoc.isAnnouncementActive ?? true;
-        return NextResponse.json({
-          banners: bannerDoc.banners || defaultOfferBanners,
-          announcement,
-          isAnnouncementActive,
-          banner: {
-            isActive: isAnnouncementActive,
-            announcement,
-          },
-        });
-      }
-    } catch (error) {
-      console.warn("MongoDB fetch failed for banner:", error);
-    }
-  }
-
-  // 3. Fallback
+  // 3. Bundled Fallback
   return NextResponse.json({
     banners: (fallbackData.banners as OfferBanner[]) || defaultOfferBanners,
     announcement: fallbackData.announcement || defaultBannersData.announcement,
@@ -63,13 +74,14 @@ export async function GET() {
       isActive: fallbackData.isAnnouncementActive ?? true,
       announcement: fallbackData.announcement || defaultBannersData.announcement,
     },
+    source: "fallback",
   });
 }
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    
+
     // Normalize data structure
     const banners: OfferBanner[] = Array.isArray(body.banners)
       ? body.banners
@@ -84,25 +96,31 @@ export async function POST(request: Request) {
       banners,
     };
 
-    // 1. Save locally to data/banners.json first (instant < 2ms)
-    try {
-      await fs.writeFile(bannerFilePath, JSON.stringify(dataToSave, null, 2), "utf-8");
-    } catch (fsError) {
-      console.warn("Could not save banner config to local file:", fsError);
-    }
+    let savedToMongo = false;
 
-    // 2. Background sync to MongoDB (non-blocking, zero client latency)
+    // 1. AWAIT MongoDB write
     if (clientPromise) {
-      (async () => {
-        try {
+      try {
+        const syncPromise = (async () => {
           const client = await clientPromise;
           const db = client.db("apple_store");
           await db.collection("banners_config").deleteMany({});
           await db.collection("banners_config").insertOne({ ...dataToSave });
-        } catch (mongoError) {
-          console.warn("Background MongoDB sync for banners failed:", mongoError);
-        }
-      })();
+          return true;
+        })();
+
+        const timeoutPromise = new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 2500));
+        savedToMongo = await Promise.race([syncPromise, timeoutPromise]);
+      } catch (mongoError) {
+        console.warn("MongoDB sync for banners failed:", mongoError);
+      }
+    }
+
+    // 2. Also try local file write
+    try {
+      await fs.writeFile(bannerFilePath, JSON.stringify(dataToSave, null, 2), "utf-8");
+    } catch (fsError) {
+      // ignore on read-only environments
     }
 
     return NextResponse.json({
@@ -110,6 +128,7 @@ export async function POST(request: Request) {
       banners: dataToSave.banners,
       announcement: dataToSave.announcement,
       isAnnouncementActive: dataToSave.isAnnouncementActive,
+      savedToMongo,
     });
   } catch (error: any) {
     console.error("Banner save error:", error);

@@ -14,12 +14,9 @@ import { ChevronRightIcon } from "@/lib/icons";
 
 type Params = Promise<{ slug: string }>;
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 export const dynamicParams = true;
-
-export async function generateStaticParams() {
-  const allProducts = await getAllProducts();
-  return allProducts.map((p) => ({ slug: p.slug }));
-}
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { slug } = await params;

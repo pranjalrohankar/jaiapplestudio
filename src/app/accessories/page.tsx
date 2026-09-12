@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import CategoryView from "@/components/CategoryView";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
-  title: "Accessories — Cases, Chargers, AirTag & more",
+  title: "Apple Accessories — Power Adapters, Cases, Cables",
   description:
-    "Buy genuine Apple accessories at Jai Apple Store, Pimpri-Chinchwad. MagSafe, adapters, cases, cables and AirTag.",
+    "MagSafe chargers, USB-C cables, 20W/30W adapters, iPhone cases, Apple Pencil, and Magic accessories at Jai Apple Store.",
 };
 
 export default function AccessoriesPage() {

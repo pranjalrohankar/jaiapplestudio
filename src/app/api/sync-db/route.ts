@@ -24,6 +24,7 @@ export async function GET() {
     const sliderDoc = await db.collection("slider_config").findOne({});
     const bannerDoc = await db.collection("banners_config").findOne({});
     const ordersCount = await db.collection("orders").countDocuments();
+    const enquiriesCount = await db.collection("enquiries").countDocuments();
     const socialDoc = await db.collection("social_links").findOne({});
 
     const slidesCount = Array.isArray(sliderDoc?.slides) ? sliderDoc.slides.length : 0;
@@ -39,8 +40,16 @@ export async function GET() {
         slides: slidesCount,
         banners: bannersCount,
         orders: ordersCount,
+        enquiries: enquiriesCount,
         socialLinks: socialLinksCount,
-        totalDocuments: productsCount + categoriesCount + (sliderDoc ? 1 : 0) + (bannerDoc ? 1 : 0) + ordersCount + (socialDoc ? 1 : 0),
+        totalDocuments:
+          productsCount +
+          categoriesCount +
+          (sliderDoc ? 1 : 0) +
+          (bannerDoc ? 1 : 0) +
+          ordersCount +
+          enquiriesCount +
+          (socialDoc ? 1 : 0),
       },
     });
   } catch (err: any) {
@@ -72,6 +81,7 @@ export async function POST() {
     const bannersData = await readJsonFile("banners.json", { banners: [], announcement: "" });
     const categoriesData = await readJsonFile("categories.json", { categories: [] });
     const ordersData = await readJsonFile("orders.json", { orders: [] });
+    const enquiriesData = await readJsonFile("enquiries.json", { enquiries: [] });
     const socialData = await readJsonFile("social.json", { socialLinks: [] });
 
     const results: Record<string, number> = {};
@@ -133,7 +143,19 @@ export async function POST() {
       results.orders = cleanOrders.length;
     }
 
-    // 7. Sync Social Links
+    // 7. Sync Enquiries
+    const enquiriesList = Array.isArray(enquiriesData.enquiries) ? enquiriesData.enquiries : [];
+    if (enquiriesList.length > 0) {
+      await db.collection("enquiries").deleteMany({});
+      const cleanEnquiries = enquiriesList.map((e: any) => {
+        const { _id, ...rest } = e;
+        return rest;
+      });
+      await db.collection("enquiries").insertMany(cleanEnquiries);
+      results.enquiries = cleanEnquiries.length;
+    }
+
+    // 8. Sync Social Links
     if (socialData) {
       await db.collection("social_links").deleteMany({});
       const { _id, ...cleanSocial } = socialData;
