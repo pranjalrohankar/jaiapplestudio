@@ -2,11 +2,12 @@ import { MongoClient, ServerApiVersion } from 'mongodb';
 import fs from 'fs';
 import path from 'path';
 
-const FALLBACK_MONGODB_URI = "mongodb+srv://admin_jai:JaiStore2026Pass@cluster0.the3xab.mongodb.net/apple_store?retryWrites=true&w=majority";
+export const FALLBACK_MONGODB_URI =
+  "mongodb+srv://admin_jai:JaiStore2026Pass@cluster0.the3xab.mongodb.net/apple_store?retryWrites=true&w=majority";
 
 function getMongoURI(): string {
-  if (process.env.MONGODB_URI) {
-    return process.env.MONGODB_URI;
+  if (process.env.MONGODB_URI && process.env.MONGODB_URI.trim()) {
+    return process.env.MONGODB_URI.trim();
   }
   try {
     const envPath = path.join(process.cwd(), '.env.local');
@@ -29,9 +30,9 @@ const options = {
     strict: true,
     deprecationErrors: true,
   },
-  connectTimeoutMS: 2500,
-  serverSelectionTimeoutMS: 2500,
-  socketTimeoutMS: 5000,
+  connectTimeoutMS: 3500,
+  serverSelectionTimeoutMS: 3500,
+  socketTimeoutMS: 6000,
   maxPoolSize: 10,
 };
 
@@ -46,15 +47,17 @@ declare global {
   var _mongoLastErrorMessage: string | undefined;
 }
 
-const CIRCUIT_BREAKER_COOLDOWN_MS = 30000; // 30 seconds cooldown after a connection failure
+const CIRCUIT_BREAKER_COOLDOWN_MS = 5000; // 5s short cooldown
+
+async function connectWithUri(uri: string): Promise<MongoClient> {
+  const client = new MongoClient(uri, options);
+  return await client.connect();
+}
 
 export async function getMongoClient(): Promise<MongoClient> {
-  const uri = getMongoURI();
-  if (!uri) {
-    throw new Error('MONGODB_URI is not set');
-  }
+  const primaryUri = getMongoURI();
 
-  // Circuit breaker: If MongoDB failed within the last 30s, fail immediately without blocking requests
+  // Short Circuit breaker: If MongoDB failed within the last 5s, throw brief error
   const now = Date.now();
   if (
     global._mongoLastFailureTime &&
@@ -64,43 +67,58 @@ export async function getMongoClient(): Promise<MongoClient> {
       (CIRCUIT_BREAKER_COOLDOWN_MS - (now - global._mongoLastFailureTime)) / 1000
     );
     throw new Error(
-      `MongoDB connection temporarily paused (${remainingSec}s remaining). Last error: ${global._mongoLastErrorMessage || 'Network / IP Access Blocked'}`
+      `MongoDB connection cooldown (${remainingSec}s). Last error: ${global._mongoLastErrorMessage || 'Authentication / Network Error'}`
     );
   }
 
-  // In development, reuse active promise if URI hasn't changed
-  if (global._mongoClientPromise && global._mongoCachedUri === uri) {
+  // Reuse active promise if available
+  if (global._mongoClientPromise && global._mongoCachedUri) {
     try {
       const client = await global._mongoClientPromise;
       return client;
     } catch {
-      // If previous promise rejected, reset and retry
       global._mongoClientPromise = undefined;
     }
   }
 
-  const client = new MongoClient(uri, options);
-  const promise = client
-    .connect()
-    .then((connectedClient) => {
-      // Clear failure record on successful connection
+  const promise = (async () => {
+    try {
+      const connectedClient = await connectWithUri(primaryUri);
       global._mongoLastFailureTime = undefined;
       global._mongoLastErrorMessage = undefined;
+      global._mongoCachedUri = primaryUri;
       return connectedClient;
-    })
-    .catch((err) => {
-      // Trigger circuit breaker so subsequent requests don't hang
+    } catch (err: any) {
+      // If primary URI failed with authentication error and is different from fallback URI, try fallback URI!
+      const isAuthError =
+        err?.message?.includes('Authentication failed') ||
+        err?.message?.includes('bad auth') ||
+        err?.code === 8000;
+
+      if (isAuthError && primaryUri !== FALLBACK_MONGODB_URI) {
+        console.warn('Primary MONGODB_URI had authentication failure. Retrying with default cluster URI...');
+        try {
+          const fallbackClient = await connectWithUri(FALLBACK_MONGODB_URI);
+          global._mongoLastFailureTime = undefined;
+          global._mongoLastErrorMessage = undefined;
+          global._mongoCachedUri = FALLBACK_MONGODB_URI;
+          return fallbackClient;
+        } catch (fallbackErr: any) {
+          global._mongoLastFailureTime = Date.now();
+          global._mongoLastErrorMessage = fallbackErr?.message || 'Authentication failed on fallback';
+          global._mongoClientPromise = undefined;
+          throw fallbackErr;
+        }
+      }
+
       global._mongoLastFailureTime = Date.now();
       global._mongoLastErrorMessage = err?.message || 'Connection failed';
       global._mongoClientPromise = undefined;
       throw err;
-    });
+    }
+  })();
 
-  if (process.env.NODE_ENV === 'development') {
-    global._mongoClientPromise = promise;
-    global._mongoCachedUri = uri;
-  }
-
+  global._mongoClientPromise = promise;
   return promise;
 }
 
@@ -126,7 +144,7 @@ export async function withMongo<T>(
   }
 }
 
-// Proxy object or thenable to remain 100% backward compatible with `await clientPromise`
+// Proxy object to remain 100% backward compatible with `await clientPromise`
 const clientPromise = {
   then<TResult1 = MongoClient, TResult2 = never>(
     onfulfilled?: ((value: MongoClient) => TResult1 | PromiseLike<TResult1>) | null,

@@ -176,7 +176,7 @@ export async function POST() {
         error: err?.message || "Database synchronization failed",
         hint: "Ensure MongoDB Atlas Network Access has IP 0.0.0.0/0 allowed.",
       },
-      { status: 500 }
+      { status: 400 }
     );
   }
 }
