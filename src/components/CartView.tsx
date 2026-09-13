@@ -97,7 +97,12 @@ export default function CartView() {
     launchOrder(profile.name, profile.phone, profile.city, custNote);
   }
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   async function launchOrder(name: string, phone: string, city?: string, note?: string) {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
     const orderNo = nextOrderNumber();
     const totalDisplay =
       subtotal > 0
@@ -137,6 +142,8 @@ export default function CartView() {
       await recordOrder(orderRecord);
     } catch (err) {
       console.warn("Failed to record order:", err);
+    } finally {
+      setTimeout(() => setIsSubmitting(false), 2000);
     }
 
     const message = buildOrderMessage({
@@ -425,11 +432,16 @@ export default function CartView() {
               {/* MAIN ACTION BUTTON: Solid Apple Black */}
               <button
                 type="button"
+                disabled={isSubmitting}
                 onClick={handleBuyNowClick}
-                className="w-full mt-5 flex items-center justify-center gap-2 rounded-full bg-[#1d1d1f] hover:bg-[#333336] text-white py-4 text-sm font-semibold shadow-sm transition active:scale-[0.99]"
+                className="w-full mt-5 flex items-center justify-center gap-2 rounded-full bg-[#1d1d1f] hover:bg-[#333336] text-white py-4 text-sm font-semibold shadow-sm transition active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
               >
-                <BagIcon width={16} height={16} />
-                {hasPreOrder ? "Pre-Order Now" : "Buy Now"}
+                {isSubmitting ? (
+                  <div className="h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                ) : (
+                  <BagIcon width={16} height={16} />
+                )}
+                <span>{isSubmitting ? "Processing Order..." : hasPreOrder ? "Pre-Order Now" : "Buy Now"}</span>
               </button>
 
               <p className="mt-3 text-center text-xs text-gray-400">
@@ -542,10 +554,15 @@ export default function CartView() {
 
               <button
                 type="submit"
-                className="w-full mt-4 flex items-center justify-center gap-2 rounded-full bg-[#1d1d1f] hover:bg-[#333336] text-white py-3.5 text-sm font-semibold shadow-sm transition active:scale-[0.99]"
+                disabled={isSubmitting}
+                className="w-full mt-4 flex items-center justify-center gap-2 rounded-full bg-[#1d1d1f] hover:bg-[#333336] text-white py-3.5 text-sm font-semibold shadow-sm transition active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
               >
-                <BagIcon width={16} height={16} />
-                {hasPreOrder ? "Confirm Pre-Order & Proceed" : "Proceed to Buy"}
+                {isSubmitting ? (
+                  <div className="h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                ) : (
+                  <BagIcon width={16} height={16} />
+                )}
+                <span>{isSubmitting ? "Submitting..." : hasPreOrder ? "Confirm Pre-Order & Proceed" : "Proceed to Buy"}</span>
               </button>
             </form>
           </div>
