@@ -20,33 +20,27 @@ export async function GET() {
   // 1. Prioritize MongoDB Atlas (live admin updates)
   if (clientPromise) {
     try {
-      const mongoPromise = (async () => {
-        const client = await clientPromise;
-        const db = client.db("apple_store");
+      const client = await clientPromise;
+      const db = client.db("apple_store");
 
-        // Try individual documents in 'categories' collection first
-        const docs = await db.collection("categories").find({}, { projection: { _id: 0 } }).toArray();
-        if (Array.isArray(docs) && docs.length > 0) {
-          // If docs is array of CategoryTile
-          return docs;
-        }
-
-        // Try config doc in 'categories_config'
-        const configDoc = await db.collection("categories_config").findOne({}, { projection: { _id: 0 } });
-        if (configDoc && Array.isArray(configDoc.categories) && configDoc.categories.length > 0) {
-          return configDoc.categories;
-        }
-
-        return null;
-      })();
-
-      const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000));
-      const categories = await Promise.race([mongoPromise, timeoutPromise]);
-
-      if (categories && Array.isArray(categories) && categories.length > 0) {
+      // Try individual documents in 'categories' collection first
+      const docs = await db.collection("categories").find({}, { projection: { _id: 0 } }).toArray();
+      if (Array.isArray(docs) && docs.length > 0) {
         return NextResponse.json(
           {
-            categories,
+            categories: docs,
+            source: "mongodb",
+          },
+          { headers: NO_CACHE_HEADERS }
+        );
+      }
+
+      // Try config doc in 'categories_config'
+      const configDoc = await db.collection("categories_config").findOne({}, { projection: { _id: 0 } });
+      if (configDoc && Array.isArray(configDoc.categories) && configDoc.categories.length > 0) {
+        return NextResponse.json(
+          {
+            categories: configDoc.categories,
             source: "mongodb",
           },
           { headers: NO_CACHE_HEADERS }
@@ -95,33 +89,28 @@ export async function POST(request: Request) {
 
     let savedToMongo = false;
 
-    // 1. AWAIT MongoDB write
+    // 1. Direct MongoDB write
     if (clientPromise) {
       try {
-        const syncPromise = (async () => {
-          const client = await clientPromise;
-          const db = client.db("apple_store");
+        const client = await clientPromise;
+        const db = client.db("apple_store");
 
-          const cleanCategories = categories.map((c: any) => {
-            const { _id, ...rest } = c;
-            return rest;
-          });
+        const cleanCategories = categories.map((c: any) => {
+          const { _id, ...rest } = c;
+          return rest;
+        });
 
-          // Sync to 'categories' collection (array of items)
-          await db.collection("categories").deleteMany({});
-          if (cleanCategories.length > 0) {
-            await db.collection("categories").insertMany(cleanCategories);
-          }
+        // Sync to 'categories' collection (array of items)
+        await db.collection("categories").deleteMany({});
+        if (cleanCategories.length > 0) {
+          await db.collection("categories").insertMany(cleanCategories);
+        }
 
-          // Also sync to 'categories_config' collection (single doc with { categories })
-          await db.collection("categories_config").deleteMany({});
-          await db.collection("categories_config").insertOne({ categories: cleanCategories });
+        // Also sync to 'categories_config' collection (single doc with { categories })
+        await db.collection("categories_config").deleteMany({});
+        await db.collection("categories_config").insertOne({ categories: cleanCategories });
 
-          return true;
-        })();
-
-        const timeoutPromise = new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 5000));
-        savedToMongo = await Promise.race([syncPromise, timeoutPromise]);
+        savedToMongo = true;
       } catch (mongoError) {
         console.warn("MongoDB sync for categories failed:", mongoError);
       }

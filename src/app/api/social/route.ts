@@ -20,32 +20,27 @@ export async function GET() {
   // 1. Prioritize MongoDB Atlas (live admin updates)
   if (clientPromise) {
     try {
-      const mongoPromise = (async () => {
-        const client = await clientPromise;
-        const db = client.db("apple_store");
+      const client = await clientPromise;
+      const db = client.db("apple_store");
 
-        // Try social_links first
-        const doc = await db.collection("social_links").findOne({}, { projection: { _id: 0 } });
-        if (doc && Array.isArray(doc.socialLinks) && doc.socialLinks.length > 0) {
-          return doc.socialLinks;
-        }
-
-        // Try social_config
-        const configDoc = await db.collection("social_config").findOne({}, { projection: { _id: 0 } });
-        if (configDoc && Array.isArray(configDoc.socialLinks) && configDoc.socialLinks.length > 0) {
-          return configDoc.socialLinks;
-        }
-
-        return null;
-      })();
-
-      const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000));
-      const socialLinks = await Promise.race([mongoPromise, timeoutPromise]);
-
-      if (socialLinks && Array.isArray(socialLinks) && socialLinks.length > 0) {
+      // Try social_links first
+      const doc = await db.collection("social_links").findOne({}, { projection: { _id: 0 } });
+      if (doc && Array.isArray(doc.socialLinks) && doc.socialLinks.length > 0) {
         return NextResponse.json(
           {
-            socialLinks,
+            socialLinks: doc.socialLinks,
+            source: "mongodb",
+          },
+          { headers: NO_CACHE_HEADERS }
+        );
+      }
+
+      // Try social_config
+      const configDoc = await db.collection("social_config").findOne({}, { projection: { _id: 0 } });
+      if (configDoc && Array.isArray(configDoc.socialLinks) && configDoc.socialLinks.length > 0) {
+        return NextResponse.json(
+          {
+            socialLinks: configDoc.socialLinks,
             source: "mongodb",
           },
           { headers: NO_CACHE_HEADERS }
@@ -94,25 +89,20 @@ export async function POST(request: Request) {
 
     let savedToMongo = false;
 
-    // 1. AWAIT MongoDB write
+    // 1. Direct MongoDB write
     if (clientPromise) {
       try {
-        const syncPromise = (async () => {
-          const client = await clientPromise;
-          const db = client.db("apple_store");
+        const client = await clientPromise;
+        const db = client.db("apple_store");
 
-          // Sync to both social_links and social_config
-          await db.collection("social_links").deleteMany({});
-          await db.collection("social_links").insertOne({ ...dataToSave });
+        // Sync to both social_links and social_config
+        await db.collection("social_links").deleteMany({});
+        await db.collection("social_links").insertOne({ ...dataToSave });
 
-          await db.collection("social_config").deleteMany({});
-          await db.collection("social_config").insertOne({ ...dataToSave });
+        await db.collection("social_config").deleteMany({});
+        await db.collection("social_config").insertOne({ ...dataToSave });
 
-          return true;
-        })();
-
-        const timeoutPromise = new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 5000));
-        savedToMongo = await Promise.race([syncPromise, timeoutPromise]);
+        savedToMongo = true;
       } catch (mongoError) {
         console.warn("MongoDB sync for social links failed:", mongoError);
       }
