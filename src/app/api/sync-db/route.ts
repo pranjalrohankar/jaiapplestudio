@@ -134,29 +134,37 @@ export async function POST() {
       results.banners = Array.isArray(bannersData.banners) ? bannersData.banners.length : 1;
     }
 
-    // 6. Sync Orders
+    // 6. Sync Orders (Non-destructive upsert to preserve live orders)
     const ordersList = Array.isArray(ordersData.orders) ? ordersData.orders : [];
-    if (ordersList.length > 0) {
-      await db.collection("orders").deleteMany({});
-      const cleanOrders = ordersList.map((o: any) => {
-        const { _id, ...rest } = o;
-        return rest;
-      });
-      await db.collection("orders").insertMany(cleanOrders);
-      results.orders = cleanOrders.length;
+    let syncedOrdersCount = 0;
+    for (const o of ordersList) {
+      if (o && o.orderNo) {
+        const { _id, ...cleanOrder } = o;
+        await db.collection("orders").updateOne(
+          { orderNo: cleanOrder.orderNo },
+          { $set: cleanOrder },
+          { upsert: true }
+        );
+        syncedOrdersCount++;
+      }
     }
+    results.orders = syncedOrdersCount;
 
-    // 7. Sync Enquiries
+    // 7. Sync Enquiries (Non-destructive upsert to preserve live customer leads)
     const enquiriesList = Array.isArray(enquiriesData.enquiries) ? enquiriesData.enquiries : [];
-    if (enquiriesList.length > 0) {
-      await db.collection("enquiries").deleteMany({});
-      const cleanEnquiries = enquiriesList.map((e: any) => {
-        const { _id, ...rest } = e;
-        return rest;
-      });
-      await db.collection("enquiries").insertMany(cleanEnquiries);
-      results.enquiries = cleanEnquiries.length;
+    let syncedEnquiriesCount = 0;
+    for (const e of enquiriesList) {
+      if (e && e.enquiryNo) {
+        const { _id, ...cleanEnquiry } = e;
+        await db.collection("enquiries").updateOne(
+          { enquiryNo: cleanEnquiry.enquiryNo },
+          { $set: cleanEnquiry },
+          { upsert: true }
+        );
+        syncedEnquiriesCount++;
+      }
     }
+    results.enquiries = syncedEnquiriesCount;
 
     // 8. Sync Social Links
     if (socialData) {

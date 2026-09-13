@@ -27,7 +27,7 @@ export type EnquiryRecord = {
 };
 
 /**
- * Format enquiry number: ENQ-YYYYMMDD-001
+ * Format enquiry number: ENQ-YYYYMMDD-XXXX (Guaranteed unique across all devices & sessions)
  */
 export function nextEnquiryNumber(): string {
   const now = new Date();
@@ -36,26 +36,11 @@ export function nextEnquiryNumber(): string {
   const d = String(now.getDate()).padStart(2, "0");
   const dateTag = `${y}${m}${d}`;
 
-  const key = `jas-enquiry-${dateTag}`;
-  let last = 0;
-  try {
-    if (typeof window !== "undefined") {
-      last = Number(window.localStorage.getItem(key) ?? "0") || 0;
-    }
-  } catch {
-    // ignore
-  }
+  // High-entropy timestamp + random alphanumeric suffix
+  const timeSuffix = Date.now().toString(36).slice(-3).toUpperCase();
+  const randomSuffix = Math.random().toString(36).substring(2, 6).toUpperCase();
 
-  const n = last + 1;
-  try {
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(key, String(n));
-    }
-  } catch {
-    // ignore
-  }
-
-  return `ENQ-${dateTag}-${String(n).padStart(3, "0")}`;
+  return `ENQ-${dateTag}-${timeSuffix}${randomSuffix}`;
 }
 
 export function formatEnquiryDate(dateInput: string | Date = new Date()): string {

@@ -41,46 +41,111 @@ const NO_CACHE_HEADERS = {
   Expires: "0",
 };
 
-// GET all enquiries (Instant local response with fast MongoDB background sync)
+function generateUniqueEnquiryNo(): string {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, "0");
+  const d = String(now.getDate()).padStart(2, "0");
+  const dateTag = `${y}${m}${d}`;
+  const timeSuffix = Date.now().toString(36).slice(-3).toUpperCase();
+  const randomSuffix = Math.random().toString(36).substring(2, 6).toUpperCase();
+  return `ENQ-${dateTag}-${timeSuffix}${randomSuffix}`;
+}
+
+// GET all enquiries (Robust bidirectional merge so no enquiry is ever lost)
 export async function GET() {
-  // 1. Try MongoDB Atlas first
+  const localEnquiries = readLocalEnquiries();
+  let mongoEnquiries: EnquiryRecord[] = [];
+
+  // 1. Fetch from MongoDB Atlas
   if (clientPromise) {
     try {
       const mongoPromise = (async () => {
         const client = await clientPromise;
         const db = client.db("apple_store");
-        return await db
+        const docs = await db
           .collection("enquiries")
-          .find({}, { projection: { _id: 0 } })
+          .find({})
           .sort({ createdAt: -1 })
           .toArray();
+
+        return docs.map((doc: any) => {
+          const { _id, ...rest } = doc;
+          return rest as EnquiryRecord;
+        });
       })();
 
-      const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000));
-      const mongoEnquiries = await Promise.race([mongoPromise, timeoutPromise]);
-
-      if (mongoEnquiries && Array.isArray(mongoEnquiries) && mongoEnquiries.length > 0) {
-        return NextResponse.json(
-          { enquiries: mongoEnquiries, source: "mongodb" },
-          { headers: NO_CACHE_HEADERS }
-        );
-      }
+      const timeoutPromise = new Promise<EnquiryRecord[]>((resolve) =>
+        setTimeout(() => resolve([]), 4000)
+      );
+      mongoEnquiries = await Promise.race([mongoPromise, timeoutPromise]);
     } catch (mongoError) {
       console.warn("MongoDB fetch enquiries failed:", mongoError);
     }
   }
 
-  // 2. Read from local file
-  const localEnquiries = readLocalEnquiries();
-  localEnquiries.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  // 2. Merge Mongo & Local by enquiryNo
+  const enquiryMap = new Map<string, EnquiryRecord>();
+
+  // Add Mongo records first
+  for (const item of mongoEnquiries) {
+    if (item && item.enquiryNo) {
+      enquiryMap.set(item.enquiryNo, item);
+    }
+  }
+
+  // Add local records that might not be in Mongo yet
+  const missingInMongo: EnquiryRecord[] = [];
+  for (const item of localEnquiries) {
+    if (item && item.enquiryNo) {
+      if (!enquiryMap.has(item.enquiryNo)) {
+        enquiryMap.set(item.enquiryNo, item);
+        missingInMongo.push(item);
+      }
+    }
+  }
+
+  // If local had records missing in Mongo, background sync them
+  if (missingInMongo.length > 0 && clientPromise) {
+    (async () => {
+      try {
+        const client = await clientPromise;
+        const db = client.db("apple_store");
+        for (const missing of missingInMongo) {
+          await db.collection("enquiries").updateOne(
+            { enquiryNo: missing.enquiryNo },
+            { $set: missing },
+            { upsert: true }
+          );
+        }
+      } catch (err) {
+        console.warn("Background sync of missing enquiries to Mongo failed:", err);
+      }
+    })().catch(() => {});
+  }
+
+  // Build sorted array (newest first)
+  const mergedEnquiries = Array.from(enquiryMap.values()).sort((a, b) => {
+    const timeA = new Date(a.createdAt || a.date).getTime() || 0;
+    const timeB = new Date(b.createdAt || b.date).getTime() || 0;
+    return timeB - timeA;
+  });
+
+  // Keep local storage up to date with full list
+  if (mergedEnquiries.length > localEnquiries.length) {
+    writeLocalEnquiries(mergedEnquiries);
+  }
 
   return NextResponse.json(
-    { enquiries: localEnquiries, source: "local" },
+    {
+      enquiries: mergedEnquiries,
+      source: mongoEnquiries.length > 0 ? "mongodb+synced" : "local",
+    },
     { headers: NO_CACHE_HEADERS }
   );
 }
 
-// POST a new customer enquiry
+// POST a new customer enquiry (Guaranteed unique, never overwrites)
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -94,10 +159,16 @@ export async function POST(req: Request) {
     }
 
     const now = new Date();
+    const existingLocal = readLocalEnquiries();
+
+    // Determine clean and unique enquiryNo
+    let finalEnquiryNo = (rawEnquiry.enquiryNo || "").trim();
+    if (!finalEnquiryNo || existingLocal.some((e) => e.enquiryNo === finalEnquiryNo)) {
+      finalEnquiryNo = generateUniqueEnquiryNo();
+    }
+
     const newEnquiry: EnquiryRecord = {
-      enquiryNo:
-        rawEnquiry.enquiryNo ||
-        `ENQ-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}-${Math.floor(100 + Math.random() * 900)}`,
+      enquiryNo: finalEnquiryNo,
       name: rawEnquiry.name.trim(),
       phone: rawEnquiry.phone.trim(),
       email: rawEnquiry.email?.trim() || "",
@@ -122,36 +193,28 @@ export async function POST(req: Request) {
       updatedAt: now.toISOString(),
     };
 
-    // 1. Always persist locally first (instant response)
-    const enquiries = readLocalEnquiries();
-    const existingIndex = enquiries.findIndex((e) => e.enquiryNo === newEnquiry.enquiryNo);
-    if (existingIndex >= 0) {
-      enquiries[existingIndex] = newEnquiry;
-    } else {
-      enquiries.unshift(newEnquiry);
-    }
-    writeLocalEnquiries(enquiries);
+    // 1. Prepend to local storage (never overwrite different records)
+    const updatedLocal = [newEnquiry, ...existingLocal.filter((e) => e.enquiryNo !== finalEnquiryNo)];
+    writeLocalEnquiries(updatedLocal);
 
     let savedToMongo = false;
 
-    // 2. Sync to MongoDB Atlas safely with timeout
+    // 2. Insert into MongoDB Atlas (insertOne to guarantee fresh separate document)
     if (clientPromise) {
       try {
         const syncPromise = (async () => {
           const client = await clientPromise;
           const db = client.db("apple_store");
-          await db.collection("enquiries").updateOne(
-            { enquiryNo: newEnquiry.enquiryNo },
-            { $set: newEnquiry },
-            { upsert: true }
-          );
+          await db.collection("enquiries").insertOne({ ...newEnquiry });
           return true;
         })();
 
-        const timeoutPromise = new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 5000));
+        const timeoutPromise = new Promise<boolean>((resolve) =>
+          setTimeout(() => resolve(false), 5000)
+        );
         savedToMongo = await Promise.race([syncPromise, timeoutPromise]);
       } catch (mongoError) {
-        console.warn("Could not save enquiry to MongoDB, saved locally:", mongoError);
+        console.warn("Could not insert enquiry into MongoDB, saved locally:", mongoError);
       }
     }
 
@@ -160,7 +223,7 @@ export async function POST(req: Request) {
         success: true,
         enquiry: newEnquiry,
         savedToMongo,
-        enquiries,
+        enquiries: updatedLocal,
       },
       { headers: NO_CACHE_HEADERS }
     );
@@ -179,7 +242,10 @@ export async function PATCH(req: Request) {
     const { enquiryNo, status, adminNote, priority } = body;
 
     if (!enquiryNo) {
-      return NextResponse.json({ error: "Enquiry number required" }, { status: 400, headers: NO_CACHE_HEADERS });
+      return NextResponse.json(
+        { error: "Enquiry number required" },
+        { status: 400, headers: NO_CACHE_HEADERS }
+      );
     }
 
     // 1. Update locally first
@@ -209,7 +275,9 @@ export async function PATCH(req: Request) {
           await db.collection("enquiries").updateOne({ enquiryNo }, { $set: updateFields });
           return true;
         })();
-        const timeoutPromise = new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 5000));
+        const timeoutPromise = new Promise<boolean>((resolve) =>
+          setTimeout(() => resolve(false), 5000)
+        );
         await Promise.race([syncPromise, timeoutPromise]);
       } catch (mongoError) {
         console.warn("Could not update enquiry in MongoDB:", mongoError);
@@ -235,7 +303,10 @@ export async function DELETE(req: Request) {
     const enquiryNo = searchParams.get("enquiryNo");
 
     if (!enquiryNo) {
-      return NextResponse.json({ error: "Enquiry number required" }, { status: 400, headers: NO_CACHE_HEADERS });
+      return NextResponse.json(
+        { error: "Enquiry number required" },
+        { status: 400, headers: NO_CACHE_HEADERS }
+      );
     }
 
     // 1. Delete locally first
@@ -252,7 +323,9 @@ export async function DELETE(req: Request) {
           await db.collection("enquiries").deleteOne({ enquiryNo });
           return true;
         })();
-        const timeoutPromise = new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 5000));
+        const timeoutPromise = new Promise<boolean>((resolve) =>
+          setTimeout(() => resolve(false), 5000)
+        );
         await Promise.race([deletePromise, timeoutPromise]);
       } catch (mongoError) {
         console.warn("Could not delete enquiry in MongoDB:", mongoError);

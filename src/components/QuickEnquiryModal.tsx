@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { store, waLink } from "@/lib/store";
-import { submitEnquiry } from "@/lib/enquiry";
+import { submitEnquiry, nextEnquiryNumber } from "@/lib/enquiry";
 import { WhatsAppIcon, CloseIcon, CheckIcon } from "@/lib/icons";
 
 export default function QuickEnquiryModal({
@@ -38,7 +38,11 @@ export default function QuickEnquiryModal({
     setLoading(true);
 
     try {
+      const generatedEnquiryNo = nextEnquiryNumber();
+      setEnquiryRef(generatedEnquiryNo);
+
       const result = await submitEnquiry({
+        enquiryNo: generatedEnquiryNo,
         name: name.trim(),
         phone: phone.trim(),
         product: productName,
@@ -52,7 +56,7 @@ export default function QuickEnquiryModal({
         status: "New",
       });
 
-      const refNo = result.enquiry?.enquiryNo;
+      const refNo = result.enquiry?.enquiryNo || generatedEnquiryNo;
       if (refNo) setEnquiryRef(refNo);
 
       setSubmitted(true);

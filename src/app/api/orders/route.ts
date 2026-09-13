@@ -26,7 +26,6 @@ export type OrderRecord = {
   orderNo: string;
   date: string;
   createdAt: string;
-  
   customerName: string;
   customerPhone: string;
   customerCity?: string;
@@ -70,93 +69,170 @@ const NO_CACHE_HEADERS = {
   Expires: "0",
 };
 
-// GET all orders (Instant local response with fast background sync)
+function generateUniqueOrderNo(): string {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, "0");
+  const d = String(now.getDate()).padStart(2, "0");
+  const dateTag = `${y}${m}${d}`;
+  const timeSuffix = Date.now().toString(36).slice(-3).toUpperCase();
+  const randomSuffix = Math.random().toString(36).substring(2, 6).toUpperCase();
+  return `JAS-${dateTag}-${timeSuffix}${randomSuffix}`;
+}
+
+// GET all orders (Robust bidirectional merge so no order is ever lost)
 export async function GET() {
-  // 1. Try MongoDB Atlas first
+  const localOrders = readLocalOrders();
+  let mongoOrders: OrderRecord[] = [];
+
+  // 1. Fetch from MongoDB Atlas
   if (clientPromise) {
     try {
       const mongoPromise = (async () => {
         const client = await clientPromise;
         const db = client.db("apple_store");
-        return await db
+        const docs = await db
           .collection("orders")
-          .find({}, { projection: { _id: 0 } })
+          .find({})
           .sort({ createdAt: -1 })
           .toArray();
+
+        return docs.map((doc: any) => {
+          const { _id, ...rest } = doc;
+          return rest as OrderRecord;
+        });
       })();
 
-      const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000));
-      const mongoOrders = await Promise.race([mongoPromise, timeoutPromise]);
-
-      if (mongoOrders && Array.isArray(mongoOrders) && mongoOrders.length > 0) {
-        return NextResponse.json(
-          { orders: mongoOrders, source: "mongodb" },
-          { headers: NO_CACHE_HEADERS }
-        );
-      }
+      const timeoutPromise = new Promise<OrderRecord[]>((resolve) =>
+        setTimeout(() => resolve([]), 4000)
+      );
+      mongoOrders = await Promise.race([mongoPromise, timeoutPromise]);
     } catch (mongoError) {
       console.warn("MongoDB fetch orders failed:", mongoError);
     }
   }
 
-  // 2. Read from local file
-  const localOrders = readLocalOrders();
-  localOrders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  // 2. Merge Mongo & Local by orderNo
+  const orderMap = new Map<string, OrderRecord>();
+
+  // Add Mongo records first
+  for (const item of mongoOrders) {
+    if (item && item.orderNo) {
+      orderMap.set(item.orderNo, item);
+    }
+  }
+
+  // Add local records missing in Mongo
+  const missingInMongo: OrderRecord[] = [];
+  for (const item of localOrders) {
+    if (item && item.orderNo) {
+      if (!orderMap.has(item.orderNo)) {
+        orderMap.set(item.orderNo, item);
+        missingInMongo.push(item);
+      }
+    }
+  }
+
+  // Sync missing in background
+  if (missingInMongo.length > 0 && clientPromise) {
+    (async () => {
+      try {
+        const client = await clientPromise;
+        const db = client.db("apple_store");
+        for (const missing of missingInMongo) {
+          await db.collection("orders").updateOne(
+            { orderNo: missing.orderNo },
+            { $set: missing },
+            { upsert: true }
+          );
+        }
+      } catch (err) {
+        console.warn("Background sync of missing orders to Mongo failed:", err);
+      }
+    })().catch(() => {});
+  }
+
+  // Build sorted array
+  const mergedOrders = Array.from(orderMap.values()).sort((a, b) => {
+    const timeA = new Date(a.createdAt || a.date).getTime() || 0;
+    const timeB = new Date(b.createdAt || b.date).getTime() || 0;
+    return timeB - timeA;
+  });
+
+  if (mergedOrders.length > localOrders.length) {
+    writeLocalOrders(mergedOrders);
+  }
 
   return NextResponse.json(
-    { orders: localOrders, source: "local" },
+    {
+      orders: mergedOrders,
+      source: mongoOrders.length > 0 ? "mongodb+synced" : "local",
+    },
     { headers: NO_CACHE_HEADERS }
   );
 }
 
-// POST a new order (Saves locally first for instant checkout, then syncs to MongoDB)
+// POST a new order (Guaranteed unique, never overwrites)
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const newOrder: OrderRecord = body.order;
+    const rawOrder: OrderRecord = body.order || body;
 
-    if (!newOrder || !newOrder.orderNo) {
+    if (!rawOrder) {
       return NextResponse.json(
         { error: "Invalid order data" },
         { status: 400, headers: NO_CACHE_HEADERS }
       );
     }
 
-    // 1. Always persist locally first (instant < 2ms)
-    const orders = readLocalOrders();
-    const existingIndex = orders.findIndex((o) => o.orderNo === newOrder.orderNo);
-    if (existingIndex >= 0) {
-      orders[existingIndex] = newOrder;
-    } else {
-      orders.unshift(newOrder);
+    const existingLocal = readLocalOrders();
+    let finalOrderNo = (rawOrder.orderNo || "").trim();
+    if (!finalOrderNo || existingLocal.some((o) => o.orderNo === finalOrderNo)) {
+      finalOrderNo = generateUniqueOrderNo();
     }
-    writeLocalOrders(orders);
+
+    const now = new Date();
+    const newOrder: OrderRecord = {
+      ...rawOrder,
+      orderNo: finalOrderNo,
+      date:
+        rawOrder.date ||
+        now.toLocaleDateString("en-IN", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        }),
+      createdAt: rawOrder.createdAt || now.toISOString(),
+      status: rawOrder.status || "New",
+    };
+
+    // 1. Prepend to local storage
+    const updatedLocal = [newOrder, ...existingLocal.filter((o) => o.orderNo !== finalOrderNo)];
+    writeLocalOrders(updatedLocal);
 
     let savedToMongo = false;
 
-    // 2. Sync to MongoDB Atlas safely with timeout
+    // 2. Insert into MongoDB Atlas (insertOne to guarantee fresh separate document)
     if (clientPromise) {
       try {
         const syncPromise = (async () => {
           const client = await clientPromise;
           const db = client.db("apple_store");
-          await db.collection("orders").updateOne(
-            { orderNo: newOrder.orderNo },
-            { $set: newOrder },
-            { upsert: true }
-          );
+          await db.collection("orders").insertOne({ ...newOrder });
           return true;
         })();
 
-        const timeoutPromise = new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 5000));
+        const timeoutPromise = new Promise<boolean>((resolve) =>
+          setTimeout(() => resolve(false), 5000)
+        );
         savedToMongo = await Promise.race([syncPromise, timeoutPromise]);
       } catch (mongoError) {
-        console.warn("Could not save order to MongoDB, saved locally:", mongoError);
+        console.warn("Could not insert order into MongoDB, saved locally:", mongoError);
       }
     }
 
     return NextResponse.json(
-      { success: true, order: newOrder, savedToMongo, orders },
+      { success: true, order: newOrder, savedToMongo, orders: updatedLocal },
       { headers: NO_CACHE_HEADERS }
     );
   } catch (err: any) {
@@ -203,7 +279,9 @@ export async function PATCH(req: Request) {
           await db.collection("orders").updateOne({ orderNo }, { $set: updateFields });
           return true;
         })();
-        const timeoutPromise = new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 5000));
+        const timeoutPromise = new Promise<boolean>((resolve) =>
+          setTimeout(() => resolve(false), 5000)
+        );
         await Promise.race([syncPromise, timeoutPromise]);
       } catch (mongoError) {
         console.warn("Could not update order in MongoDB:", mongoError);
@@ -249,7 +327,9 @@ export async function DELETE(req: Request) {
           await db.collection("orders").deleteOne({ orderNo });
           return true;
         })();
-        const timeoutPromise = new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 5000));
+        const timeoutPromise = new Promise<boolean>((resolve) =>
+          setTimeout(() => resolve(false), 5000)
+        );
         await Promise.race([deletePromise, timeoutPromise]);
       } catch (mongoError) {
         console.warn("Could not delete order in MongoDB:", mongoError);

@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { store, waLink } from "@/lib/store";
 import { products, productBySlug } from "@/lib/products";
-import { submitEnquiry } from "@/lib/enquiry";
+import { submitEnquiry, nextEnquiryNumber } from "@/lib/enquiry";
 import { WhatsAppIcon } from "@/lib/icons";
 
 const OPTIONS = [
@@ -49,8 +49,12 @@ export default function EnquiryForm() {
     setLoading(true);
 
     try {
+      const generatedEnquiryNo = nextEnquiryNumber();
+      setEnquiryRef(generatedEnquiryNo);
+
       // 1. Submit enquiry to our database API in real-time
       const result = await submitEnquiry({
+        enquiryNo: generatedEnquiryNo,
         name: name.trim(),
         phone: phone.trim(),
         email: email.trim(),
@@ -63,7 +67,7 @@ export default function EnquiryForm() {
         status: "New",
       });
 
-      const refNo = result.enquiry?.enquiryNo;
+      const refNo = result.enquiry?.enquiryNo || generatedEnquiryNo;
       if (refNo) setEnquiryRef(refNo);
 
       // 2. Also send to Formspree if configured

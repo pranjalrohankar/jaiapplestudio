@@ -99,25 +99,39 @@ async function main() {
       console.log(`🎨 Synced ${bannersData.banners?.length || 0} Offer Banners to collections "banners_config" & "banners"`);
     }
 
-    // 5. Orders
+    // 5. Orders (Non-destructive upsert)
     const ordersData = readData('orders.json', { orders: [] });
     const orders = Array.isArray(ordersData.orders) ? ordersData.orders : [];
-    if (orders.length > 0) {
-      await db.collection('orders').deleteMany({});
-      const cleanOrders = orders.map(({ _id, ...rest }) => rest);
-      await db.collection('orders').insertMany(cleanOrders);
-      console.log(`📋 Synced ${cleanOrders.length} Orders to collection "orders"`);
+    let syncedOrdersCount = 0;
+    for (const o of orders) {
+      if (o && o.orderNo) {
+        const { _id, ...cleanOrder } = o;
+        await db.collection('orders').updateOne(
+          { orderNo: cleanOrder.orderNo },
+          { $set: cleanOrder },
+          { upsert: true }
+        );
+        syncedOrdersCount++;
+      }
     }
+    console.log(`📋 Synced/Upserted ${syncedOrdersCount} Orders to collection "orders"`);
 
-    // 6. Enquiries
+    // 6. Enquiries (Non-destructive upsert)
     const enquiriesData = readData('enquiries.json', { enquiries: [] });
     const enquiries = Array.isArray(enquiriesData.enquiries) ? enquiriesData.enquiries : [];
-    if (enquiries.length > 0) {
-      await db.collection('enquiries').deleteMany({});
-      const cleanEnquiries = enquiries.map(({ _id, ...rest }) => rest);
-      await db.collection('enquiries').insertMany(cleanEnquiries);
-      console.log(`💬 Synced ${cleanEnquiries.length} Enquiries to collection "enquiries"`);
+    let syncedEnquiriesCount = 0;
+    for (const e of enquiries) {
+      if (e && e.enquiryNo) {
+        const { _id, ...cleanEnquiry } = e;
+        await db.collection('enquiries').updateOne(
+          { enquiryNo: cleanEnquiry.enquiryNo },
+          { $set: cleanEnquiry },
+          { upsert: true }
+        );
+        syncedEnquiriesCount++;
+      }
     }
+    console.log(`💬 Synced/Upserted ${syncedEnquiriesCount} Enquiries to collection "enquiries"`);
 
     // 7. Social Links
     const socialData = readData('social.json', { socialLinks: [] });

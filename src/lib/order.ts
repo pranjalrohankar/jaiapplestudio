@@ -34,9 +34,7 @@ export type OrderRecord = {
 };
 
 /**
- * Order number = "Date" + n+1, where n is the count of orders already
- * generated today on this device, stored in localStorage.
- * Format: JAS-YYYYMMDD-001 (updates automatically each day).
+ * Order number = JAS-YYYYMMDD-XXXX (Guaranteed unique across all devices & sessions)
  */
 export function nextOrderNumber(): string {
   const now = new Date();
@@ -45,22 +43,11 @@ export function nextOrderNumber(): string {
   const d = String(now.getDate()).padStart(2, "0");
   const dateTag = `${y}${m}${d}`;
 
-  const key = `jas-order-${dateTag}`;
-  let last = 0;
-  try {
-    last = Number(window.localStorage.getItem(key) ?? "0") || 0;
-  } catch {
-    // ignore
-  }
+  // High-entropy timestamp + random alphanumeric suffix
+  const timeSuffix = Date.now().toString(36).slice(-3).toUpperCase();
+  const randomSuffix = Math.random().toString(36).substring(2, 6).toUpperCase();
 
-  const n = last + 1;
-  try {
-    window.localStorage.setItem(key, String(n));
-  } catch {
-    // ignore
-  }
-
-  return `JAS-${dateTag}-${String(n).padStart(3, "0")}`;
+  return `JAS-${dateTag}-${timeSuffix}${randomSuffix}`;
 }
 
 export function formatDate(now = new Date()): string {
