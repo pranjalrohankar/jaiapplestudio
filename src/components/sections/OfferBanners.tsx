@@ -12,13 +12,13 @@ export default function OfferBanners() {
     if (typeof window !== "undefined") {
       try {
         const cached = window.localStorage.getItem("jas-live-banners");
-        if (cached) {
+        if (cached !== null) {
           const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed)) return parsed;
         }
       } catch {}
     }
-    return defaultOfferBanners;
+    return [];
   });
 
   useEffect(() => {
@@ -30,16 +30,14 @@ export default function OfferBanners() {
         });
         if (res.ok) {
           const data = await res.json();
-          if (Array.isArray(data.banners) && data.banners.length > 0) {
+          if (Array.isArray(data.banners)) {
             const activeOnly = data.banners.filter((b: OfferBanner) => b.isActive !== false);
-            if (activeOnly.length > 0) {
-              setBanners(activeOnly);
-              try {
-                if (typeof window !== "undefined") {
-                  window.localStorage.setItem("jas-live-banners", JSON.stringify(activeOnly));
-                }
-              } catch {}
-            }
+            setBanners(activeOnly);
+            try {
+              if (typeof window !== "undefined") {
+                window.localStorage.setItem("jas-live-banners", JSON.stringify(activeOnly));
+              }
+            } catch {}
           }
         }
       } catch (err) {

@@ -78,7 +78,7 @@ export default function AdminSliderManager() {
         throw new Error(json.error || `Failed to fetch slider (HTTP ${res.status})`);
       }
       setData({
-        slides: Array.isArray(json.slides) ? json.slides : defaultSliderData.slides,
+        slides: Array.isArray(json.slides) ? json.slides : [],
       });
     } catch (err: any) {
       setError(err?.message || "Failed to load slider configuration");

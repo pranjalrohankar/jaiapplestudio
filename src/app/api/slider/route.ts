@@ -24,7 +24,7 @@ export async function GET() {
       const db = client.db("apple_store");
       const sliderDoc = await db.collection("slider_config").findOne({}, { projection: { _id: 0 } });
 
-      if (sliderDoc && Array.isArray(sliderDoc.slides) && sliderDoc.slides.length > 0) {
+      if (sliderDoc && Array.isArray(sliderDoc.slides)) {
         return NextResponse.json(
           {
             slides: sliderDoc.slides,
@@ -42,7 +42,7 @@ export async function GET() {
   try {
     const fileContent = await fs.readFile(sliderFilePath, "utf-8");
     const data = JSON.parse(fileContent);
-    if (data && Array.isArray(data.slides) && data.slides.length > 0) {
+    if (data && Array.isArray(data.slides)) {
       return NextResponse.json(
         {
           slides: data.slides,
@@ -55,10 +55,10 @@ export async function GET() {
     // Continue to fallback
   }
 
-  // 3. Bundled Fallback
+  // 3. Bundled Fallback (only if no DB/file doc exists at all)
   return NextResponse.json(
     {
-      slides: (fallbackData.slides as SliderSlide[]) || defaultSliderSlides,
+      slides: (fallbackData.slides as SliderSlide[]) || [],
       source: "fallback",
     },
     { headers: NO_CACHE_HEADERS }
@@ -68,7 +68,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const slides: SliderSlide[] = Array.isArray(body.slides) ? body.slides : defaultSliderSlides;
+    const slides: SliderSlide[] = Array.isArray(body.slides) ? body.slides : [];
 
     const dataToSave: SliderData = {
       slides,

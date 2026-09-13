@@ -67,9 +67,9 @@ export default function AdminBannersManager() {
         throw new Error(json.error || `Failed to fetch banners (HTTP ${res.status})`);
       }
       setData({
-        announcement: json.announcement || defaultBannersData.announcement,
+        announcement: json.announcement || "",
         isAnnouncementActive: json.isAnnouncementActive ?? true,
-        banners: Array.isArray(json.banners) ? json.banners : defaultBannersData.banners,
+        banners: Array.isArray(json.banners) ? json.banners : [],
       });
     } catch (err: any) {
       setError(err?.message || "Failed to load banner settings");

@@ -30,9 +30,9 @@ export async function GET() {
 
       const doc = bannerDoc || legacyDoc;
       if (doc && (Array.isArray(doc.banners) || doc.announcement)) {
-        const announcement = doc.announcement || defaultBannersData.announcement;
+        const announcement = doc.announcement || "";
         const isAnnouncementActive = doc.isAnnouncementActive ?? true;
-        const banners = Array.isArray(doc.banners) && doc.banners.length > 0 ? doc.banners : defaultOfferBanners;
+        const banners = Array.isArray(doc.banners) ? doc.banners : [];
 
         return NextResponse.json(
           {
@@ -58,8 +58,8 @@ export async function GET() {
     const fileContent = await fs.readFile(bannerFilePath, "utf-8");
     const data = JSON.parse(fileContent);
     if (data && (Array.isArray(data.banners) || data.announcement)) {
-      const banners = Array.isArray(data.banners) && data.banners.length > 0 ? data.banners : defaultOfferBanners;
-      const announcement = data.announcement || defaultBannersData.announcement;
+      const banners = Array.isArray(data.banners) ? data.banners : [];
+      const announcement = data.announcement || "";
       const isAnnouncementActive = data.isAnnouncementActive ?? true;
       return NextResponse.json(
         {
@@ -82,12 +82,12 @@ export async function GET() {
   // 3. Bundled Fallback
   return NextResponse.json(
     {
-      banners: (fallbackData.banners as OfferBanner[]) || defaultOfferBanners,
-      announcement: fallbackData.announcement || defaultBannersData.announcement,
+      banners: (fallbackData.banners as OfferBanner[]) || [],
+      announcement: fallbackData.announcement || "",
       isAnnouncementActive: fallbackData.isAnnouncementActive ?? true,
       banner: {
         isActive: fallbackData.isAnnouncementActive ?? true,
-        announcement: fallbackData.announcement || defaultBannersData.announcement,
+        announcement: fallbackData.announcement || "",
       },
       source: "fallback",
     },
@@ -100,11 +100,8 @@ export async function POST(request: Request) {
     const body = await request.json();
 
     // Normalize data structure
-    const banners: OfferBanner[] = Array.isArray(body.banners)
-      ? body.banners
-      : defaultOfferBanners;
-
-    const announcement = body.announcement ?? defaultBannersData.announcement;
+    const banners: OfferBanner[] = Array.isArray(body.banners) ? body.banners : [];
+    const announcement = body.announcement ?? "";
     const isAnnouncementActive = body.isAnnouncementActive ?? true;
 
     const dataToSave: BannersData = {

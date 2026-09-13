@@ -11,13 +11,13 @@ export default function Hero() {
     if (typeof window !== "undefined") {
       try {
         const cached = window.localStorage.getItem("jas-live-slider");
-        if (cached) {
+        if (cached !== null) {
           const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed)) return parsed;
         }
       } catch {}
     }
-    return defaultSliderSlides;
+    return [];
   });
   const [current, setCurrent] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
@@ -32,16 +32,14 @@ export default function Hero() {
         });
         if (res.ok) {
           const data = await res.json();
-          if (Array.isArray(data.slides) && data.slides.length > 0) {
+          if (Array.isArray(data.slides)) {
             const activeOnly = data.slides.filter((s: SliderSlide) => s.isActive !== false);
-            if (activeOnly.length > 0) {
-              setSlides(activeOnly);
-              try {
-                if (typeof window !== "undefined") {
-                  window.localStorage.setItem("jas-live-slider", JSON.stringify(activeOnly));
-                }
-              } catch {}
-            }
+            setSlides(activeOnly);
+            try {
+              if (typeof window !== "undefined") {
+                window.localStorage.setItem("jas-live-slider", JSON.stringify(activeOnly));
+              }
+            } catch {}
           }
         }
       } catch (err) {
