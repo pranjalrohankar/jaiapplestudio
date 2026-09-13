@@ -1,36 +1,3 @@
 {
-  "slides": [
-    {
-      "id": "iphone-18-pro",
-      "isActive": true,
-      "badge": "",
-      "title": "",
-      "subtitle": "",
-      "price": "",
-      "ctaText": "",
-      "ctaLink": "",
-      "secondaryText": "",
-      "secondaryLink": "",
-      "image": "https://inventstore.in/wp-content/uploads/2026/05/Untitled-design-2026-05-28T173013.476.webp",
-      "bgGradient": "from-[#08090d] via-[#10121a] to-[#040507]",
-      "accentColor": "#0071e3"
-    },
-    {
-      "id": "banner-1788990210664",
-      "isActive": true,
-      "type": "banner",
-      "imageFit": "cover",
-      "title": "",
-      "badge": "",
-      "subtitle": "",
-      "price": "",
-      "ctaText": "",
-      "ctaLink": "",
-      "secondaryText": "",
-      "secondaryLink": "",
-      "image": "https://inventstore.in/wp-content/uploads/2026/07/banner-website.png",
-      "bgGradient": "from-[#08090d] via-[#10121a] to-[#040507]",
-      "accentColor": "#0071e3"
-    }
-  ]
+  "slides": []
 }
