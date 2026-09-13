@@ -138,6 +138,13 @@ export default function AdminBannersManager() {
       }
 
       setData(updatedData);
+      try {
+        if (typeof window !== "undefined") {
+          const activeOnly = updatedData.banners.filter((b) => b.isActive !== false);
+          window.localStorage.setItem("jas-live-banners", JSON.stringify(activeOnly));
+          window.dispatchEvent(new Event("jas-data-updated"));
+        }
+      } catch {}
       showToast(successMsg || "✓ Offer banners updated successfully!");
     } catch (err: any) {
       setError(err?.message || "An unexpected error occurred while saving");

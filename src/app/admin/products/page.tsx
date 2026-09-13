@@ -188,6 +188,7 @@ export default function ProductsManager() {
       }
 
       setData(newData);
+      syncProductsLocally(finalProducts);
       setShowImportModal(false);
       setImportFile(null);
       setImportResult(null);
@@ -255,6 +256,15 @@ export default function ProductsManager() {
     }
   };
 
+  const syncProductsLocally = (products: Product[]) => {
+    try {
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("jas-live-products", JSON.stringify(products));
+        window.dispatchEvent(new Event("jas-data-updated"));
+      }
+    } catch {}
+  };
+
   const handleQuickStatusChange = async (productSlug: string, newBadge: string) => {
     if (!data) return;
 
@@ -272,6 +282,7 @@ export default function ProductsManager() {
     const newProducts = products.map((p) => (p.slug === productSlug ? updatedProduct : p));
     const newData = { ...data, products: newProducts };
     setData(newData);
+    syncProductsLocally(newProducts);
 
     try {
       const res = await fetch("/api/products", {
@@ -342,6 +353,7 @@ export default function ProductsManager() {
 
     const newData = { ...data, products };
     setData(newData);
+    syncProductsLocally(products);
 
     try {
       const res = await fetch("/api/products", {
@@ -414,6 +426,7 @@ export default function ProductsManager() {
       }
 
       setData(newData);
+      syncProductsLocally(newProducts);
       setEditing(null);
       setPinToTop(false);
       showToast(
@@ -449,6 +462,7 @@ export default function ProductsManager() {
       }
 
       setData(newData);
+      syncProductsLocally(newProducts);
       showToast("✓ Product deleted");
     } catch (err: any) {
       alert("Error deleting: " + (err?.message || "Unknown error"));

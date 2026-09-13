@@ -46,7 +46,19 @@ export default function OfferBanners() {
         // Fallback
       }
     }
+
     fetchLiveBanners();
+
+    const handleUpdate = () => {
+      fetchLiveBanners();
+    };
+
+    window.addEventListener("jas-data-updated", handleUpdate);
+    window.addEventListener("storage", handleUpdate);
+    return () => {
+      window.removeEventListener("jas-data-updated", handleUpdate);
+      window.removeEventListener("storage", handleUpdate);
+    };
   }, []);
 
   if (!banners || banners.length === 0) return null;

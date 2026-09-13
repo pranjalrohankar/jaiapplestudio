@@ -171,6 +171,12 @@ export default function AdminCategoriesManager() {
       }
 
       setData(updatedData);
+      try {
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem("jas-live-categories", JSON.stringify(updatedData.categories));
+          window.dispatchEvent(new Event("jas-data-updated"));
+        }
+      } catch {}
       showToast(successMsg || "✓ Categories updated successfully!");
     } catch (err: any) {
       setError(err?.message || "An unexpected error occurred while saving");

@@ -17,7 +17,18 @@ const filterTabs = [
 
 export default function Lineup() {
   const [activeTab, setActiveTab] = useState("all");
-  const [productList, setProductList] = useState<Product[]>(defaultProducts);
+  const [productList, setProductList] = useState<Product[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const cached = window.localStorage.getItem("jas-live-products");
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch {}
+    }
+    return defaultProducts;
+  });
 
   useEffect(() => {
     async function loadProducts() {
@@ -30,27 +41,35 @@ export default function Lineup() {
           const data = await res.json();
           if (Array.isArray(data.products) && data.products.length > 0) {
             setProductList(data.products);
+            try {
+              if (typeof window !== "undefined") {
+                window.localStorage.setItem("jas-live-products", JSON.stringify(data.products));
+              }
+            } catch {}
           }
         }
       } catch {
         // Fallback to defaultProducts
       }
     }
+
     loadProducts();
+
+    const handleUpdate = () => {
+      loadProducts();
+    };
+
+    window.addEventListener("jas-data-updated", handleUpdate);
+    window.addEventListener("storage", handleUpdate);
+    return () => {
+      window.removeEventListener("jas-data-updated", handleUpdate);
+      window.removeEventListener("storage", handleUpdate);
+    };
   }, []);
 
   const filteredProducts: Product[] =
     activeTab === "all"
-      ? [
-          productList.find((p) => p.slug === "iphone-duo"),
-          productList.find((p) => p.slug === "iphone-18-pro"),
-          productList.find((p) => p.slug === "iphone-18"),
-          productList.find((p) => p.slug === "iphone-17-pro-max"),
-          productList.find((p) => p.slug === "macbook-air-13"),
-          productList.find((p) => p.slug === "apple-watch-ultra"),
-          productList.find((p) => p.slug === "airpods-pro-3"),
-          productList.find((p) => p.slug === "ipad-air"),
-        ].filter(Boolean) as Product[]
+      ? productList.slice(0, 8)
       : productList.filter((p) => p.category === activeTab).slice(0, 8);
 
   return (

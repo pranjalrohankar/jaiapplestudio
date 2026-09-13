@@ -48,7 +48,19 @@ export default function Hero() {
         // Fallback
       }
     }
+
     fetchLiveSlides();
+
+    const handleUpdate = () => {
+      fetchLiveSlides();
+    };
+
+    window.addEventListener("jas-data-updated", handleUpdate);
+    window.addEventListener("storage", handleUpdate);
+    return () => {
+      window.removeEventListener("jas-data-updated", handleUpdate);
+      window.removeEventListener("storage", handleUpdate);
+    };
   }, []);
 
   const total = slides.length;

@@ -7,7 +7,18 @@ import Reveal from "@/components/Reveal";
 import { defaultCategoryTiles, type CategoryTile } from "@/lib/categories";
 
 export default function CategoryTiles() {
-  const [categories, setCategories] = useState<CategoryTile[]>(defaultCategoryTiles);
+  const [categories, setCategories] = useState<CategoryTile[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const cached = window.localStorage.getItem("jas-live-categories");
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch {}
+    }
+    return defaultCategoryTiles;
+  });
 
   useEffect(() => {
     async function fetchCategories() {
@@ -22,6 +33,11 @@ export default function CategoryTiles() {
             const activeOnly = data.categories.filter((c: CategoryTile) => c.isActive !== false);
             if (activeOnly.length > 0) {
               setCategories(activeOnly);
+              try {
+                if (typeof window !== "undefined") {
+                  window.localStorage.setItem("jas-live-categories", JSON.stringify(activeOnly));
+                }
+              } catch {}
             }
           }
         }
@@ -30,6 +46,17 @@ export default function CategoryTiles() {
       }
     }
     fetchCategories();
+
+    const handleUpdate = () => {
+      fetchCategories();
+    };
+
+    window.addEventListener("jas-data-updated", handleUpdate);
+    window.addEventListener("storage", handleUpdate);
+    return () => {
+      window.removeEventListener("jas-data-updated", handleUpdate);
+      window.removeEventListener("storage", handleUpdate);
+    };
   }, []);
 
   return (

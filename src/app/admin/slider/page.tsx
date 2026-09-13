@@ -147,6 +147,13 @@ export default function AdminSliderManager() {
       }
 
       setData(updatedData);
+      try {
+        if (typeof window !== "undefined") {
+          const activeOnly = updatedData.slides.filter((s) => s.isActive !== false);
+          window.localStorage.setItem("jas-live-slider", JSON.stringify(activeOnly));
+          window.dispatchEvent(new Event("jas-data-updated"));
+        }
+      } catch {}
       showToast(successMsg || "✓ Hero slider updated successfully!");
     } catch (err: any) {
       setError(err?.message || "An unexpected error occurred while saving");

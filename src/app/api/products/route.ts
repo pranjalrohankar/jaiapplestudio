@@ -81,36 +81,63 @@ export async function POST(request: Request) {
 
     let savedToMongo = false;
 
-    // 1. Direct MongoDB sync
+    // 1. Direct MongoDB atomic sync (never leave collection empty)
     if (clientPromise) {
       try {
         const client = await clientPromise;
         const db = client.db("apple_store");
 
-        await db.collection("products").deleteMany({});
-
-        const productsToInsert = updatedData.products.map((p: any) => {
+        const validSlugs: string[] = [];
+        const bulkOps = updatedData.products.map((p: any) => {
           const { _id, ...rest } = p;
-          return rest;
+          if (rest.slug) validSlugs.push(rest.slug);
+          return {
+            updateOne: {
+              filter: { slug: rest.slug },
+              update: { $set: rest },
+              upsert: true,
+            },
+          };
         });
 
-        if (productsToInsert.length > 0) {
-          await db.collection("products").insertMany(productsToInsert);
+        if (bulkOps.length > 0) {
+          await db.collection("products").bulkWrite(bulkOps);
+          if (validSlugs.length > 0) {
+            await db.collection("products").deleteMany({ slug: { $nin: validSlugs } });
+          }
         }
 
         if (updatedData.categories && Array.isArray(updatedData.categories)) {
-          await db.collection("categories").deleteMany({});
-          const categoriesToInsert = updatedData.categories.map((c: any) => {
+          const cleanCategories = updatedData.categories.map((c: any) => {
             const { _id, ...rest } = c;
             return rest;
           });
-          if (categoriesToInsert.length > 0) {
-            await db.collection("categories").insertMany(categoriesToInsert);
+
+          const validCategorySlugs: string[] = [];
+          const catBulkOps = cleanCategories.map((cat: any) => {
+            if (cat.slug) validCategorySlugs.push(cat.slug);
+            return {
+              updateOne: {
+                filter: { slug: cat.slug },
+                update: { $set: cat },
+                upsert: true,
+              },
+            };
+          });
+
+          if (catBulkOps.length > 0) {
+            await db.collection("categories").bulkWrite(catBulkOps);
+            if (validCategorySlugs.length > 0) {
+              await db.collection("categories").deleteMany({ slug: { $nin: validCategorySlugs } });
+            }
           }
 
-          // Also keep categories_config in sync
-          await db.collection("categories_config").deleteMany({});
-          await db.collection("categories_config").insertOne({ categories: categoriesToInsert });
+          // Also keep categories_config in sync atomically
+          await db.collection("categories_config").updateOne(
+            {},
+            { $set: { categories: cleanCategories } },
+            { upsert: true }
+          );
         }
         savedToMongo = true;
       } catch (mongoError) {
