@@ -75,23 +75,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <nav className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm font-semibold">
           <Link
             href="/admin"
-            className={`px-3 py-1.5 rounded-lg transition ${
-              pathname === "/admin"
-                ? "bg-gray-900 text-white"
+            className={`px-3.5 py-1.5 rounded-xl transition font-bold flex items-center gap-1.5 ${
+              pathname === "/admin" || pathname === "/admin/enquiries"
+                ? "bg-gray-900 text-white shadow-xs"
                 : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
             }`}
           >
-            📋 Orders Sheet
-          </Link>
-          <Link
-            href="/admin/enquiries"
-            className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
-              pathname === "/admin/enquiries"
-                ? "bg-gray-900 text-white"
-                : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-            }`}
-          >
-            <span>💬 Enquiries</span>
+            <span>💬 Customer Enquiries &amp; Orders</span>
           </Link>
           <Link
             href="/admin/products"

@@ -2,8 +2,10 @@
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import { type EnquiryRecord, type EnquiryStatus, formatEnquiryDate } from "@/lib/enquiry";
+import Image from "next/image";
+import { type EnquiryRecord, type EnquiryStatus, type OrderItem, formatEnquiryDate } from "@/lib/enquiry";
 import { store, waLink, telLink } from "@/lib/store";
+import { formatINR } from "@/lib/currency";
 import {
   PhoneIcon,
   WhatsAppIcon,
@@ -13,18 +15,22 @@ import {
   ChevronRightIcon,
   CloseIcon,
   SparklesIcon,
+  BagIcon,
 } from "@/lib/icons";
 
 const STATUS_OPTIONS: EnquiryStatus[] = [
   "New",
   "Contacted",
   "In Progress",
+  "Confirmed",
   "Converted",
+  "Dispatched",
+  "Delivered",
   "Closed",
   "Cancelled",
 ];
 
-const STATUS_COLORS: Record<EnquiryStatus, { bg: string; text: string; border: string; dot: string }> = {
+const STATUS_COLORS: Record<string, { bg: string; text: string; border: string; dot: string }> = {
   New: {
     bg: "bg-blue-50 text-blue-800",
     text: "text-blue-800",
@@ -43,11 +49,29 @@ const STATUS_COLORS: Record<EnquiryStatus, { bg: string; text: string; border: s
     border: "border-purple-200",
     dot: "bg-purple-500",
   },
+  Confirmed: {
+    bg: "bg-emerald-50 text-emerald-800",
+    text: "text-emerald-800",
+    border: "border-emerald-200",
+    dot: "bg-emerald-500",
+  },
   Converted: {
     bg: "bg-emerald-50 text-emerald-800",
     text: "text-emerald-800",
     border: "border-emerald-200",
     dot: "bg-emerald-500",
+  },
+  Dispatched: {
+    bg: "bg-indigo-50 text-indigo-800",
+    text: "text-indigo-800",
+    border: "border-indigo-200",
+    dot: "bg-indigo-500",
+  },
+  Delivered: {
+    bg: "bg-teal-50 text-teal-800",
+    text: "text-teal-800",
+    border: "border-teal-200",
+    dot: "bg-teal-500",
   },
   Closed: {
     bg: "bg-gray-100 text-gray-700",
@@ -60,6 +84,39 @@ const STATUS_COLORS: Record<EnquiryStatus, { bg: string; text: string; border: s
     text: "text-rose-800",
     border: "border-rose-200",
     dot: "bg-rose-500",
+  },
+};
+
+const SOURCE_LABELS: Record<string, { label: string; icon: string; bg: string; text: string }> = {
+  cart_checkout: {
+    label: "Cart Order",
+    icon: "🛒",
+    bg: "bg-emerald-50 border-emerald-200",
+    text: "text-emerald-800",
+  },
+  product_page: {
+    label: "Product Page",
+    icon: "📱",
+    bg: "bg-blue-50 border-blue-200",
+    text: "text-blue-800",
+  },
+  contact_page: {
+    label: "Contact Form",
+    icon: "✉️",
+    bg: "bg-purple-50 border-purple-200",
+    text: "text-purple-800",
+  },
+  quick_enquiry: {
+    label: "Quick Modal",
+    icon: "⚡",
+    bg: "bg-amber-50 border-amber-200",
+    text: "text-amber-800",
+  },
+  whatsapp: {
+    label: "WhatsApp Lead",
+    icon: "💬",
+    bg: "bg-green-50 border-green-200",
+    text: "text-green-800",
   },
 };
 
@@ -107,7 +164,7 @@ export default function AdminEnquiriesPage() {
 
         // Check if new enquiry arrived
         if (prevCountRef.current > 0 && data.enquiries.length > prevCountRef.current) {
-          showToast(`🔔 New Customer Enquiry received!`);
+          showToast(`🔔 New Customer Lead received! (${data.enquiries.length} total)`);
         }
         prevCountRef.current = data.enquiries.length;
       } else {
@@ -188,7 +245,7 @@ export default function AdminEnquiriesPage() {
 
   // Delete Enquiry
   async function handleDeleteEnquiry(enquiryNo: string) {
-    if (!window.confirm(`Are you sure you want to delete enquiry ${enquiryNo}?`)) return;
+    if (!window.confirm(`Are you sure you want to delete lead ${enquiryNo}?`)) return;
     try {
       const res = await fetch(`/api/enquiries?enquiryNo=${encodeURIComponent(enquiryNo)}`, {
         method: "DELETE",
@@ -196,10 +253,10 @@ export default function AdminEnquiriesPage() {
       if (res.ok) {
         setEnquiries((prev) => prev.filter((e) => e.enquiryNo !== enquiryNo));
         if (selectedEnquiry?.enquiryNo === enquiryNo) setSelectedEnquiry(null);
-        showToast(`Enquiry ${enquiryNo} deleted`);
+        showToast(`Lead ${enquiryNo} deleted`);
       }
     } catch (err) {
-      console.error("Delete enquiry error:", err);
+      console.error("Delete lead error:", err);
     }
   }
 
@@ -208,19 +265,18 @@ export default function AdminEnquiriesPage() {
     if (enquiries.length === 0) return;
 
     const headers = [
-      "Enquiry Ref",
+      "Ref Number",
       "Date",
       "Customer Name",
       "Phone",
       "Email",
-      "Product / Model",
-      "Variant",
-      "Color",
-      "Budget",
+      "City / Address",
+      "Type / Source",
+      "Product / Items",
+      "Total Amount / Budget",
       "Status",
-      "Source",
-      "Customer Message",
-      "Admin Note",
+      "Customer Message / Notes",
+      "Admin Remarks",
     ];
 
     const rows = enquiries.map((e) => [
@@ -229,12 +285,11 @@ export default function AdminEnquiriesPage() {
       `"${e.name}"`,
       `"${e.phone}"`,
       `"${e.email || ""}"`,
-      `"${e.product || e.productName || ""}"`,
-      `"${e.preferredVariant || ""}"`,
-      `"${e.preferredColor || ""}"`,
-      `"${e.budget || ""}"`,
+      `"${e.city || ""}"`,
+      `"${SOURCE_LABELS[e.source || ""]?.label || e.source || "Enquiry"}"`,
+      `"${(e.items && e.items.length > 0 ? e.items.map((i) => `${i.qty}x ${i.name}`).join("; ") : e.product || e.productName || "").replace(/"/g, '""')}"`,
+      `"${e.totalDisplay || e.budget || ""}"`,
       `"${e.status}"`,
-      `"${e.source || "contact_page"}"`,
       `"${(e.message || "").replace(/"/g, '""')}"`,
       `"${(e.adminNote || "").replace(/"/g, '""')}"`,
     ]);
@@ -244,7 +299,7 @@ export default function AdminEnquiriesPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `Jai_Apple_Store_Enquiries_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `Jai_Apple_Store_Leads_${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -253,33 +308,51 @@ export default function AdminEnquiriesPage() {
   function getCustomerWhatsAppLink(enquiry: EnquiryRecord) {
     const cleanPhone = enquiry.phone.replace(/[^0-9]/g, "");
     const formattedPhone = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
-    const msg = `👋 Hi ${enquiry.name}!\n\nThank you for reaching out to *Jai Apple Store, Pimpri* regarding the *${enquiry.product || "Apple product"}*.\n\nWe would be happy to share current availability, best price offers, EMI options, and exchange bonus for your device.\n\nHow can we help you today?`;
+
+    let msg = "";
+    if (enquiry.source === "cart_checkout" && enquiry.items && enquiry.items.length > 0) {
+      const itemsList = enquiry.items.map((i) => `• ${i.qty}x *${i.name}* ${i.variant ? `(${i.variant})` : ""}`).join("\n");
+      msg = `👋 Hi ${enquiry.name}!\n\nThank you for placing your order *${enquiry.enquiryNo}* at *Jai Apple Store, Pimpri*.\n\n🛒 *Your Items:*\n${itemsList}\n\n💰 *Total:* ${enquiry.totalDisplay || "Confirmed at Store"}\n\nWe would like to confirm your store pickup / delivery schedule and payment preference. When can we connect?`;
+    } else {
+      msg = `👋 Hi ${enquiry.name}!\n\nThank you for reaching out to *Jai Apple Store, Pimpri* regarding the *${enquiry.product || "Apple product"}* (Ref: ${enquiry.enquiryNo}).\n\nWe would be happy to share current availability, best price offers, EMI options, and exchange bonus for your device.\n\nHow can we help you today?`;
+    }
+
     return `https://wa.me/${formattedPhone}?text=${encodeURIComponent(msg)}`;
   }
 
   // Filtered list
   const filteredEnquiries = enquiries.filter((e) => {
     const matchesStatus = statusFilter === "All" || e.status === statusFilter;
-    const matchesSource = sourceFilter === "All" || e.source === sourceFilter;
+    const matchesSource =
+      sourceFilter === "All" ||
+      e.source === sourceFilter ||
+      (sourceFilter === "enquiries_only" && e.source !== "cart_checkout");
+
     const query = search.toLowerCase().trim();
     const matchesSearch =
       !query ||
       e.enquiryNo.toLowerCase().includes(query) ||
       e.name.toLowerCase().includes(query) ||
       e.phone.includes(query) ||
+      (e.city && e.city.toLowerCase().includes(query)) ||
       (e.email && e.email.toLowerCase().includes(query)) ||
       (e.product && e.product.toLowerCase().includes(query)) ||
+      (e.productName && e.productName.toLowerCase().includes(query)) ||
       (e.message && e.message.toLowerCase().includes(query)) ||
-      (e.adminNote && e.adminNote.toLowerCase().includes(query));
+      (e.adminNote && e.adminNote.toLowerCase().includes(query)) ||
+      (e.items && e.items.some((i) => i.name.toLowerCase().includes(query)));
 
     return matchesStatus && matchesSource && matchesSearch;
   });
 
   // KPI calculations
   const totalCount = enquiries.length;
+  const cartOrdersCount = enquiries.filter((e) => e.source === "cart_checkout").length;
+  const inquiriesCount = enquiries.filter((e) => e.source !== "cart_checkout").length;
   const newCount = enquiries.filter((e) => e.status === "New").length;
-  const contactedCount = enquiries.filter((e) => e.status === "Contacted" || e.status === "In Progress").length;
-  const convertedCount = enquiries.filter((e) => e.status === "Converted").length;
+  const convertedCount = enquiries.filter(
+    (e) => e.status === "Converted" || e.status === "Confirmed" || e.status === "Delivered"
+  ).length;
 
   return (
     <div className="space-y-6">
@@ -294,9 +367,9 @@ export default function AdminEnquiriesPage() {
       {/* Header & Action Controls */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 sm:p-7 rounded-3xl border border-gray-100 shadow-xs">
         <div>
-          <div className="flex items-center gap-2 mb-1.5">
+          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
             <span className="text-xs font-bold uppercase tracking-wider bg-blue-50 text-blue-700 px-3 py-1 rounded-full border border-blue-200/60">
-              Customer Leads &amp; Inquiries
+              Unified Leads &amp; Orders Manager
             </span>
             <button
               onClick={() => setAutoSync(!autoSync)}
@@ -316,10 +389,10 @@ export default function AdminEnquiriesPage() {
             )}
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
-            Customer Enquiries Management
+            Customer Enquiries &amp; Orders
           </h1>
           <p className="text-xs sm:text-sm text-gray-500 mt-1">
-            Real-time spreadsheet of all customer enquiries, WhatsApp leads &amp; product availability questions.
+            Real-time unified management of all Cart Orders, Product Enquiries, and Contact Leads in one place.
           </p>
         </div>
 
@@ -350,11 +423,20 @@ export default function AdminEnquiriesPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="rounded-2xl bg-white p-5 border border-gray-200/80 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Total Enquiries</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Total Leads</span>
             <span className="text-lg">💬</span>
           </div>
           <p className="text-3xl font-extrabold text-gray-900 mt-2">{totalCount}</p>
-          <p className="text-xs text-gray-400 mt-0.5">All customer queries</p>
+          <p className="text-xs text-gray-400 mt-0.5">All customer submissions</p>
+        </div>
+
+        <div className="rounded-2xl bg-emerald-50/40 p-5 border border-emerald-200 shadow-xs">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">Cart Orders</span>
+            <span className="text-lg">🛒</span>
+          </div>
+          <p className="text-3xl font-extrabold text-emerald-700 mt-2">{cartOrdersCount}</p>
+          <p className="text-xs text-emerald-600/80 mt-0.5">Direct cart checkouts</p>
         </div>
 
         <div className="rounded-2xl bg-blue-50/40 p-5 border border-blue-200 shadow-xs">
@@ -363,26 +445,41 @@ export default function AdminEnquiriesPage() {
             <span className="text-lg">⚡</span>
           </div>
           <p className="text-3xl font-extrabold text-blue-700 mt-2">{newCount}</p>
-          <p className="text-xs text-blue-600/80 mt-0.5">Awaiting customer response</p>
+          <p className="text-xs text-blue-600/80 mt-0.5">Awaiting follow-up</p>
         </div>
 
-        <div className="rounded-2xl bg-amber-50/40 p-5 border border-amber-200 shadow-xs">
+        <div className="rounded-2xl bg-purple-50/40 p-5 border border-purple-200 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-amber-700">In Progress / Contacted</span>
-            <span className="text-lg">⏳</span>
-          </div>
-          <p className="text-3xl font-extrabold text-amber-700 mt-2">{contactedCount}</p>
-          <p className="text-xs text-amber-700/80 mt-0.5">Discussions ongoing</p>
-        </div>
-
-        <div className="rounded-2xl bg-emerald-50/40 p-5 border border-emerald-200 shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">Converted to Sale</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-purple-700">Converted / Closed</span>
             <span className="text-lg">🎉</span>
           </div>
-          <p className="text-3xl font-extrabold text-emerald-700 mt-2">{convertedCount}</p>
-          <p className="text-xs text-emerald-700/80 mt-0.5">Successful closures</p>
+          <p className="text-3xl font-extrabold text-purple-700 mt-2">{convertedCount}</p>
+          <p className="text-xs text-purple-700/80 mt-0.5">Successful sales</p>
         </div>
+      </div>
+
+      {/* Source Tabs Bar */}
+      <div className="bg-white p-2.5 rounded-2xl border border-gray-200 shadow-xs flex items-center gap-1.5 overflow-x-auto text-xs font-bold">
+        {[
+          { id: "All", label: `All Leads (${totalCount})`, icon: "📋" },
+          { id: "cart_checkout", label: `Cart Orders (${cartOrdersCount})`, icon: "🛒" },
+          { id: "product_page", label: `Product Inquiries (${enquiries.filter((e) => e.source === "product_page").length})`, icon: "📱" },
+          { id: "contact_page", label: `Contact Form (${enquiries.filter((e) => e.source === "contact_page").length})`, icon: "✉️" },
+          { id: "quick_enquiry", label: `Quick Modal (${enquiries.filter((e) => e.source === "quick_enquiry").length})`, icon: "⚡" },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setSourceFilter(tab.id)}
+            className={`px-4 py-2 rounded-xl transition whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
+              sourceFilter === tab.id
+                ? "bg-gray-900 text-white shadow-xs"
+                : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+            }`}
+          >
+            <span>{tab.icon}</span>
+            <span>{tab.label}</span>
+          </button>
+        ))}
       </div>
 
       {/* Search & Status Filters Bar */}
@@ -392,7 +489,7 @@ export default function AdminEnquiriesPage() {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by customer name, phone, product, enquiry ID, or note..."
+            placeholder="Search by customer name, phone, city, product/item, ID, or note..."
             className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:border-blue-500 focus:bg-white transition"
           />
           <span className="absolute left-3 top-3 text-gray-400 text-sm">🔍</span>
@@ -409,7 +506,7 @@ export default function AdminEnquiriesPage() {
         <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
           {/* Status Filter */}
           <div className="flex items-center gap-1.5 bg-gray-100 p-1 rounded-xl text-xs font-semibold overflow-x-auto">
-            {["All", "New", "Contacted", "In Progress", "Converted"].map((st) => (
+            {["All", "New", "Contacted", "In Progress", "Confirmed", "Converted"].map((st) => (
               <button
                 key={st}
                 onClick={() => setStatusFilter(st)}
@@ -428,17 +525,6 @@ export default function AdminEnquiriesPage() {
               </button>
             ))}
           </div>
-
-          <select
-            value={sourceFilter}
-            onChange={(e) => setSourceFilter(e.target.value)}
-            className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-semibold text-gray-700 outline-none focus:border-blue-500"
-          >
-            <option value="All">All Sources</option>
-            <option value="contact_page">Contact Page</option>
-            <option value="product_page">Product Page</option>
-            <option value="quick_enquiry">Quick Modal</option>
-          </select>
         </div>
       </div>
 
@@ -447,7 +533,7 @@ export default function AdminEnquiriesPage() {
         {loading && enquiries.length === 0 ? (
           <div className="p-16 text-center text-gray-400">
             <div className="inline-block w-7 h-7 border-3 border-blue-600 border-t-transparent rounded-full animate-spin mb-3"></div>
-            <p className="text-sm font-medium text-gray-600">Loading enquiries database...</p>
+            <p className="text-sm font-medium text-gray-600">Loading customer leads database...</p>
           </div>
         ) : error ? (
           <div className="p-12 text-center text-red-600">
@@ -455,7 +541,7 @@ export default function AdminEnquiriesPage() {
             <p className="text-xs text-red-500 mt-1">{error}</p>
             <button
               onClick={() => fetchEnquiries()}
-              className="mt-3 px-4 py-1.5 bg-red-100 hover:bg-red-200 text-red-800 rounded-lg text-xs font-bold"
+              className="mt-3 px-4 py-1.5 bg-red-100 hover:bg-red-200 text-red-800 rounded-lg text-xs font-bold cursor-pointer"
             >
               Retry
             </button>
@@ -463,11 +549,11 @@ export default function AdminEnquiriesPage() {
         ) : filteredEnquiries.length === 0 ? (
           <div className="p-16 text-center text-gray-400">
             <span className="text-4xl mb-2 block">📭</span>
-            <p className="text-base font-bold text-gray-700">No enquiries found</p>
+            <p className="text-base font-bold text-gray-700">No leads found</p>
             <p className="text-xs text-gray-400 mt-1">
-              {search || statusFilter !== "All"
+              {search || statusFilter !== "All" || sourceFilter !== "All"
                 ? "Try clearing your search or status filters."
-                : "Customer enquiries submitted through the store will appear here in real-time."}
+                : "Customer orders and enquiries submitted through the store will appear here in real-time."}
             </p>
           </div>
         ) : (
@@ -475,20 +561,22 @@ export default function AdminEnquiriesPage() {
             <table className="w-full text-left text-xs sm:text-sm border-collapse">
               <thead>
                 <tr className="border-b border-gray-200 bg-gray-50/80 text-[11px] font-bold uppercase tracking-wider text-gray-500">
-                  <th className="py-3.5 px-4 sm:px-5">Enquiry Ref &amp; Time</th>
+                  <th className="py-3.5 px-4 sm:px-5">Ref &amp; Time</th>
                   <th className="py-3.5 px-4 sm:px-5">Customer</th>
-                  <th className="py-3.5 px-4 sm:px-5">Product / Request</th>
-                  <th className="py-3.5 px-4 sm:px-5">Customer Message</th>
+                  <th className="py-3.5 px-4 sm:px-5">Order / Request Items</th>
+                  <th className="py-3.5 px-4 sm:px-5">Message / Notes</th>
                   <th className="py-3.5 px-4 sm:px-5">Status</th>
-                  <th className="py-3.5 px-4 sm:px-5 min-w-[200px]">Admin Remarks / Follow-up</th>
+                  <th className="py-3.5 px-4 sm:px-5 min-w-[200px]">Admin Remarks</th>
                   <th className="py-3.5 px-4 sm:px-5 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {filteredEnquiries.map((enquiry) => {
                   const statusConfig = STATUS_COLORS[enquiry.status] || STATUS_COLORS.New;
+                  const sourceConfig = SOURCE_LABELS[enquiry.source || ""] || SOURCE_LABELS.contact_page;
                   const isUpdating = updatingId === enquiry.enquiryNo;
                   const isEditingNote = editingNoteId === enquiry.enquiryNo;
+                  const hasCartItems = Array.isArray(enquiry.items) && enquiry.items.length > 0;
 
                   return (
                     <tr
@@ -497,7 +585,7 @@ export default function AdminEnquiriesPage() {
                         enquiry.status === "New" ? "bg-blue-50/15" : ""
                       }`}
                     >
-                      {/* 1. Enquiry Ref & Time */}
+                      {/* 1. Ref Number & Source */}
                       <td className="py-4 px-4 sm:px-5 align-top">
                         <div className="font-mono font-bold text-gray-900 text-xs">
                           {enquiry.enquiryNo}
@@ -505,11 +593,12 @@ export default function AdminEnquiriesPage() {
                         <div className="text-[11px] text-gray-500 mt-0.5">
                           {formatEnquiryDate(enquiry.createdAt || enquiry.date)}
                         </div>
-                        {enquiry.source && (
-                          <span className="inline-block mt-1 text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-gray-100 text-gray-600">
-                            {enquiry.source.replace("_", " ")}
-                          </span>
-                        )}
+                        <span
+                          className={`inline-flex items-center gap-1 mt-1 text-[10px] uppercase font-bold px-2 py-0.5 rounded-full border ${sourceConfig.bg} ${sourceConfig.text}`}
+                        >
+                          <span>{sourceConfig.icon}</span>
+                          <span>{sourceConfig.label}</span>
+                        </span>
                       </td>
 
                       {/* 2. Customer Info */}
@@ -524,6 +613,12 @@ export default function AdminEnquiriesPage() {
                             {enquiry.phone}
                           </a>
                         </div>
+                        {enquiry.city && (
+                          <div className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
+                            <span>📍</span>
+                            <span>{enquiry.city}</span>
+                          </div>
+                        )}
                         {enquiry.email && (
                           <div className="text-xs text-gray-400 truncate max-w-[150px] mt-0.5">
                             {enquiry.email}
@@ -531,29 +626,57 @@ export default function AdminEnquiriesPage() {
                         )}
                       </td>
 
-                      {/* 3. Product & Specs */}
+                      {/* 3. Product / Order Items */}
                       <td className="py-4 px-4 sm:px-5 align-top">
-                        <div className="font-semibold text-gray-900">
-                          {enquiry.product || enquiry.productName || "General Store Enquiry"}
-                        </div>
-                        {(enquiry.preferredVariant || enquiry.preferredColor) && (
-                          <div className="text-xs text-gray-500 mt-0.5">
-                            {[enquiry.preferredVariant, enquiry.preferredColor]
-                              .filter(Boolean)
-                              .join(" • ")}
+                        {hasCartItems ? (
+                          <div className="space-y-1">
+                            <div className="font-bold text-gray-900 flex items-center gap-1.5">
+                              <span>🛒</span>
+                              <span>{enquiry.items!.length} item{enquiry.items!.length > 1 ? "s" : ""}</span>
+                              {enquiry.totalDisplay && (
+                                <span className="text-emerald-700 font-extrabold ml-1">
+                                  ({enquiry.totalDisplay})
+                                </span>
+                              )}
+                            </div>
+                            <ul className="text-xs text-gray-600 space-y-0.5">
+                              {enquiry.items!.slice(0, 2).map((item, idx) => (
+                                <li key={idx} className="truncate max-w-xs">
+                                  • {item.qty}x {item.name} {item.variant ? `(${item.variant})` : ""}
+                                </li>
+                              ))}
+                              {enquiry.items!.length > 2 && (
+                                <li className="text-[11px] text-blue-600 font-semibold">
+                                  +{enquiry.items!.length - 2} more items...
+                                </li>
+                              )}
+                            </ul>
                           </div>
-                        )}
-                        {enquiry.budget && (
-                          <div className="text-[11px] text-emerald-700 font-semibold mt-0.5">
-                            Budget: {enquiry.budget}
+                        ) : (
+                          <div>
+                            <div className="font-semibold text-gray-900">
+                              {enquiry.product || enquiry.productName || "General Store Enquiry"}
+                            </div>
+                            {(enquiry.preferredVariant || enquiry.preferredColor) && (
+                              <div className="text-xs text-gray-500 mt-0.5">
+                                {[enquiry.preferredVariant, enquiry.preferredColor]
+                                  .filter(Boolean)
+                                  .join(" • ")}
+                              </div>
+                            )}
+                            {enquiry.budget && (
+                              <div className="text-[11px] text-emerald-700 font-semibold mt-0.5">
+                                Budget: {enquiry.budget}
+                              </div>
+                            )}
                           </div>
                         )}
                       </td>
 
-                      {/* 4. Customer Message */}
+                      {/* 4. Customer Message / Notes */}
                       <td className="py-4 px-4 sm:px-5 align-top max-w-xs">
                         <p className="text-xs text-gray-700 line-clamp-3 leading-relaxed">
-                          {enquiry.message || "— No message provided —"}
+                          {enquiry.message || "— No specific note provided —"}
                         </p>
                       </td>
 
@@ -582,7 +705,7 @@ export default function AdminEnquiriesPage() {
                         </div>
                       </td>
 
-                      {/* 6. Admin Note */}
+                      {/* 6. Admin Remark */}
                       <td className="py-4 px-4 sm:px-5 align-top">
                         {isEditingNote ? (
                           <div className="space-y-1.5">
@@ -598,14 +721,14 @@ export default function AdminEnquiriesPage() {
                               <button
                                 type="button"
                                 onClick={() => handleSaveNote(enquiry.enquiryNo)}
-                                className="px-2.5 py-1 rounded bg-blue-600 text-white font-bold text-[11px] hover:bg-blue-700"
+                                className="px-2.5 py-1 rounded bg-blue-600 text-white font-bold text-[11px] hover:bg-blue-700 cursor-pointer"
                               >
                                 Save
                               </button>
                               <button
                                 type="button"
                                 onClick={() => setEditingNoteId(null)}
-                                className="px-2.5 py-1 rounded bg-gray-200 text-gray-700 text-[11px] hover:bg-gray-300"
+                                className="px-2.5 py-1 rounded bg-gray-200 text-gray-700 text-[11px] hover:bg-gray-300 cursor-pointer"
                               >
                                 Cancel
                               </button>
@@ -638,7 +761,7 @@ export default function AdminEnquiriesPage() {
                             href={getCustomerWhatsAppLink(enquiry)}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition shadow-2xs"
+                            className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition shadow-2xs cursor-pointer"
                             title="Open WhatsApp Chat with Customer"
                           >
                             <WhatsAppIcon width={16} height={16} />
@@ -647,7 +770,7 @@ export default function AdminEnquiriesPage() {
                           {/* Phone Call */}
                           <a
                             href={`tel:${enquiry.phone.replace(/[^0-9+]/g, "")}`}
-                            className="p-1.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition shadow-2xs"
+                            className="p-1.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition shadow-2xs cursor-pointer"
                             title="Call Customer"
                           >
                             <PhoneIcon width={16} height={16} />
@@ -657,7 +780,7 @@ export default function AdminEnquiriesPage() {
                           <button
                             type="button"
                             onClick={() => setSelectedEnquiry(enquiry)}
-                            className="p-1.5 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition"
+                            className="p-1.5 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition cursor-pointer"
                             title="View Full Details"
                           >
                             🔍
@@ -667,8 +790,8 @@ export default function AdminEnquiriesPage() {
                           <button
                             type="button"
                             onClick={() => handleDeleteEnquiry(enquiry.enquiryNo)}
-                            className="p-1.5 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 transition"
-                            title="Delete Enquiry"
+                            className="p-1.5 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 transition cursor-pointer"
+                            title="Delete Lead"
                           >
                             <TrashIcon width={16} height={16} />
                           </button>
@@ -686,7 +809,7 @@ export default function AdminEnquiriesPage() {
       {/* Detail View Modal */}
       {selectedEnquiry && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-fadeIn">
-          <div className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-gray-100 max-h-[90vh] overflow-y-auto space-y-6">
+          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-gray-100 max-h-[90vh] overflow-y-auto space-y-6">
             <div className="flex items-center justify-between pb-4 border-b border-gray-100">
               <div>
                 <div className="flex items-center gap-2">
@@ -699,6 +822,13 @@ export default function AdminEnquiriesPage() {
                     }`}
                   >
                     {selectedEnquiry.status}
+                  </span>
+                  <span
+                    className={`text-xs font-bold px-2.5 py-0.5 rounded-full border ${
+                      SOURCE_LABELS[selectedEnquiry.source || ""]?.bg || ""
+                    } ${SOURCE_LABELS[selectedEnquiry.source || ""]?.text || ""}`}
+                  >
+                    {SOURCE_LABELS[selectedEnquiry.source || ""]?.label || selectedEnquiry.source}
                   </span>
                 </div>
                 <h3 className="text-xl font-extrabold text-gray-900 mt-1">
@@ -725,20 +855,8 @@ export default function AdminEnquiriesPage() {
                 <span className="font-bold text-gray-900">{selectedEnquiry.email || "—"}</span>
               </div>
               <div>
-                <span className="text-gray-400 block font-semibold text-[11px] uppercase">Product</span>
-                <span className="font-bold text-gray-900">{selectedEnquiry.product}</span>
-              </div>
-              <div>
-                <span className="text-gray-400 block font-semibold text-[11px] uppercase">Variant / Color</span>
-                <span className="font-bold text-gray-900">
-                  {[selectedEnquiry.preferredVariant, selectedEnquiry.preferredColor]
-                    .filter(Boolean)
-                    .join(" • ") || "—"}
-                </span>
-              </div>
-              <div>
-                <span className="text-gray-400 block font-semibold text-[11px] uppercase">Budget</span>
-                <span className="font-bold text-emerald-700">{selectedEnquiry.budget || "—"}</span>
+                <span className="text-gray-400 block font-semibold text-[11px] uppercase">City / Location</span>
+                <span className="font-bold text-gray-900">{selectedEnquiry.city || "—"}</span>
               </div>
               <div>
                 <span className="text-gray-400 block font-semibold text-[11px] uppercase">Date Logged</span>
@@ -748,10 +866,62 @@ export default function AdminEnquiriesPage() {
               </div>
             </div>
 
+            {/* Cart Items Table (if cart order) */}
+            {selectedEnquiry.items && selectedEnquiry.items.length > 0 && (
+              <div>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">
+                  Ordered Items ({selectedEnquiry.items.length})
+                </h4>
+                <div className="rounded-2xl border border-gray-200 overflow-hidden">
+                  <table className="w-full text-xs sm:text-sm">
+                    <thead className="bg-gray-50 text-[11px] font-bold uppercase text-gray-500">
+                      <tr>
+                        <th className="py-2.5 px-3">Item</th>
+                        <th className="py-2.5 px-3 text-center">Qty</th>
+                        <th className="py-2.5 px-3 text-right">Price</th>
+                        <th className="py-2.5 px-3 text-right">Total</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {selectedEnquiry.items.map((item, idx) => (
+                        <tr key={idx} className="hover:bg-gray-50">
+                          <td className="py-3 px-3">
+                            <div className="font-bold text-gray-900">{item.name}</div>
+                            {(item.variant || item.color) && (
+                              <div className="text-xs text-gray-500 mt-0.5">
+                                {[item.variant, item.color].filter(Boolean).join(" • ")}
+                              </div>
+                            )}
+                          </td>
+                          <td className="py-3 px-3 text-center font-bold">{item.qty}</td>
+                          <td className="py-3 px-3 text-right">
+                            {item.price > 0 ? formatINR(item.price) : item.priceLabel || "Pre-Order"}
+                          </td>
+                          <td className="py-3 px-3 text-right font-bold text-emerald-700">
+                            {item.price > 0 ? formatINR(item.price * item.qty) : item.priceLabel || "Pre-Order"}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot className="bg-gray-50 font-bold border-t border-gray-200">
+                      <tr>
+                        <td colSpan={3} className="py-3 px-3 text-right">
+                          Estimated Total:
+                        </td>
+                        <td className="py-3 px-3 text-right text-emerald-700 text-sm">
+                          {selectedEnquiry.totalDisplay || (selectedEnquiry.subtotal ? formatINR(selectedEnquiry.subtotal) : "—")}
+                        </td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </div>
+            )}
+
             {/* Message Box */}
             <div>
               <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">
-                Customer Message
+                Customer Message / Notes
               </h4>
               <div className="bg-gray-50 p-4 rounded-2xl text-sm text-gray-800 leading-relaxed border border-gray-100">
                 {selectedEnquiry.message || "No specific note provided."}
@@ -774,14 +944,14 @@ export default function AdminEnquiriesPage() {
                 href={getCustomerWhatsAppLink(selectedEnquiry)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 btn-wa text-center justify-center py-3 text-sm font-bold shadow-md"
+                className="flex-1 btn-wa text-center justify-center py-3 text-sm font-bold shadow-md cursor-pointer"
               >
                 <WhatsAppIcon width={18} height={18} />
                 Chat on WhatsApp
               </a>
               <a
                 href={`tel:${selectedEnquiry.phone.replace(/[^0-9+]/g, "")}`}
-                className="flex-1 inline-flex items-center justify-center gap-2 rounded-full bg-gray-900 text-white py-3 text-sm font-bold hover:bg-gray-800 transition"
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-full bg-gray-900 text-white py-3 text-sm font-bold hover:bg-gray-800 transition cursor-pointer"
               >
                 <PhoneIcon width={18} height={18} />
                 Call Customer

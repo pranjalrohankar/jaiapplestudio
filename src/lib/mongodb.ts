@@ -25,15 +25,11 @@ function getMongoURI(): string {
 }
 
 const options = {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  },
-  connectTimeoutMS: 5000,
-  serverSelectionTimeoutMS: 5000,
-  socketTimeoutMS: 10000,
+  connectTimeoutMS: 10000,
+  serverSelectionTimeoutMS: 10000,
+  socketTimeoutMS: 20000,
   maxPoolSize: 10,
+  retryWrites: true,
 };
 
 declare global {

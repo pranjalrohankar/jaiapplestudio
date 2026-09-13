@@ -2,23 +2,44 @@ export type EnquiryStatus =
   | "New"
   | "Contacted"
   | "In Progress"
+  | "Confirmed"
   | "Converted"
+  | "Dispatched"
+  | "Delivered"
   | "Closed"
   | "Cancelled";
+
+export type OrderItem = {
+  name: string;
+  color?: string;
+  variant?: string;
+  qty: number;
+  price: number;
+  priceLabel: string;
+  image?: string;
+  badge?: string;
+  status?: string;
+  isPreOrder?: boolean;
+  isComingSoon?: boolean;
+};
 
 export type EnquiryRecord = {
   enquiryNo: string;
   name: string;
   phone: string;
   email?: string;
+  city?: string;
   product?: string;
   productName?: string;
   productSlug?: string;
+  items?: OrderItem[];
+  subtotal?: number;
+  totalDisplay?: string;
   message?: string;
   budget?: string;
   preferredVariant?: string;
   preferredColor?: string;
-  source?: "contact_page" | "product_page" | "quick_enquiry" | "whatsapp";
+  source?: "cart_checkout" | "contact_page" | "product_page" | "quick_enquiry" | "whatsapp";
   status: EnquiryStatus;
   adminNote?: string;
   date: string;

@@ -154,6 +154,30 @@ export function buildOrderMessage({
 
 export async function recordOrder(order: OrderRecord) {
   try {
+    // 1. Post to unified enquiries API
+    await fetch("/api/enquiries", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        enquiry: {
+          enquiryNo: order.orderNo,
+          name: order.customerName,
+          phone: order.customerPhone,
+          city: order.customerCity,
+          message: order.customerNote,
+          items: order.items,
+          subtotal: order.subtotal,
+          totalDisplay: order.totalDisplay,
+          source: "cart_checkout",
+          status: order.status || "New",
+          adminNote: order.adminNote,
+          date: order.date,
+          createdAt: order.createdAt,
+        },
+      }),
+    });
+
+    // 2. Also post to orders API for backward compatibility
     const res = await fetch("/api/orders", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
