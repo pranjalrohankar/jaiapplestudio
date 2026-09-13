@@ -17,17 +17,12 @@ const NO_CACHE_HEADERS = {
 };
 
 export async function GET() {
-  // 1. Prioritize MongoDB Atlas (live admin updates)
+  // 1. Prioritize MongoDB Atlas (live database source of truth)
   if (clientPromise) {
     try {
-      const mongoPromise = (async () => {
-        const client = await clientPromise;
-        const db = client.db("apple_store");
-        return await db.collection("slider_config").findOne({}, { projection: { _id: 0 } });
-      })();
-
-      const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000));
-      const sliderDoc = await Promise.race([mongoPromise, timeoutPromise]);
+      const client = await clientPromise;
+      const db = client.db("apple_store");
+      const sliderDoc = await db.collection("slider_config").findOne({}, { projection: { _id: 0 } });
 
       if (sliderDoc && Array.isArray(sliderDoc.slides) && sliderDoc.slides.length > 0) {
         return NextResponse.json(
@@ -81,25 +76,19 @@ export async function POST(request: Request) {
 
     let savedToMongo = false;
 
-    // 1. AWAIT MongoDB write
+    // 1. Atomic MongoDB write (never delete before insert)
     if (clientPromise) {
       try {
-        const syncPromise = (async () => {
-          const client = await clientPromise;
-          const db = client.db("apple_store");
-          await db.collection("slider_config").deleteMany({});
-          await db.collection("slider_config").insertOne({ ...dataToSave });
-          return true;
-        })();
-
-        const timeoutPromise = new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 5000));
-        savedToMongo = await Promise.race([syncPromise, timeoutPromise]);
+        const client = await clientPromise;
+        const db = client.db("apple_store");
+        await db.collection("slider_config").updateOne({}, { $set: dataToSave }, { upsert: true });
+        savedToMongo = true;
       } catch (mongoError) {
         console.warn("MongoDB sync for slider failed:", mongoError);
       }
     }
 
-    // 2. Also try local file write
+    // 2. Also save to local file backup
     try {
       await fs.writeFile(sliderFilePath, JSON.stringify(dataToSave, null, 2), "utf-8");
     } catch (fsError) {

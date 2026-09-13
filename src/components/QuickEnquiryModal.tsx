@@ -1,9 +1,16 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, useRef, type FormEvent } from "react";
 import { store, waLink } from "@/lib/store";
 import { submitEnquiry, nextEnquiryNumber } from "@/lib/enquiry";
 import { WhatsAppIcon, CloseIcon, CheckIcon } from "@/lib/icons";
+
+function validatePhone(phone: string): boolean {
+  const clean = phone.replace(/[^0-9]/g, "");
+  if (clean.length === 10 && /^[6-9]\d{9}$/.test(clean)) return true;
+  if (clean.length === 12 && clean.startsWith("91") && /^[6-9]\d{9}$/.test(clean.slice(2))) return true;
+  return false;
+}
 
 export default function QuickEnquiryModal({
   productName,
@@ -29,11 +36,41 @@ export default function QuickEnquiryModal({
   const [submitted, setSubmitted] = useState(false);
   const [enquiryRef, setEnquiryRef] = useState<string | null>(null);
 
+  // Validation State
+  const [errors, setErrors] = useState<{ name?: string; phone?: string }>({});
+
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const phoneInputRef = useRef<HTMLInputElement>(null);
+
   if (!isOpen) return null;
+
+  function validate(): boolean {
+    const newErrors: { name?: string; phone?: string } = {};
+
+    if (!name.trim() || name.trim().length < 2) {
+      newErrors.name = "Please enter your name (at least 2 letters).";
+    }
+
+    if (!phone.trim()) {
+      newErrors.phone = "Please enter your mobile phone number.";
+    } else if (!validatePhone(phone)) {
+      newErrors.phone = "Please enter a valid 10-digit mobile number (e.g. 98220 00000).";
+    }
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
+      if (newErrors.name) nameInputRef.current?.focus();
+      else if (newErrors.phone) phoneInputRef.current?.focus();
+      return false;
+    }
+
+    return true;
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!name.trim() || !phone.trim()) return;
+    if (!validate()) return;
 
     setLoading(true);
 
@@ -71,9 +108,9 @@ export default function QuickEnquiryModal({
         ...(color ? [`🎨 *Color:* ${color}`] : []),
         ...(price ? [`💰 *Price:* ${price}`] : []),
         "",
-        `👤 *My Name:* ${name}`,
-        `📞 *Phone:* ${phone}`,
-        ...(message ? [`💬 *Note:* ${message}`] : []),
+        `👤 *My Name:* ${name.trim()}`,
+        `📞 *Phone:* ${phone.trim()}`,
+        ...(message.trim() ? [`💬 *Note:* ${message.trim()}`] : []),
         "",
         `Please confirm stock availability and EMI / exchange offers at your Pimpri store.`,
       ].join("\n");
@@ -98,7 +135,7 @@ export default function QuickEnquiryModal({
         </button>
 
         {!submitted ? (
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} noValidate className="space-y-4">
             <div>
               <span className="text-[11px] font-bold uppercase tracking-wider bg-blue-50 text-blue-700 px-2.5 py-0.5 rounded-full">
                 Quick Enquiry
@@ -116,12 +153,23 @@ export default function QuickEnquiryModal({
                 Your Name *
               </label>
               <input
+                ref={nameInputRef}
                 required
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => {
+                  setName(e.target.value);
+                  if (errors.name) setErrors((prev) => ({ ...prev, name: undefined }));
+                }}
                 placeholder="e.g. Anand Patil"
-                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:bg-white transition"
+                className={`w-full rounded-xl border px-3.5 py-2.5 text-sm outline-none transition ${
+                  errors.name
+                    ? "border-red-500 bg-red-50/30 focus:border-red-600 focus:bg-white"
+                    : "border-gray-200 bg-gray-50 focus:border-blue-500 focus:bg-white"
+                }`}
               />
+              {errors.name && (
+                <p className="mt-1 text-[11px] font-semibold text-red-600">{errors.name}</p>
+              )}
             </div>
 
             <div>
@@ -129,13 +177,24 @@ export default function QuickEnquiryModal({
                 Phone / WhatsApp Number *
               </label>
               <input
+                ref={phoneInputRef}
                 required
                 type="tel"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="e.g. +91 98220 00000"
-                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:bg-white transition"
+                onChange={(e) => {
+                  setPhone(e.target.value);
+                  if (errors.phone) setErrors((prev) => ({ ...prev, phone: undefined }));
+                }}
+                placeholder="e.g. 98220 00000"
+                className={`w-full rounded-xl border px-3.5 py-2.5 text-sm outline-none transition ${
+                  errors.phone
+                    ? "border-red-500 bg-red-50/30 focus:border-red-600 focus:bg-white"
+                    : "border-gray-200 bg-gray-50 focus:border-blue-500 focus:bg-white"
+                }`}
               />
+              {errors.phone && (
+                <p className="mt-1 text-[11px] font-semibold text-red-600">{errors.phone}</p>
+              )}
             </div>
 
             <div>
@@ -177,7 +236,7 @@ export default function QuickEnquiryModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2 rounded-full bg-gray-900 text-white font-bold text-xs hover:bg-gray-800 transition"
+              className="px-6 py-2 rounded-full bg-gray-900 text-white font-bold text-xs hover:bg-gray-800 transition cursor-pointer"
             >
               Close
             </button>

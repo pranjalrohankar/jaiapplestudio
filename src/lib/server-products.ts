@@ -7,20 +7,15 @@ import { type Product, type Category, normalizeSlug, matchProductSlug } from "@/
 const dataFilePath = path.join(process.cwd(), "data", "products.json");
 
 export async function getAllProducts(): Promise<Product[]> {
-  // 1. Prioritize MongoDB Atlas (live changes from Admin)
+  // 1. Prioritize MongoDB Atlas (live database products)
   if (clientPromise) {
     try {
-      const mongoPromise = (async () => {
-        const client = await clientPromise;
-        const db = client.db("apple_store");
-        return await db
-          .collection("products")
-          .find({}, { projection: { _id: 0 } })
-          .toArray();
-      })();
-
-      const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000));
-      const products = await Promise.race([mongoPromise, timeoutPromise]);
+      const client = await clientPromise;
+      const db = client.db("apple_store");
+      const products = await db
+        .collection("products")
+        .find({}, { projection: { _id: 0 } })
+        .toArray();
 
       if (products && Array.isArray(products) && products.length > 0) {
         return products as unknown as Product[];
@@ -45,36 +40,23 @@ export async function getAllProducts(): Promise<Product[]> {
 }
 
 export async function getAllCategories(): Promise<Category[]> {
-  // 1. Prioritize MongoDB Atlas
+  // 1. Prioritize MongoDB Atlas (live database categories)
   if (clientPromise) {
     try {
-      const mongoPromise = (async () => {
-        const client = await clientPromise;
-        const db = client.db("apple_store");
-        
-        // Try individual items in categories collection
-        const docs = await db
-          .collection("categories")
-          .find({}, { projection: { _id: 0 } })
-          .toArray();
-        if (Array.isArray(docs) && docs.length > 0) {
-          return docs;
-        }
+      const client = await clientPromise;
+      const db = client.db("apple_store");
+      
+      const docs = await db
+        .collection("categories")
+        .find({}, { projection: { _id: 0 } })
+        .toArray();
+      if (Array.isArray(docs) && docs.length > 0) {
+        return docs as unknown as Category[];
+      }
 
-        // Try config doc in categories_config
-        const configDoc = await db.collection("categories_config").findOne({}, { projection: { _id: 0 } });
-        if (configDoc && Array.isArray(configDoc.categories) && configDoc.categories.length > 0) {
-          return configDoc.categories;
-        }
-
-        return null;
-      })();
-
-      const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000));
-      const categories = await Promise.race([mongoPromise, timeoutPromise]);
-
-      if (categories && Array.isArray(categories) && categories.length > 0) {
-        return categories as unknown as Category[];
+      const configDoc = await db.collection("categories_config").findOne({}, { projection: { _id: 0 } });
+      if (configDoc && Array.isArray(configDoc.categories) && configDoc.categories.length > 0) {
+        return configDoc.categories as unknown as Category[];
       }
     } catch (error) {
       console.warn("MongoDB fetch categories failed, using local fallback:", error);

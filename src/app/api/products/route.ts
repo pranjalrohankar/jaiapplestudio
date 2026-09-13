@@ -16,25 +16,21 @@ const NO_CACHE_HEADERS = {
 };
 
 export async function GET() {
-  // 1. Try MongoDB Atlas first (live admin updates)
+  // 1. Try MongoDB Atlas first (live database products)
   if (clientPromise) {
     try {
-      const mongoPromise = (async () => {
-        const client = await clientPromise;
-        const db = client.db("apple_store");
-        const categories = await db.collection("categories").find({}, { projection: { _id: 0 } }).toArray();
-        const products = await db.collection("products").find({}, { projection: { _id: 0 } }).toArray();
-        return { categories, products };
-      })();
+      const client = await clientPromise;
+      const db = client.db("apple_store");
+      const [categories, products] = await Promise.all([
+        db.collection("categories").find({}, { projection: { _id: 0 } }).toArray().catch(() => []),
+        db.collection("products").find({}, { projection: { _id: 0 } }).toArray().catch(() => []),
+      ]);
 
-      const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000));
-      const mongoData = await Promise.race([mongoPromise, timeoutPromise]);
-
-      if (mongoData && (mongoData.products.length > 0 || mongoData.categories.length > 0)) {
+      if (products.length > 0 || categories.length > 0) {
         return NextResponse.json(
           {
-            categories: mongoData.categories.length > 0 ? mongoData.categories : fallbackData.categories || [],
-            products: mongoData.products.length > 0 ? mongoData.products : fallbackData.products || [],
+            categories: categories.length > 0 ? categories : fallbackData.categories || [],
+            products: products.length > 0 ? products : fallbackData.products || [],
             source: "mongodb",
           },
           { headers: NO_CACHE_HEADERS }
@@ -85,49 +81,44 @@ export async function POST(request: Request) {
 
     let savedToMongo = false;
 
-    // 1. AWAIT save directly into MongoDB Atlas
+    // 1. Direct MongoDB sync
     if (clientPromise) {
       try {
-        const syncPromise = (async () => {
-          const client = await clientPromise;
-          const db = client.db("apple_store");
+        const client = await clientPromise;
+        const db = client.db("apple_store");
 
-          await db.collection("products").deleteMany({});
+        await db.collection("products").deleteMany({});
 
-          const productsToInsert = updatedData.products.map((p: any) => {
-            const { _id, ...rest } = p;
+        const productsToInsert = updatedData.products.map((p: any) => {
+          const { _id, ...rest } = p;
+          return rest;
+        });
+
+        if (productsToInsert.length > 0) {
+          await db.collection("products").insertMany(productsToInsert);
+        }
+
+        if (updatedData.categories && Array.isArray(updatedData.categories)) {
+          await db.collection("categories").deleteMany({});
+          const categoriesToInsert = updatedData.categories.map((c: any) => {
+            const { _id, ...rest } = c;
             return rest;
           });
-
-          if (productsToInsert.length > 0) {
-            await db.collection("products").insertMany(productsToInsert);
+          if (categoriesToInsert.length > 0) {
+            await db.collection("categories").insertMany(categoriesToInsert);
           }
 
-          if (updatedData.categories && Array.isArray(updatedData.categories)) {
-            await db.collection("categories").deleteMany({});
-            const categoriesToInsert = updatedData.categories.map((c: any) => {
-              const { _id, ...rest } = c;
-              return rest;
-            });
-            if (categoriesToInsert.length > 0) {
-              await db.collection("categories").insertMany(categoriesToInsert);
-            }
-
-            // Also keep categories_config in sync
-            await db.collection("categories_config").deleteMany({});
-            await db.collection("categories_config").insertOne({ categories: categoriesToInsert });
-          }
-          return true;
-        })();
-
-        const timeoutPromise = new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 5000));
-        savedToMongo = await Promise.race([syncPromise, timeoutPromise]);
+          // Also keep categories_config in sync
+          await db.collection("categories_config").deleteMany({});
+          await db.collection("categories_config").insertOne({ categories: categoriesToInsert });
+        }
+        savedToMongo = true;
       } catch (mongoError) {
         console.warn("MongoDB sync failed:", mongoError);
       }
     }
 
-    // 2. Also try local file write for local development
+    // 2. Also try local file write for local development backup
     try {
       await fs.writeFile(dataFilePath, JSON.stringify(updatedData, null, 2), "utf-8");
     } catch (fsError) {

@@ -17,37 +17,26 @@ const NO_CACHE_HEADERS = {
 };
 
 export async function GET() {
-  // 1. Prioritize MongoDB Atlas (live admin updates)
+  // 1. Prioritize MongoDB Atlas (live database source of truth)
   if (clientPromise) {
     try {
-      const mongoPromise = (async () => {
-        const client = await clientPromise;
-        const db = client.db("apple_store");
+      const client = await clientPromise;
+      const db = client.db("apple_store");
 
-        // Try banners_config first
-        const bannerDoc = await db.collection("banners_config").findOne({}, { projection: { _id: 0 } });
-        if (bannerDoc && (Array.isArray(bannerDoc.banners) || bannerDoc.announcement)) {
-          return bannerDoc;
-        }
+      const [bannerDoc, legacyDoc] = await Promise.all([
+        db.collection("banners_config").findOne({}, { projection: { _id: 0 } }).catch(() => null),
+        db.collection("banners").findOne({}, { projection: { _id: 0 } }).catch(() => null),
+      ]);
 
-        // Fallback check banners collection
-        const legacyDoc = await db.collection("banners").findOne({}, { projection: { _id: 0 } });
-        if (legacyDoc && Array.isArray(legacyDoc.banners)) {
-          return legacyDoc;
-        }
+      const doc = bannerDoc || legacyDoc;
+      if (doc && (Array.isArray(doc.banners) || doc.announcement)) {
+        const announcement = doc.announcement || defaultBannersData.announcement;
+        const isAnnouncementActive = doc.isAnnouncementActive ?? true;
+        const banners = Array.isArray(doc.banners) && doc.banners.length > 0 ? doc.banners : defaultOfferBanners;
 
-        return null;
-      })();
-
-      const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000));
-      const bannerDoc = await Promise.race([mongoPromise, timeoutPromise]);
-
-      if (bannerDoc && (Array.isArray(bannerDoc.banners) || bannerDoc.announcement)) {
-        const announcement = bannerDoc.announcement || defaultBannersData.announcement;
-        const isAnnouncementActive = bannerDoc.isAnnouncementActive ?? true;
         return NextResponse.json(
           {
-            banners: bannerDoc.banners || defaultOfferBanners,
+            banners,
             announcement,
             isAnnouncementActive,
             banner: {
@@ -69,7 +58,7 @@ export async function GET() {
     const fileContent = await fs.readFile(bannerFilePath, "utf-8");
     const data = JSON.parse(fileContent);
     if (data && (Array.isArray(data.banners) || data.announcement)) {
-      const banners = Array.isArray(data.banners) ? data.banners : defaultOfferBanners;
+      const banners = Array.isArray(data.banners) && data.banners.length > 0 ? data.banners : defaultOfferBanners;
       const announcement = data.announcement || defaultBannersData.announcement;
       const isAnnouncementActive = data.isAnnouncementActive ?? true;
       return NextResponse.json(
@@ -126,31 +115,24 @@ export async function POST(request: Request) {
 
     let savedToMongo = false;
 
-    // 1. AWAIT MongoDB write
+    // 1. Direct MongoDB atomic upsert (never leave empty)
     if (clientPromise) {
       try {
-        const syncPromise = (async () => {
-          const client = await clientPromise;
-          const db = client.db("apple_store");
+        const client = await clientPromise;
+        const db = client.db("apple_store");
 
-          // Sync to both banners_config and banners collections
-          await db.collection("banners_config").deleteMany({});
-          await db.collection("banners_config").insertOne({ ...dataToSave });
+        await Promise.all([
+          db.collection("banners_config").updateOne({}, { $set: dataToSave }, { upsert: true }),
+          db.collection("banners").updateOne({}, { $set: dataToSave }, { upsert: true }),
+        ]);
 
-          await db.collection("banners").deleteMany({});
-          await db.collection("banners").insertOne({ ...dataToSave });
-
-          return true;
-        })();
-
-        const timeoutPromise = new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 5000));
-        savedToMongo = await Promise.race([syncPromise, timeoutPromise]);
+        savedToMongo = true;
       } catch (mongoError) {
         console.warn("MongoDB sync for banners failed:", mongoError);
       }
     }
 
-    // 2. Also try local file write
+    // 2. Also save to local file backup
     try {
       await fs.writeFile(bannerFilePath, JSON.stringify(dataToSave, null, 2), "utf-8");
     } catch (fsError) {
