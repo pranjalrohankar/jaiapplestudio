@@ -1,30 +1,5 @@
 {
   "announcement": "🚀 Latest Offers: Instant ₹5,000 Bank Cashback on all iPhones + No-Cost EMI available! Call +91 88886 83101",
   "isAnnouncementActive": true,
-  "banners": [
-    {
-      "id": "mega-festive-cashback",
-      "isActive": true,
-      "title": "New Launch iPhone 18 Duo",
-      "badge": "Preorder Now",
-      "subtitle": "Get up to ₹10,000 Extra Exchange Bonus + ₹5,000 Instant Bank Cashback on all iPhone & Mac models.",
-      "priceTag": "Zero Down Payment No-Cost EMI Available",
-      "image": "https://www.apple.com/newsroom/images/2026/09/apple-unveils-iphone-duo/article/Apple-iPhone-Duo-display-sizes-260909_big.jpg.large_2x.jpg",
-      "link": "/product/iPhone Duo",
-      "ctaText": "Preorder",
-      "layout": "full"
-    },
-    {
-      "id": "banner-1789003616428",
-      "isActive": true,
-      "title": "Book Your Lattest Pro Series",
-      "badge": "Preorder",
-      "subtitle": "Get up to ₹10,000 extra exchange bonus + ₹5,000 instant bank cashback on all models.",
-      "priceTag": "Zero Down Payment No-Cost EMI Available",
-      "image": "https://www.apple.com/v/iphone/home/ck/images/overview/priority-router/hero_iphone_18_pro__cybfx8phkvu6_large_2x.jpg",
-      "link": "/iphone",
-      "ctaText": "Preorder Now",
-      "layout": "full"
-    }
-  ]
+  "banners": []
 }

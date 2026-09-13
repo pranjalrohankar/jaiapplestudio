@@ -7,18 +7,7 @@ import { ChevronRightIcon } from "@/lib/icons";
 import { defaultSliderSlides, type SliderSlide } from "@/lib/slider";
 
 export default function Hero() {
-  const [slides, setSlides] = useState<SliderSlide[]>(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const cached = window.localStorage.getItem("jas-live-slider");
-        if (cached !== null) {
-          const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed)) return parsed;
-        }
-      } catch {}
-    }
-    return [];
-  });
+  const [slides, setSlides] = useState<SliderSlide[]>([]);
   const [current, setCurrent] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const touchStartX = useRef<number | null>(null);
@@ -37,7 +26,11 @@ export default function Hero() {
             setSlides(activeOnly);
             try {
               if (typeof window !== "undefined") {
-                window.localStorage.setItem("jas-live-slider", JSON.stringify(activeOnly));
+                if (activeOnly.length > 0) {
+                  window.localStorage.setItem("jas-live-slider", JSON.stringify(activeOnly));
+                } else {
+                  window.localStorage.removeItem("jas-live-slider");
+                }
               }
             } catch {}
           }

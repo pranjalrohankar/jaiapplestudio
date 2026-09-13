@@ -8,18 +8,7 @@ import { type OfferBanner, defaultOfferBanners } from "@/lib/banners";
 import { ChevronRightIcon } from "@/lib/icons";
 
 export default function OfferBanners() {
-  const [banners, setBanners] = useState<OfferBanner[]>(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const cached = window.localStorage.getItem("jas-live-banners");
-        if (cached !== null) {
-          const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed)) return parsed;
-        }
-      } catch {}
-    }
-    return [];
-  });
+  const [banners, setBanners] = useState<OfferBanner[]>([]);
 
   useEffect(() => {
     async function fetchLiveBanners() {
@@ -35,7 +24,11 @@ export default function OfferBanners() {
             setBanners(activeOnly);
             try {
               if (typeof window !== "undefined") {
-                window.localStorage.setItem("jas-live-banners", JSON.stringify(activeOnly));
+                if (activeOnly.length > 0) {
+                  window.localStorage.setItem("jas-live-banners", JSON.stringify(activeOnly));
+                } else {
+                  window.localStorage.removeItem("jas-live-banners");
+                }
               }
             } catch {}
           }

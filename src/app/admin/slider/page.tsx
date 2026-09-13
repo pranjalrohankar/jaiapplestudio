@@ -150,7 +150,11 @@ export default function AdminSliderManager() {
       try {
         if (typeof window !== "undefined") {
           const activeOnly = updatedData.slides.filter((s) => s.isActive !== false);
-          window.localStorage.setItem("jas-live-slider", JSON.stringify(activeOnly));
+          if (activeOnly.length > 0) {
+            window.localStorage.setItem("jas-live-slider", JSON.stringify(activeOnly));
+          } else {
+            window.localStorage.removeItem("jas-live-slider");
+          }
           window.dispatchEvent(new Event("jas-data-updated"));
         }
       } catch {}
@@ -206,10 +210,10 @@ export default function AdminSliderManager() {
       subtitle: "",
       price: "",
       ctaText: "",
-      ctaLink: "/iphone",
+      ctaLink: "/",
       secondaryText: "",
       secondaryLink: "",
-      image: "https://inventstore.in/wp-content/uploads/2026/05/Untitled-design-2026-05-28T173013.476.webp",
+      image: "",
       bgGradient: "from-[#08090d] via-[#10121a] to-[#040507]",
       accentColor: "#0071e3",
     };

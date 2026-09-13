@@ -141,7 +141,11 @@ export default function AdminBannersManager() {
       try {
         if (typeof window !== "undefined") {
           const activeOnly = updatedData.banners.filter((b) => b.isActive !== false);
-          window.localStorage.setItem("jas-live-banners", JSON.stringify(activeOnly));
+          if (activeOnly.length > 0) {
+            window.localStorage.setItem("jas-live-banners", JSON.stringify(activeOnly));
+          } else {
+            window.localStorage.removeItem("jas-live-banners");
+          }
           window.dispatchEvent(new Event("jas-data-updated"));
         }
       } catch {}
@@ -192,10 +196,10 @@ export default function AdminBannersManager() {
       isActive: true,
       title: "",
       badge: "LIMITED PERIOD OFFER",
-      subtitle: "Get up to ₹10,000 extra exchange bonus + ₹5,000 instant bank cashback on all models.",
-      priceTag: "Zero Down Payment No-Cost EMI Available",
-      image: "/images/iphone-18-hero-banner.jpg",
-      link: "/iphone",
+      subtitle: "",
+      priceTag: "",
+      image: "",
+      link: "/",
       ctaText: "Claim Deal Now",
       layout: "full",
     };
