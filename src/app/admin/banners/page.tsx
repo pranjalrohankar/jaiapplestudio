@@ -7,7 +7,7 @@ import { type OfferBanner, type BannersData, defaultBannersData } from "@/lib/ba
 import { CheckIcon, TrashIcon } from "@/lib/icons";
 
 export default function AdminBannersManager() {
-  const [data, setData] = useState<BannersData>(defaultBannersData);
+  const [data, setData] = useState<BannersData>({ announcement: "", isAnnouncementActive: false, banners: [] });
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingBanner, setEditingBanner] = useState<OfferBanner | null>(null);
 

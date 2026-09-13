@@ -17,7 +17,7 @@ const GRADIENT_PRESETS = [
 ];
 
 export default function AdminSliderManager() {
-  const [data, setData] = useState<SliderData>(defaultSliderData);
+  const [data, setData] = useState<SliderData>({ slides: [] });
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingSlide, setEditingSlide] = useState<SliderSlide | null>(null);
   const [previewCurrent, setPreviewCurrent] = useState(0);
