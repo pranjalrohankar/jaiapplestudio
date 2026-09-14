@@ -41,7 +41,7 @@ export default function ProductsManager() {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingGallery, setUploadingGallery] = useState(false);
   const [uploadingColorIdx, setUploadingColorIdx] = useState<number | null>(null);
-  const [expandedColorIdx, setExpandedColorIdx] = useState<number | null>(null);
+  const [expandedColors, setExpandedColors] = useState<Record<number, boolean>>({});
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -283,7 +283,11 @@ export default function ProductsManager() {
 
       if (uploadedUrls.length > 0) {
         const nextImages = [...(editing.images || []), ...uploadedUrls];
-        setEditing({ ...editing, images: nextImages });
+        setEditing({
+          ...editing,
+          image: editing.image || uploadedUrls[0],
+          images: nextImages,
+        });
         showToast(`✓ Uploaded ${uploadedUrls.length} angle image(s)!`);
       }
     } catch (err: any) {
@@ -309,9 +313,15 @@ export default function ProductsManager() {
       const resData = await res.json();
       if (res.ok && resData.url) {
         const nextColors = [...(editing.colors || [])];
-        nextColors[colorIdx] = { ...nextColors[colorIdx], image: resData.url };
+        const existingImages = nextColors[colorIdx].images || [];
+        nextColors[colorIdx] = {
+          ...nextColors[colorIdx],
+          image: resData.url,
+          images: existingImages.length === 0 ? [resData.url] : existingImages,
+        };
         setEditing({ ...editing, colors: nextColors });
-        showToast("✓ Color finish image uploaded!");
+        setExpandedColors((prev) => ({ ...prev, [colorIdx]: true }));
+        showToast(`✓ Image uploaded for ${nextColors[colorIdx].name}!`);
       }
     } catch (err: any) {
       alert("Color image upload failed: " + (err.message || "Unknown error"));
@@ -344,11 +354,15 @@ export default function ProductsManager() {
       if (uploadedUrls.length > 0) {
         const nextColors = [...(editing.colors || [])];
         const existingColorImages = nextColors[colorIdx].images || [];
+        const nextImages = [...existingColorImages, ...uploadedUrls];
+        const primaryImage = nextColors[colorIdx].image || uploadedUrls[0];
         nextColors[colorIdx] = {
           ...nextColors[colorIdx],
-          images: [...existingColorImages, ...uploadedUrls],
+          image: primaryImage,
+          images: nextImages,
         };
         setEditing({ ...editing, colors: nextColors });
+        setExpandedColors((prev) => ({ ...prev, [colorIdx]: true }));
         showToast(`✓ Uploaded ${uploadedUrls.length} angle(s) for ${nextColors[colorIdx].name}!`);
       }
     } catch (err: any) {
@@ -1697,7 +1711,10 @@ export default function ProductsManager() {
                   ) : (
                     <div className="space-y-3">
                       {editing.colors.map((c: Color, idx: number) => {
-                        const isExpanded = expandedColorIdx === idx;
+                        const isExpanded =
+                          expandedColors[idx] !== undefined
+                            ? expandedColors[idx]
+                            : Boolean(c.images && c.images.length > 0);
                         const angleCount = (c.images?.length || 0) + (c.image ? 1 : 0);
                         return (
                           <div
@@ -1776,7 +1793,9 @@ export default function ProductsManager() {
                               {/* Toggle Color-Specific Angles Gallery */}
                               <button
                                 type="button"
-                                onClick={() => setExpandedColorIdx(isExpanded ? null : idx)}
+                                onClick={() =>
+                                  setExpandedColors((prev) => ({ ...prev, [idx]: !isExpanded }))
+                                }
                                 className={`text-xs font-bold px-3 py-1 rounded-lg border transition flex items-center gap-1 cursor-pointer shrink-0 ${
                                   isExpanded
                                     ? "bg-blue-600 text-white border-blue-600"

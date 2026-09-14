@@ -43,25 +43,32 @@ export default function ProductDetailConfigurator({ product }: { product: Produc
 
   const activeColorObj = product.colors.find((c) => c.name === color) ?? product.colors[0];
 
-  // Build the dynamic multi-angle gallery list for the active color & product
-  const colorImages: string[] =
-    Array.isArray(activeColorObj?.images) && activeColorObj.images.length > 0
-      ? activeColorObj.images.filter(Boolean)
-      : activeColorObj?.image
-      ? [activeColorObj.image]
-      : [];
+  // Dynamic gallery resolution:
+  // 1. If active color has its own multi-angle images, use ONLY that color's angles!
+  // 2. If active color only has single image, use that color image.
+  // 3. Fall back to product-level gallery or product primary image.
+  let galleryList: string[] = [];
+  const rawColorImages = Array.isArray(activeColorObj?.images)
+    ? activeColorObj.images.filter((img): img is string => typeof img === "string" && img.trim().length > 0)
+    : [];
+  const rawColorPrimary =
+    typeof activeColorObj?.image === "string" && activeColorObj.image.trim().length > 0
+      ? activeColorObj.image.trim()
+      : null;
 
-  const productImages: string[] =
-    Array.isArray(product.images) && product.images.length > 0
-      ? product.images.filter(Boolean)
-      : product.image
-      ? [product.image]
-      : [];
-
-  // Combine color-specific angles first, then product-level gallery images without duplicates
-  const galleryList: string[] = Array.from(
-    new Set([...colorImages, ...productImages].filter(Boolean))
-  );
+  if (rawColorImages.length > 0) {
+    if (rawColorPrimary && !rawColorImages.includes(rawColorPrimary)) {
+      galleryList = [rawColorPrimary, ...rawColorImages];
+    } else {
+      galleryList = rawColorImages;
+    }
+  } else if (rawColorPrimary) {
+    galleryList = [rawColorPrimary];
+  } else if (Array.isArray(product.images) && product.images.length > 0) {
+    galleryList = product.images.filter((img): img is string => typeof img === "string" && img.trim().length > 0);
+  } else if (product.image) {
+    galleryList = [product.image];
+  }
 
   const currentDisplayImage =
     galleryList[activeImgIndex] || galleryList[0] || product.image || "";
