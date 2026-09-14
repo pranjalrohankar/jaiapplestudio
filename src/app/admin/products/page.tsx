@@ -502,6 +502,41 @@ export default function ProductsManager() {
         .replace(/[^\w\s-]/g, "")
         .replace(/[\s_]+/g, "-");
 
+      // Normalize and deduplicate color finishes by name (merging multiple images into single finish)
+      const colorMap = new Map<string, Color>();
+      for (const c of editing.colors || []) {
+        const name = (c.name || "").trim();
+        const key = name.toLowerCase();
+        if (!key) continue;
+        const rawImages = Array.isArray(c.images)
+          ? c.images.map((s) => (typeof s === "string" ? s.trim() : "")).filter(Boolean)
+          : [];
+        const primary = c.image ? c.image.trim() : "";
+
+        if (!colorMap.has(key)) {
+          colorMap.set(key, {
+            name,
+            hex: (c.hex || "#000000").trim(),
+            image: primary,
+            images: rawImages,
+          });
+        } else {
+          const existing = colorMap.get(key)!;
+          const combinedImages = [
+            ...(existing.images || []),
+            ...(existing.image ? [existing.image] : []),
+            ...(primary ? [primary] : []),
+            ...rawImages,
+          ].filter((img, idx, arr) => Boolean(img && img.trim()) && arr.indexOf(img) === idx);
+
+          colorMap.set(key, {
+            ...existing,
+            image: existing.image || primary || combinedImages[0] || "",
+            images: combinedImages,
+          });
+        }
+      }
+
       const productToSave: Product = {
         ...editing,
         slug: cleanSlug || editing.slug,
@@ -509,17 +544,7 @@ export default function ProductsManager() {
         images: Array.isArray(editing.images)
           ? editing.images.map((s) => (typeof s === "string" ? s.trim() : "")).filter(Boolean)
           : [],
-        colors: Array.isArray(editing.colors)
-          ? editing.colors.map((c) => ({
-              ...c,
-              name: (c.name || "").trim(),
-              hex: (c.hex || "#000000").trim(),
-              image: c.image ? c.image.trim() : "",
-              images: Array.isArray(c.images)
-                ? c.images.map((s) => (typeof s === "string" ? s.trim() : "")).filter(Boolean)
-                : [],
-            }))
-          : [],
+        colors: Array.from(colorMap.values()),
         highlights: Array.isArray(editing.highlights) ? editing.highlights.filter((h) => h.trim() !== "") : [],
       };
 
@@ -1705,6 +1730,74 @@ export default function ProductsManager() {
                       + Add Finish
                     </button>
                   </div>
+
+                  {/* Duplicate color warning banner with 1-click merge */}
+                  {(() => {
+                    const counts: Record<string, number> = {};
+                    for (const col of editing.colors || []) {
+                      const k = (col.name || "").trim().toLowerCase();
+                      if (k) counts[k] = (counts[k] || 0) + 1;
+                    }
+                    const dupes = Object.entries(counts).filter(([_, count]) => count > 1);
+                    if (dupes.length === 0) return null;
+
+                    return (
+                      <div className="bg-amber-50 border border-amber-300 rounded-2xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-amber-900 shadow-2xs">
+                        <div className="flex items-start gap-2">
+                          <span className="text-base">⚠️</span>
+                          <div>
+                            <p className="font-bold">
+                              Duplicate Finish Names Detected ({dupes.map(([name]) => `"${name}"`).join(", ")})
+                            </p>
+                            <p className="text-[11px] text-amber-800/80 mt-0.5">
+                              Instead of creating multiple finish rows for the same color, store all images inside one finish card.
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const map = new Map<string, Color>();
+                            for (const col of editing.colors || []) {
+                              const name = (col.name || "").trim();
+                              const key = name.toLowerCase();
+                              if (!key) continue;
+                              const rawImages = Array.isArray(col.images)
+                                ? col.images.filter((img): img is string => typeof img === "string" && img.trim().length > 0)
+                                : [];
+                              const primary = col.image ? col.image.trim() : "";
+                              if (!map.has(key)) {
+                                map.set(key, {
+                                  name,
+                                  hex: (col.hex || "#000000").trim(),
+                                  image: primary,
+                                  images: rawImages,
+                                });
+                              } else {
+                                const existing = map.get(key)!;
+                                const combined = [
+                                  ...(existing.images || []),
+                                  ...(existing.image ? [existing.image] : []),
+                                  ...(primary ? [primary] : []),
+                                  ...rawImages,
+                                ].filter((img, i, arr) => Boolean(img) && arr.indexOf(img) === i);
+                                map.set(key, {
+                                  ...existing,
+                                  image: existing.image || primary || combined[0] || "",
+                                  images: combined,
+                                });
+                              }
+                            }
+                            setEditing({ ...editing, colors: Array.from(map.values()) });
+                            showToast("✓ Duplicate color finishes merged into one!");
+                          }}
+                          className="bg-amber-600 hover:bg-amber-700 text-white font-bold px-3.5 py-1.5 rounded-xl shadow-xs shrink-0 cursor-pointer text-xs transition"
+                        >
+                          Merge Duplicate Colors
+                        </button>
+                      </div>
+                    );
+                  })()}
 
                   {(!editing.colors || editing.colors.length === 0) ? (
                     <p className="text-xs text-gray-400 italic">No color finishes configured.</p>

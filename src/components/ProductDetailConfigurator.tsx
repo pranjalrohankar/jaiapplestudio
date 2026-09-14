@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/lib/cart-context";
-import { getVariants, priceForVariant, type Product } from "@/lib/products";
+import { getVariants, priceForVariant, type Product, type Color } from "@/lib/products";
 import { priceValue, formatINR } from "@/lib/currency";
 import {
   MinusIcon,
@@ -23,7 +23,49 @@ export default function ProductDetailConfigurator({ product }: { product: Produc
   const info = getVariants(product);
   const { addItem, count } = useCart();
 
-  const [color, setColor] = useState<string>(product.colors[0]?.name ?? "");
+  // Normalize and deduplicate color finishes by name (merging duplicate colors and their images)
+  const colors: Color[] = useMemo(() => {
+    const map = new Map<string, Color>();
+    for (const c of product.colors || []) {
+      const name = (c.name || "").trim();
+      const key = name.toLowerCase();
+      if (!key) continue;
+      if (!map.has(key)) {
+        const rawImages = Array.isArray(c.images)
+          ? c.images.map((s) => (typeof s === "string" ? s.trim() : "")).filter(Boolean)
+          : [];
+        const primary = c.image?.trim() || "";
+        const allImages = primary && !rawImages.includes(primary) ? [primary, ...rawImages] : rawImages;
+        map.set(key, {
+          name,
+          hex: c.hex?.trim() || "#000000",
+          image: primary || allImages[0] || "",
+          images: allImages,
+        });
+      } else {
+        const existing = map.get(key)!;
+        const currentPrimary = c.image?.trim() || "";
+        const currentImages = Array.isArray(c.images)
+          ? c.images.map((s) => (typeof s === "string" ? s.trim() : "")).filter(Boolean)
+          : [];
+        const combined = [
+          ...(existing.images || []),
+          ...(existing.image ? [existing.image] : []),
+          ...(currentPrimary ? [currentPrimary] : []),
+          ...currentImages,
+        ].filter((img, idx, arr) => Boolean(img && img.trim()) && arr.indexOf(img) === idx);
+
+        map.set(key, {
+          ...existing,
+          image: existing.image || currentPrimary || combined[0] || "",
+          images: combined,
+        });
+      }
+    }
+    return Array.from(map.values());
+  }, [product.colors]);
+
+  const [color, setColor] = useState<string>(colors[0]?.name ?? product.colors[0]?.name ?? "");
   const [variant, setVariant] = useState<string>(info.variants[0] ?? "");
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
@@ -41,7 +83,8 @@ export default function ProductDetailConfigurator({ product }: { product: Produc
     (product.badge?.toLowerCase().includes("coming soon") ||
       product.price?.toLowerCase().includes("coming soon"));
 
-  const activeColorObj = product.colors.find((c) => c.name === color) ?? product.colors[0];
+  const activeColorObj =
+    colors.find((c) => c.name.toLowerCase() === color.toLowerCase()) ?? colors[0];
 
   // Dynamic gallery resolution:
   // 1. If active color has its own multi-angle images, use ONLY that color's angles!
@@ -195,10 +238,10 @@ export default function ProductDetailConfigurator({ product }: { product: Produc
           )}
 
           {/* Interactive Color Finish Mini Bar for Instant Switching */}
-          {product.colors.length > 1 && (
+          {colors.length > 1 && (
             <div className="mt-2.5 flex items-center justify-center gap-1.5 sm:gap-2 flex-wrap max-w-full">
-              {product.colors.map((c) => {
-                const isSelected = (activeColorObj?.name || color) === c.name;
+              {colors.map((c) => {
+                const isSelected = (activeColorObj?.name || color).toLowerCase() === c.name.toLowerCase();
                 return (
                   <button
                     key={c.name}
@@ -370,23 +413,23 @@ export default function ProductDetailConfigurator({ product }: { product: Produc
         </div>
 
         {/* 1. SELECT FINISH / COLOR */}
-        {product.colors.length > 0 && (
+        {colors.length > 0 && (
           <div className="border-t border-black/10 pt-6">
             <div className="flex items-center justify-between mb-3.5">
               <h2 className="text-xs font-bold uppercase tracking-wider text-ink/60">
                 1. Select Finish:{" "}
-                <span className="text-ink font-extrabold text-sm capitalize">{color}</span>
+                <span className="text-ink font-extrabold text-sm capitalize">{activeColorObj?.name || color}</span>
               </h2>
             </div>
             <div className="flex flex-wrap gap-3">
-              {product.colors.map((c) => {
-                const isSelected = color === c.name;
+              {colors.map((c) => {
+                const isSelected = (activeColorObj?.name || color).toLowerCase() === c.name.toLowerCase();
                 return (
                   <button
                     key={c.name}
                     type="button"
-                    onClick={() => setColor(c.name)}
-                    className={`group flex items-center gap-3 rounded-full px-4 py-2.5 text-xs font-bold transition-all ${
+                    onClick={() => handleColorChange(c.name)}
+                    className={`group flex items-center gap-3 rounded-full px-4 py-2.5 text-xs font-bold transition-all cursor-pointer ${
                       isSelected
                         ? "bg-ink text-white shadow-md ring-2 ring-ink ring-offset-2 scale-[1.02]"
                         : "bg-[#f5f5f7] text-ink/80 hover:bg-gray-200"

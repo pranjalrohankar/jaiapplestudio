@@ -12,12 +12,14 @@
         {
           "name": "Star White",
           "hex": "#f5f5f5",
-          "image": "/images/iphone-duo.jpg"
+          "image": "/images/iphone-duo.jpg",
+          "images": []
         },
         {
           "name": "Night Sky",
           "hex": "#1a1f2b",
-          "image": "/images/iphone-duo.jpg"
+          "image": "/images/iphone-duo.jpg",
+          "images": []
         }
       ],
       "highlights": [
@@ -91,8 +93,7 @@
         "512GB ₹2,04,900",
         "1TB ₹2,54,900",
         "2TB ₹3,29,900"
-      ],
-      "image": "/images/iphone-18-pro-max.jpg"
+      ]
     },
     {
       "slug": "iphone-18-pro",
@@ -106,22 +107,26 @@
         {
           "name": "Deep Black",
           "hex": "#000000",
-          "image": "/images/iphone-18-pro.jpg"
+          "image": "/images/iphone-18-pro.jpg",
+          "images": []
         },
         {
           "name": "Glacier",
           "hex": "#dfe7ee",
-          "image": "https://inventstore.in/wp-content/uploads/2024/09/iphone-16-pro.png"
+          "image": "https://inventstore.in/wp-content/uploads/2024/09/iphone-16-pro.png",
+          "images": []
         },
         {
           "name": "Silver",
           "hex": "#d9d9d9",
-          "image": "https://inventstore.in/wp-content/uploads/2024/09/iphone-16-pro.png"
+          "image": "https://inventstore.in/wp-content/uploads/2024/09/iphone-16-pro.png",
+          "images": []
         },
         {
           "name": "Burgundy",
           "hex": "#6d1022",
-          "image": "/images/iphone-18-pro-max.jpg"
+          "image": "/images/iphone-18-pro-max.jpg",
+          "images": []
         }
       ],
       "highlights": [
@@ -145,15 +150,21 @@
       "colors": [
         {
           "name": "Cosmic Orange",
-          "hex": "#c05a35"
+          "hex": "#c05a35",
+          "image": "",
+          "images": []
         },
         {
           "name": "Deep Blue",
-          "hex": "#1c2b4a"
+          "hex": "#1c2b4a",
+          "image": "",
+          "images": []
         },
         {
           "name": "Silver",
-          "hex": "#e4e4e2"
+          "hex": "#e4e4e2",
+          "image": "",
+          "images": []
         }
       ],
       "highlights": [
@@ -173,15 +184,21 @@
       "colors": [
         {
           "name": "Cosmic Orange",
-          "hex": "#c05a35"
+          "hex": "#c05a35",
+          "image": "",
+          "images": []
         },
         {
           "name": "Deep Blue",
-          "hex": "#1c2b4a"
+          "hex": "#1c2b4a",
+          "image": "",
+          "images": []
         },
         {
           "name": "Silver",
-          "hex": "#e4e4e2"
+          "hex": "#e4e4e2",
+          "image": "",
+          "images": []
         }
       ],
       "highlights": [
@@ -201,23 +218,33 @@
       "colors": [
         {
           "name": "Black",
-          "hex": "#1c1c1e"
+          "hex": "#1c1c1e",
+          "image": "",
+          "images": []
         },
         {
           "name": "Lavender",
-          "hex": "#cbb9d8"
+          "hex": "#cbb9d8",
+          "image": "",
+          "images": []
         },
         {
           "name": "Mist Blue",
-          "hex": "#a9c2d9"
+          "hex": "#a9c2d9",
+          "image": "",
+          "images": []
         },
         {
           "name": "Sage",
-          "hex": "#b6c2ab"
+          "hex": "#b6c2ab",
+          "image": "",
+          "images": []
         },
         {
           "name": "White",
-          "hex": "#f5f5f2"
+          "hex": "#f5f5f2",
+          "image": "",
+          "images": []
         }
       ],
       "highlights": [
@@ -240,15 +267,21 @@
       "colors": [
         {
           "name": "Black",
-          "hex": "#1c1c1e"
+          "hex": "#1c1c1e",
+          "image": "",
+          "images": []
         },
         {
           "name": "Soft Pink",
-          "hex": "#f0d3d8"
+          "hex": "#f0d3d8",
+          "image": "",
+          "images": []
         },
         {
           "name": "White",
-          "hex": "#f5f5f2"
+          "hex": "#f5f5f2",
+          "image": "",
+          "images": []
         }
       ],
       "highlights": [
@@ -271,19 +304,27 @@
       "colors": [
         {
           "name": "Cloud White",
-          "hex": "#f5f5f2"
+          "hex": "#f5f5f2",
+          "image": "",
+          "images": []
         },
         {
           "name": "Light Gold",
-          "hex": "#e8d9bd"
+          "hex": "#e8d9bd",
+          "image": "",
+          "images": []
         },
         {
           "name": "Sky Blue",
-          "hex": "#a9c9de"
+          "hex": "#a9c9de",
+          "image": "",
+          "images": []
         },
         {
           "name": "Space Black",
-          "hex": "#1c1c1e"
+          "hex": "#1c1c1e",
+          "image": "",
+          "images": []
         }
       ],
       "highlights": [
@@ -304,23 +345,33 @@
       "colors": [
         {
           "name": "Ultramarine",
-          "hex": "#4169e1"
+          "hex": "#4169e1",
+          "image": "",
+          "images": []
         },
         {
           "name": "Teal",
-          "hex": "#3f7a74"
+          "hex": "#3f7a74",
+          "image": "",
+          "images": []
         },
         {
           "name": "Pink",
-          "hex": "#f2c2cb"
+          "hex": "#f2c2cb",
+          "image": "",
+          "images": []
         },
         {
           "name": "White",
-          "hex": "#f5f5f2"
+          "hex": "#f5f5f2",
+          "image": "",
+          "images": []
         },
         {
           "name": "Black",
-          "hex": "#1c1c1e"
+          "hex": "#1c1c1e",
+          "image": "",
+          "images": []
         }
       ],
       "highlights": [
@@ -343,23 +394,33 @@
       "colors": [
         {
           "name": "Ultramarine",
-          "hex": "#4169e1"
+          "hex": "#4169e1",
+          "image": "",
+          "images": []
         },
         {
           "name": "Teal",
-          "hex": "#3f7a74"
+          "hex": "#3f7a74",
+          "image": "",
+          "images": []
         },
         {
           "name": "Pink",
-          "hex": "#f2c2cb"
+          "hex": "#f2c2cb",
+          "image": "",
+          "images": []
         },
         {
           "name": "White",
-          "hex": "#f5f5f2"
+          "hex": "#f5f5f2",
+          "image": "",
+          "images": []
         },
         {
           "name": "Black",
-          "hex": "#1c1c1e"
+          "hex": "#1c1c1e",
+          "image": "",
+          "images": []
         }
       ],
       "highlights": [
@@ -382,23 +443,33 @@
       "colors": [
         {
           "name": "Black",
-          "hex": "#1c1c1e"
+          "hex": "#1c1c1e",
+          "image": "",
+          "images": []
         },
         {
           "name": "Blue",
-          "hex": "#5f80a8"
+          "hex": "#5f80a8",
+          "image": "",
+          "images": []
         },
         {
           "name": "Green",
-          "hex": "#7ba488"
+          "hex": "#7ba488",
+          "image": "",
+          "images": []
         },
         {
           "name": "Yellow",
-          "hex": "#e9d78d"
+          "hex": "#e9d78d",
+          "image": "",
+          "images": []
         },
         {
           "name": "Pink",
-          "hex": "#f0c8cf"
+          "hex": "#f0c8cf",
+          "image": "",
+          "images": []
         }
       ],
       "highlights": [
@@ -420,11 +491,15 @@
       "colors": [
         {
           "name": "Silver",
-          "hex": "#e4e4e2"
+          "hex": "#e4e4e2",
+          "image": "",
+          "images": []
         },
         {
           "name": "Space Black",
-          "hex": "#1c1c1e"
+          "hex": "#1c1c1e",
+          "image": "",
+          "images": []
         }
       ],
       "highlights": [
@@ -446,19 +521,30 @@
       "colors": [
         {
           "name": "Blue",
-          "hex": "#8ea8e8"
+          "hex": "#8ea8e8",
+          "image": "https://inventstore.in/wp-content/uploads/2024/05/1.png",
+          "images": [
+            "https://inventstore.in/wp-content/uploads/2024/05/1.png",
+            "https://inventstore.in/wp-content/uploads/2024/05/1.png"
+          ]
         },
         {
           "name": "Purple",
-          "hex": "#c3b1e0"
+          "hex": "#c3b1e0",
+          "image": "",
+          "images": []
         },
         {
           "name": "Starlight",
-          "hex": "#f2efe9"
+          "hex": "#f2efe9",
+          "image": "",
+          "images": []
         },
         {
           "name": "Space Gray",
-          "hex": "#4a4a52"
+          "hex": "#4a4a52",
+          "image": "",
+          "images": []
         }
       ],
       "highlights": [
@@ -480,19 +566,27 @@
       "colors": [
         {
           "name": "Blue",
-          "hex": "#8ea8e8"
+          "hex": "#8ea8e8",
+          "image": "",
+          "images": []
         },
         {
           "name": "Pink",
-          "hex": "#f2c1c8"
+          "hex": "#f2c1c8",
+          "image": "",
+          "images": []
         },
         {
           "name": "Yellow",
-          "hex": "#f0d060"
+          "hex": "#f0d060",
+          "image": "",
+          "images": []
         },
         {
           "name": "Silver",
-          "hex": "#e2e2de"
+          "hex": "#e2e2de",
+          "image": "",
+          "images": []
         }
       ],
       "highlights": [
@@ -514,19 +608,27 @@
       "colors": [
         {
           "name": "Space Gray",
-          "hex": "#4a4a52"
+          "hex": "#4a4a52",
+          "image": "",
+          "images": []
         },
         {
           "name": "Starlight",
-          "hex": "#f2efe9"
+          "hex": "#f2efe9",
+          "image": "",
+          "images": []
         },
         {
           "name": "Pink",
-          "hex": "#f2c1c8"
+          "hex": "#f2c1c8",
+          "image": "",
+          "images": []
         },
         {
           "name": "Purple",
-          "hex": "#c3b1e0"
+          "hex": "#c3b1e0",
+          "image": "",
+          "images": []
         }
       ],
       "highlights": [
@@ -548,19 +650,27 @@
       "colors": [
         {
           "name": "Midnight",
-          "hex": "#1f2430"
+          "hex": "#1f2430",
+          "image": "",
+          "images": []
         },
         {
           "name": "Starlight",
-          "hex": "#f2efe9"
+          "hex": "#f2efe9",
+          "image": "",
+          "images": []
         },
         {
           "name": "Silver",
-          "hex": "#e2e2de"
+          "hex": "#e2e2de",
+          "image": "",
+          "images": []
         },
         {
           "name": "Sky Blue",
-          "hex": "#a9c9de"
+          "hex": "#a9c9de",
+          "image": "",
+          "images": []
         }
       ],
       "highlights": [
@@ -583,19 +693,27 @@
       "colors": [
         {
           "name": "Midnight",
-          "hex": "#1f2430"
+          "hex": "#1f2430",
+          "image": "",
+          "images": []
         },
         {
           "name": "Starlight",
-          "hex": "#f2efe9"
+          "hex": "#f2efe9",
+          "image": "",
+          "images": []
         },
         {
           "name": "Silver",
-          "hex": "#e2e2de"
+          "hex": "#e2e2de",
+          "image": "",
+          "images": []
         },
         {
           "name": "Sky Blue",
-          "hex": "#a9c9de"
+          "hex": "#a9c9de",
+          "image": "",
+          "images": []
         }
       ],
       "highlights": [
@@ -617,11 +735,15 @@
       "colors": [
         {
           "name": "Silver",
-          "hex": "#e2e2de"
+          "hex": "#e2e2de",
+          "image": "",
+          "images": []
         },
         {
           "name": "Midnight",
-          "hex": "#1f2430"
+          "hex": "#1f2430",
+          "image": "",
+          "images": []
         }
       ],
       "highlights": [
@@ -643,11 +765,15 @@
       "colors": [
         {
           "name": "Space Black",
-          "hex": "#2b2b2f"
+          "hex": "#2b2b2f",
+          "image": "",
+          "images": []
         },
         {
           "name": "Silver",
-          "hex": "#e2e2de"
+          "hex": "#e2e2de",
+          "image": "",
+          "images": []
         }
       ],
       "highlights": [
@@ -670,19 +796,27 @@
       "colors": [
         {
           "name": "Blue",
-          "hex": "#5a7bd8"
+          "hex": "#5a7bd8",
+          "image": "",
+          "images": []
         },
         {
           "name": "Green",
-          "hex": "#6bb37a"
+          "hex": "#6bb37a",
+          "image": "",
+          "images": []
         },
         {
           "name": "Pink",
-          "hex": "#f0a7b0"
+          "hex": "#f0a7b0",
+          "image": "",
+          "images": []
         },
         {
           "name": "Silver",
-          "hex": "#e2e2de"
+          "hex": "#e2e2de",
+          "image": "",
+          "images": []
         }
       ],
       "highlights": [
@@ -705,7 +839,9 @@
       "colors": [
         {
           "name": "Silver",
-          "hex": "#e2e2de"
+          "hex": "#e2e2de",
+          "image": "",
+          "images": []
         }
       ],
       "highlights": [
@@ -727,11 +863,15 @@
       "colors": [
         {
           "name": "Natural Titanium",
-          "hex": "#c9c4bd"
+          "hex": "#c9c4bd",
+          "image": "",
+          "images": []
         },
         {
           "name": "Black Titanium",
-          "hex": "#2b2b2f"
+          "hex": "#2b2b2f",
+          "image": "",
+          "images": []
         }
       ],
       "highlights": [
@@ -753,19 +893,27 @@
       "colors": [
         {
           "name": "Jet Black",
-          "hex": "#1a1a1e"
+          "hex": "#1a1a1e",
+          "image": "",
+          "images": []
         },
         {
           "name": "Rose Gold",
-          "hex": "#ddb7ac"
+          "hex": "#ddb7ac",
+          "image": "",
+          "images": []
         },
         {
           "name": "Silver",
-          "hex": "#e2e2de"
+          "hex": "#e2e2de",
+          "image": "",
+          "images": []
         },
         {
           "name": "Space Grey",
-          "hex": "#5a5a5f"
+          "hex": "#5a5a5f",
+          "image": "",
+          "images": []
         }
       ],
       "highlights": [
@@ -787,15 +935,21 @@
       "colors": [
         {
           "name": "Midnight",
-          "hex": "#1f2430"
+          "hex": "#1f2430",
+          "image": "",
+          "images": []
         },
         {
           "name": "Starlight",
-          "hex": "#f2efe9"
+          "hex": "#f2efe9",
+          "image": "",
+          "images": []
         },
         {
           "name": "Silver",
-          "hex": "#e2e2de"
+          "hex": "#e2e2de",
+          "image": "",
+          "images": []
         }
       ],
       "highlights": [
@@ -817,7 +971,9 @@
       "colors": [
         {
           "name": "White",
-          "hex": "#f5f5f2"
+          "hex": "#f5f5f2",
+          "image": "",
+          "images": []
         }
       ],
       "highlights": [
@@ -840,7 +996,9 @@
       "colors": [
         {
           "name": "White",
-          "hex": "#f5f5f2"
+          "hex": "#f5f5f2",
+          "image": "",
+          "images": []
         }
       ],
       "highlights": [
@@ -860,7 +1018,9 @@
       "colors": [
         {
           "name": "White",
-          "hex": "#f5f5f2"
+          "hex": "#f5f5f2",
+          "image": "",
+          "images": []
         }
       ],
       "highlights": [
@@ -882,19 +1042,27 @@
       "colors": [
         {
           "name": "Ultramarine",
-          "hex": "#4169e1"
+          "hex": "#4169e1",
+          "image": "",
+          "images": []
         },
         {
           "name": "Fuchsia",
-          "hex": "#c23a6b"
+          "hex": "#c23a6b",
+          "image": "",
+          "images": []
         },
         {
           "name": "Plum",
-          "hex": "#6b4a63"
+          "hex": "#6b4a63",
+          "image": "",
+          "images": []
         },
         {
           "name": "Denim",
-          "hex": "#3a5a78"
+          "hex": "#3a5a78",
+          "image": "",
+          "images": []
         }
       ],
       "highlights": [
@@ -916,7 +1084,9 @@
       "colors": [
         {
           "name": "Clear",
-          "hex": "#e6eef5"
+          "hex": "#e6eef5",
+          "image": "",
+          "images": []
         }
       ],
       "highlights": [
@@ -936,7 +1106,9 @@
       "colors": [
         {
           "name": "White",
-          "hex": "#f5f5f2"
+          "hex": "#f5f5f2",
+          "image": "",
+          "images": []
         }
       ],
       "highlights": [
@@ -956,7 +1128,9 @@
       "colors": [
         {
           "name": "White",
-          "hex": "#f5f5f2"
+          "hex": "#f5f5f2",
+          "image": "",
+          "images": []
         }
       ],
       "highlights": [
