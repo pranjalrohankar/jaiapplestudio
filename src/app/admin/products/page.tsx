@@ -13,6 +13,7 @@ interface Color {
   name: string;
   hex: string;
   image?: string;
+  images?: string[];
 }
 
 interface Product {
@@ -25,6 +26,7 @@ interface Product {
   oldPrice?: string;
   badge?: string;
   image?: string;
+  images?: string[];
   colors?: Color[];
   highlights?: string[];
   [key: string]: any;
@@ -37,6 +39,9 @@ export default function ProductsManager() {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadingGallery, setUploadingGallery] = useState(false);
+  const [uploadingColorIdx, setUploadingColorIdx] = useState<number | null>(null);
+  const [expandedColorIdx, setExpandedColorIdx] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -256,6 +261,104 @@ export default function ProductsManager() {
     }
   };
 
+  const handleGalleryFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0 || !editing) return;
+
+    setUploadingGallery(true);
+    try {
+      const uploadedUrls: string[] = [];
+      for (let i = 0; i < files.length; i++) {
+        const formData = new FormData();
+        formData.append("file", files[i]);
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+        const resData = await res.json();
+        if (res.ok && resData.url) {
+          uploadedUrls.push(resData.url);
+        }
+      }
+
+      if (uploadedUrls.length > 0) {
+        const nextImages = [...(editing.images || []), ...uploadedUrls];
+        setEditing({ ...editing, images: nextImages });
+        showToast(`✓ Uploaded ${uploadedUrls.length} angle image(s)!`);
+      }
+    } catch (err: any) {
+      alert("Gallery upload failed: " + (err.message || "Unknown error"));
+    } finally {
+      setUploadingGallery(false);
+      e.target.value = "";
+    }
+  };
+
+  const handleColorPrimaryUpload = async (colorIdx: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !editing) return;
+
+    setUploadingColorIdx(colorIdx);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const resData = await res.json();
+      if (res.ok && resData.url) {
+        const nextColors = [...(editing.colors || [])];
+        nextColors[colorIdx] = { ...nextColors[colorIdx], image: resData.url };
+        setEditing({ ...editing, colors: nextColors });
+        showToast("✓ Color finish image uploaded!");
+      }
+    } catch (err: any) {
+      alert("Color image upload failed: " + (err.message || "Unknown error"));
+    } finally {
+      setUploadingColorIdx(null);
+      e.target.value = "";
+    }
+  };
+
+  const handleColorGalleryUpload = async (colorIdx: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0 || !editing) return;
+
+    setUploadingColorIdx(colorIdx);
+    try {
+      const uploadedUrls: string[] = [];
+      for (let i = 0; i < files.length; i++) {
+        const formData = new FormData();
+        formData.append("file", files[i]);
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+        const resData = await res.json();
+        if (res.ok && resData.url) {
+          uploadedUrls.push(resData.url);
+        }
+      }
+
+      if (uploadedUrls.length > 0) {
+        const nextColors = [...(editing.colors || [])];
+        const existingColorImages = nextColors[colorIdx].images || [];
+        nextColors[colorIdx] = {
+          ...nextColors[colorIdx],
+          images: [...existingColorImages, ...uploadedUrls],
+        };
+        setEditing({ ...editing, colors: nextColors });
+        showToast(`✓ Uploaded ${uploadedUrls.length} angle(s) for ${nextColors[colorIdx].name}!`);
+      }
+    } catch (err: any) {
+      alert("Color angle upload failed: " + (err.message || "Unknown error"));
+    } finally {
+      setUploadingColorIdx(null);
+      e.target.value = "";
+    }
+  };
+
   const syncProductsLocally = (products: Product[]) => {
     try {
       if (typeof window !== "undefined") {
@@ -388,7 +491,21 @@ export default function ProductsManager() {
       const productToSave: Product = {
         ...editing,
         slug: cleanSlug || editing.slug,
-        colors: Array.isArray(editing.colors) ? editing.colors : [],
+        image: editing.image?.trim() || "",
+        images: Array.isArray(editing.images)
+          ? editing.images.map((s) => (typeof s === "string" ? s.trim() : "")).filter(Boolean)
+          : [],
+        colors: Array.isArray(editing.colors)
+          ? editing.colors.map((c) => ({
+              ...c,
+              name: (c.name || "").trim(),
+              hex: (c.hex || "#000000").trim(),
+              image: c.image ? c.image.trim() : "",
+              images: Array.isArray(c.images)
+                ? c.images.map((s) => (typeof s === "string" ? s.trim() : "")).filter(Boolean)
+                : [],
+            }))
+          : [],
         highlights: Array.isArray(editing.highlights) ? editing.highlights.filter((h) => h.trim() !== "") : [],
       };
 
@@ -1326,119 +1443,236 @@ export default function ProductsManager() {
                   </div>
                 </div>
 
-                {/* 3. Image Manager & Aspect Ratio Guide */}
-                <div className="space-y-3 bg-gray-50/80 p-4 sm:p-5 rounded-2xl border border-gray-200">
+                {/* 3. Image Manager: Primary Image & Multi-Angle Gallery (All Sides) */}
+                <div className="space-y-4 bg-gray-50/80 p-4 sm:p-5 rounded-2xl border border-gray-200">
                   <div className="flex items-center justify-between">
-                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-800">
-                      Product Image / Cutout
-                    </label>
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-gray-800">
+                        Product Primary Image &amp; Multi-Angle Gallery
+                      </label>
+                      <p className="text-[11px] text-gray-500">
+                        Attach a primary hero cutout plus multi-angle photos showing all sides (Front, Back, Sides, Ports).
+                      </p>
+                    </div>
                     {editing.image && (
-                      <span className="text-[11px] text-emerald-700 bg-emerald-100 font-bold px-2 py-0.5 rounded-md">
-                        ✓ Image Attached
+                      <span className="text-[11px] text-emerald-700 bg-emerald-100 font-bold px-2.5 py-0.5 rounded-md">
+                        ✓ Primary Attached
                       </span>
                     )}
                   </div>
 
-                  {/* Dimension Guide */}
-                  <div className="bg-blue-50/70 border border-blue-200 rounded-xl p-3 text-xs text-blue-900 space-y-1">
-                    <div className="font-bold text-blue-950 flex items-center gap-1.5">
-                      <span>📐</span> Recommended Dimensions for Products:
-                    </div>
-                    <div className="grid sm:grid-cols-2 gap-1 text-[11px] text-blue-800">
-                      <div>
-                        • <strong>Aspect Ratio:</strong>{" "}
-                        <code className="bg-blue-100 px-1 py-0.5 rounded font-mono">1:1 (Square)</code>
+                  {/* Primary Hero Image Box */}
+                  <div className="bg-white p-3.5 rounded-xl border border-gray-200 shadow-2xs space-y-3">
+                    <span className="text-xs font-bold text-gray-700 uppercase tracking-wide flex items-center gap-1.5">
+                      <span>⭐</span> Primary Catalog Cutout Image <span className="text-red-500">*</span>
+                    </span>
+
+                    <div className="grid sm:grid-cols-12 gap-3 items-center">
+                      <div className="sm:col-span-8 space-y-2">
+                        <div className="flex gap-2">
+                          <input
+                            value={editing.image || ""}
+                            onChange={(e) => setEditing({ ...editing, image: e.target.value })}
+                            className="flex-1 border border-gray-300 rounded-xl px-3 py-2 font-mono text-xs bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            placeholder="/images/iphone-18-pro.png or https://..."
+                          />
+                          {editing.image && (
+                            <button
+                              type="button"
+                              onClick={() => setEditing({ ...editing, image: "" })}
+                              className="px-2 py-1 text-xs text-red-500 hover:bg-red-50 rounded-lg cursor-pointer"
+                              title="Remove image"
+                            >
+                              ✕
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Upload Button */}
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="file"
+                            ref={fileInputRef}
+                            accept="image/*"
+                            onChange={handleFileUpload}
+                            className="hidden"
+                            id="product-image-upload"
+                          />
+                          <label
+                            htmlFor="product-image-upload"
+                            className={`text-xs font-semibold px-3.5 py-1.5 rounded-xl border border-gray-300 bg-gray-50 hover:bg-white cursor-pointer transition flex items-center gap-1.5 ${
+                              uploadingImage ? "opacity-50 pointer-events-none" : ""
+                            }`}
+                          >
+                            <span>📁</span>
+                            <span>{uploadingImage ? "Uploading..." : "Upload Primary from Device"}</span>
+                          </label>
+                          <span className="text-[11px] text-gray-400">1:1 Square transparent PNG recommended</span>
+                        </div>
                       </div>
-                      <div>
-                        • <strong>Canvas Size:</strong>{" "}
-                        <code className="bg-blue-100 px-1 py-0.5 rounded font-mono">600 x 600 px</code> or{" "}
-                        <code className="bg-blue-100 px-1 py-0.5 rounded font-mono">800 x 800 px</code>
+
+                      {/* Image Preview */}
+                      <div className="sm:col-span-4 flex items-center gap-2.5">
+                        <div className="relative h-16 w-16 rounded-xl bg-gray-50 border border-gray-200 shadow-2xs flex items-center justify-center p-1 shrink-0 overflow-hidden">
+                          {editing.image ? (
+                            <img
+                              src={editing.image}
+                              alt="Preview"
+                              className="object-contain max-h-full max-w-full"
+                            />
+                          ) : (
+                            <span className="text-xl opacity-25">🖼️</span>
+                          )}
+                        </div>
+                        <div className="text-[11px] text-gray-500">
+                          {editing.image ? "Primary catalog cover" : "No primary image yet"}
+                        </div>
                       </div>
                     </div>
-                    <p className="text-[11px] text-blue-700">
-                      💡 Transparent background PNG or clean white studio background looks best.
-                    </p>
                   </div>
 
-                  {/* Upload + URL input */}
-                  <div className="grid sm:grid-cols-12 gap-3 items-center pt-1">
-                    <div className="sm:col-span-7 space-y-2">
-                      <div className="flex gap-2">
-                        <input
-                          value={editing.image || ""}
-                          onChange={(e) =>
-                            setEditing({ ...editing, image: e.target.value })
-                          }
-                          className="flex-1 border border-gray-300 rounded-xl px-3 py-2 font-mono text-xs bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                          placeholder="/images/iphone-18-pro.png or https://..."
-                        />
-                        {editing.image && (
-                          <button
-                            type="button"
-                            onClick={() => setEditing({ ...editing, image: "" })}
-                            className="px-2 py-1 text-xs text-red-500 hover:bg-red-50 rounded-lg cursor-pointer"
-                            title="Remove image"
-                          >
-                            ✕
-                          </button>
-                        )}
+                  {/* Multi-Angle Product Gallery (All Sides) */}
+                  <div className="bg-white p-3.5 rounded-xl border border-gray-200 shadow-2xs space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-xs font-bold text-gray-800 uppercase tracking-wide flex items-center gap-1.5">
+                          <span>📷</span> Additional Angles &amp; All-Sides Gallery
+                        </span>
+                        <p className="text-[11px] text-gray-500">
+                          Add multiple photos (Front, Back, Side profiles, camera close-up) for interactive browsing.
+                        </p>
                       </div>
-
-                      {/* Upload Button */}
                       <div className="flex items-center gap-2">
                         <input
                           type="file"
-                          ref={fileInputRef}
+                          multiple
                           accept="image/*"
-                          onChange={handleFileUpload}
+                          onChange={handleGalleryFileUpload}
                           className="hidden"
-                          id="product-image-upload"
+                          id="product-gallery-upload"
                         />
                         <label
-                          htmlFor="product-image-upload"
-                          className={`text-xs font-semibold px-4 py-2 rounded-xl border border-gray-300 bg-white hover:bg-gray-50 cursor-pointer transition flex items-center gap-1.5 ${
-                            uploadingImage ? "opacity-50 pointer-events-none" : ""
+                          htmlFor="product-gallery-upload"
+                          className={`text-xs text-blue-700 bg-blue-50 hover:bg-blue-100 font-bold px-3 py-1.5 rounded-xl border border-blue-200 cursor-pointer transition flex items-center gap-1 ${
+                            uploadingGallery ? "opacity-50 pointer-events-none" : ""
                           }`}
                         >
                           <span>📁</span>
-                          <span>{uploadingImage ? "Uploading..." : "Upload from Device"}</span>
+                          <span>{uploadingGallery ? "Uploading..." : "+ Upload Angles"}</span>
                         </label>
-                        <span className="text-[11px] text-gray-400">PNG, JPG, WebP supported</span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setEditing({
+                              ...editing,
+                              images: [...(editing.images || []), ""],
+                            })
+                          }
+                          className="text-xs text-gray-700 bg-gray-100 hover:bg-gray-200 font-semibold px-2.5 py-1.5 rounded-xl transition cursor-pointer"
+                        >
+                          + Add URL
+                        </button>
                       </div>
                     </div>
 
-                    {/* Image Preview */}
-                    <div className="sm:col-span-5 flex items-center gap-3">
-                      <div className="relative h-20 w-20 rounded-2xl bg-white border border-gray-200 shadow-xs flex items-center justify-center p-1.5 shrink-0 overflow-hidden">
-                        {editing.image ? (
-                          <img
-                            src={editing.image}
-                            alt="Preview"
-                            className="object-contain max-h-full max-w-full"
-                          />
-                        ) : (
-                          <span className="text-2xl opacity-20">🖼️</span>
-                        )}
+                    {(!editing.images || editing.images.length === 0) ? (
+                      <p className="text-xs text-gray-400 italic py-1">
+                        No additional side/angle images added yet. Click &ldquo;+ Upload Angles&rdquo; or &ldquo;+ Add URL&rdquo; to showcase multiple sides.
+                      </p>
+                    ) : (
+                      <div className="space-y-2 pt-1">
+                        {editing.images.map((imgUrl: string, idx: number) => (
+                          <div
+                            key={idx}
+                            className="flex items-center gap-2 bg-gray-50 p-2 rounded-xl border border-gray-200"
+                          >
+                            <span className="text-xs font-bold text-gray-500 w-6 text-center shrink-0">
+                              #{idx + 1}
+                            </span>
+                            <div className="relative h-10 w-10 rounded-lg bg-white border border-gray-200 p-0.5 shrink-0 overflow-hidden flex items-center justify-center">
+                              {imgUrl ? (
+                                <img
+                                  src={imgUrl}
+                                  alt={`Angle #${idx + 1}`}
+                                  className="object-contain max-h-full max-w-full"
+                                />
+                              ) : (
+                                <span className="text-xs text-gray-300">📷</span>
+                              )}
+                            </div>
+                            <input
+                              type="text"
+                              value={imgUrl}
+                              onChange={(e) => {
+                                const next = [...(editing.images || [])];
+                                next[idx] = e.target.value;
+                                setEditing({ ...editing, images: next });
+                              }}
+                              className="flex-1 border border-gray-300 rounded-lg px-2.5 py-1 text-xs font-mono bg-white"
+                              placeholder="Image URL (e.g. /images/iphone-back.png or https://...)"
+                            />
+
+                            {/* Reorder Buttons */}
+                            <div className="flex items-center gap-0.5 shrink-0">
+                              <button
+                                type="button"
+                                disabled={idx === 0}
+                                onClick={() => {
+                                  const next = [...(editing.images || [])];
+                                  const [moved] = next.splice(idx, 1);
+                                  next.splice(idx - 1, 0, moved);
+                                  setEditing({ ...editing, images: next });
+                                }}
+                                className="p-1 text-gray-400 hover:text-gray-800 disabled:opacity-20 text-xs font-bold cursor-pointer"
+                                title="Move up"
+                              >
+                                ▲
+                              </button>
+                              <button
+                                type="button"
+                                disabled={idx === (editing.images?.length || 1) - 1}
+                                onClick={() => {
+                                  const next = [...(editing.images || [])];
+                                  const [moved] = next.splice(idx, 1);
+                                  next.splice(idx + 1, 0, moved);
+                                  setEditing({ ...editing, images: next });
+                                }}
+                                className="p-1 text-gray-400 hover:text-gray-800 disabled:opacity-20 text-xs font-bold cursor-pointer"
+                                title="Move down"
+                              >
+                                ▼
+                              </button>
+                            </div>
+
+                            {/* Remove button */}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const next = [...(editing.images || [])];
+                                next.splice(idx, 1);
+                                setEditing({ ...editing, images: next });
+                              }}
+                              className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg text-xs cursor-pointer shrink-0"
+                              title="Remove angle"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ))}
                       </div>
-                      <div className="text-xs">
-                        <span className="font-bold text-gray-800 block">1:1 Preview Box</span>
-                        <p className="text-[11px] text-gray-500">
-                          {editing.image ? "Scales cleanly in catalog cards" : "No image attached yet"}
-                        </p>
-                      </div>
-                    </div>
+                    )}
                   </div>
                 </div>
 
-                {/* 4. Color Finishes & Swatches Manager */}
+                {/* 4. Color Finishes & Swatches Manager (with Multi-Angle Gallery for Each Color) */}
                 <div className="space-y-3 bg-gray-50/70 p-4 sm:p-5 rounded-2xl border border-gray-200">
                   <div className="flex items-center justify-between">
                     <div>
                       <label className="block text-xs font-bold uppercase tracking-wider text-gray-800">
-                        Color Finishes & Swatches
+                        Color Finishes &amp; Color-Specific Angles
                       </label>
                       <p className="text-[11px] text-gray-500">
-                        Configure finishes and optional color-specific transparent cutout images.
+                        Configure finishes. For each finish, you can also add multiple photos showing all sides of that specific color!
                       </p>
                     </div>
                     <button
@@ -1448,7 +1682,7 @@ export default function ProductsManager() {
                           ...editing,
                           colors: [
                             ...(editing.colors || []),
-                            { name: "New Finish", hex: "#111111", image: "" },
+                            { name: "New Finish", hex: "#111111", image: "", images: [] },
                           ],
                         })
                       }
@@ -1461,78 +1695,263 @@ export default function ProductsManager() {
                   {(!editing.colors || editing.colors.length === 0) ? (
                     <p className="text-xs text-gray-400 italic">No color finishes configured.</p>
                   ) : (
-                    <div className="space-y-2.5">
-                      {editing.colors.map((c: Color, idx: number) => (
-                        <div
-                          key={idx}
-                          className="flex flex-wrap sm:flex-nowrap gap-2 items-center bg-white p-2.5 rounded-xl border border-gray-200 shadow-xs"
-                        >
-                          {/* Color Picker & Hex */}
-                          <div className="flex items-center gap-1.5 shrink-0">
-                            <input
-                              type="color"
-                              value={c.hex.startsWith("#") && c.hex.length === 7 ? c.hex : "#000000"}
-                              onChange={(e) => {
-                                const next = [...(editing.colors || [])];
-                                next[idx] = { ...next[idx], hex: e.target.value };
-                                setEditing({ ...editing, colors: next });
-                              }}
-                              className="h-7 w-7 rounded-lg border border-gray-300 cursor-pointer p-0.5"
-                            />
-                            <input
-                              type="text"
-                              value={c.hex}
-                              onChange={(e) => {
-                                const next = [...(editing.colors || [])];
-                                next[idx] = { ...next[idx], hex: e.target.value };
-                                setEditing({ ...editing, colors: next });
-                              }}
-                              className="w-20 border border-gray-300 rounded-lg px-2 py-1 text-xs font-mono"
-                              placeholder="#111111"
-                            />
-                          </div>
-
-                          {/* Color Name */}
-                          <input
-                            type="text"
-                            value={c.name}
-                            onChange={(e) => {
-                              const next = [...(editing.colors || [])];
-                              next[idx] = { ...next[idx], name: e.target.value };
-                              setEditing({ ...editing, colors: next });
-                            }}
-                            className="w-32 border border-gray-300 rounded-lg px-2.5 py-1 text-xs font-medium"
-                            placeholder="Finish name"
-                          />
-
-                          {/* Color-specific Image URL */}
-                          <input
-                            type="text"
-                            value={c.image || ""}
-                            onChange={(e) => {
-                              const next = [...(editing.colors || [])];
-                              next[idx] = { ...next[idx], image: e.target.value };
-                              setEditing({ ...editing, colors: next });
-                            }}
-                            className="flex-1 border border-gray-300 rounded-lg px-2.5 py-1 text-xs font-mono"
-                            placeholder="Color cutout image URL (optional)"
-                          />
-
-                          {/* Remove Button */}
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const next = [...(editing.colors || [])];
-                              next.splice(idx, 1);
-                              setEditing({ ...editing, colors: next });
-                            }}
-                            className="text-red-500 hover:text-red-700 text-xs px-2 py-1 cursor-pointer"
-                            title="Remove color"
+                    <div className="space-y-3">
+                      {editing.colors.map((c: Color, idx: number) => {
+                        const isExpanded = expandedColorIdx === idx;
+                        const angleCount = (c.images?.length || 0) + (c.image ? 1 : 0);
+                        return (
+                          <div
+                            key={idx}
+                            className="bg-white rounded-2xl border border-gray-200 shadow-2xs overflow-hidden transition-all"
                           >
-                            ✕
-                          </button>
-                        </div>
-                      ))}
+                            {/* Color Header Row */}
+                            <div className="p-3 flex flex-wrap sm:flex-nowrap gap-2.5 items-center justify-between bg-white">
+                              {/* Color Picker & Hex */}
+                              <div className="flex items-center gap-1.5 shrink-0">
+                                <input
+                                  type="color"
+                                  value={c.hex.startsWith("#") && c.hex.length === 7 ? c.hex : "#000000"}
+                                  onChange={(e) => {
+                                    const next = [...(editing.colors || [])];
+                                    next[idx] = { ...next[idx], hex: e.target.value };
+                                    setEditing({ ...editing, colors: next });
+                                  }}
+                                  className="h-8 w-8 rounded-lg border border-gray-300 cursor-pointer p-0.5"
+                                />
+                                <input
+                                  type="text"
+                                  value={c.hex}
+                                  onChange={(e) => {
+                                    const next = [...(editing.colors || [])];
+                                    next[idx] = { ...next[idx], hex: e.target.value };
+                                    setEditing({ ...editing, colors: next });
+                                  }}
+                                  className="w-20 border border-gray-300 rounded-lg px-2 py-1 text-xs font-mono"
+                                  placeholder="#111111"
+                                />
+                              </div>
+
+                              {/* Color Name */}
+                              <input
+                                type="text"
+                                value={c.name}
+                                onChange={(e) => {
+                                  const next = [...(editing.colors || [])];
+                                  next[idx] = { ...next[idx], name: e.target.value };
+                                  setEditing({ ...editing, colors: next });
+                                }}
+                                className="w-36 border border-gray-300 rounded-lg px-2.5 py-1 text-xs font-semibold"
+                                placeholder="Finish name"
+                              />
+
+                              {/* Color Primary Image URL */}
+                              <div className="flex-1 flex items-center gap-1.5 min-w-[180px]">
+                                <input
+                                  type="text"
+                                  value={c.image || ""}
+                                  onChange={(e) => {
+                                    const next = [...(editing.colors || [])];
+                                    next[idx] = { ...next[idx], image: e.target.value };
+                                    setEditing({ ...editing, colors: next });
+                                  }}
+                                  className="flex-1 border border-gray-300 rounded-lg px-2.5 py-1 text-xs font-mono"
+                                  placeholder="Color primary image URL"
+                                />
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={(e) => handleColorPrimaryUpload(idx, e)}
+                                  className="hidden"
+                                  id={`color-primary-upload-${idx}`}
+                                />
+                                <label
+                                  htmlFor={`color-primary-upload-${idx}`}
+                                  className="p-1.5 rounded-lg border border-gray-300 bg-gray-50 hover:bg-gray-100 text-xs cursor-pointer transition shrink-0"
+                                  title="Upload image for this color"
+                                >
+                                  {uploadingColorIdx === idx ? "⏳" : "📁"}
+                                </label>
+                              </div>
+
+                              {/* Toggle Color-Specific Angles Gallery */}
+                              <button
+                                type="button"
+                                onClick={() => setExpandedColorIdx(isExpanded ? null : idx)}
+                                className={`text-xs font-bold px-3 py-1 rounded-lg border transition flex items-center gap-1 cursor-pointer shrink-0 ${
+                                  isExpanded
+                                    ? "bg-blue-600 text-white border-blue-600"
+                                    : "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+                                }`}
+                              >
+                                <span>📷 All Sides</span>
+                                <span className="text-[10px] bg-white/20 px-1.5 py-0.2 rounded-full font-extrabold">
+                                  {c.images?.length || 0}
+                                </span>
+                                <span>{isExpanded ? "▲" : "▼"}</span>
+                              </button>
+
+                              {/* Remove Color Finish */}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const next = [...(editing.colors || [])];
+                                  next.splice(idx, 1);
+                                  setEditing({ ...editing, colors: next });
+                                }}
+                                className="text-red-500 hover:text-red-700 text-xs px-2 py-1 cursor-pointer shrink-0"
+                                title="Remove color finish"
+                              >
+                                ✕
+                              </button>
+                            </div>
+
+                            {/* Expanded Gallery for This Color Finish */}
+                            {isExpanded && (
+                              <div className="border-t border-blue-100 bg-blue-50/30 p-3.5 space-y-3">
+                                <div className="flex items-center justify-between">
+                                  <div>
+                                    <h5 className="text-xs font-extrabold text-blue-950 flex items-center gap-1.5">
+                                      <span
+                                        className="h-3 w-3 rounded-full shadow-inner ring-1 ring-black/15"
+                                        style={{ backgroundColor: c.hex }}
+                                      />
+                                      <span>All Angles / Sides for &ldquo;{c.name}&rdquo;</span>
+                                    </h5>
+                                    <p className="text-[11px] text-blue-800">
+                                      When users select this finish on the product page, these angle photos will automatically appear.
+                                    </p>
+                                  </div>
+
+                                  <div className="flex items-center gap-2">
+                                    <input
+                                      type="file"
+                                      multiple
+                                      accept="image/*"
+                                      onChange={(e) => handleColorGalleryUpload(idx, e)}
+                                      className="hidden"
+                                      id={`color-gallery-upload-${idx}`}
+                                    />
+                                    <label
+                                      htmlFor={`color-gallery-upload-${idx}`}
+                                      className="text-xs text-blue-700 bg-white hover:bg-blue-50 font-bold px-3 py-1 rounded-lg border border-blue-300 cursor-pointer shadow-2xs transition flex items-center gap-1"
+                                    >
+                                      <span>📁</span>
+                                      <span>+ Upload Angles for {c.name}</span>
+                                    </label>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const next = [...(editing.colors || [])];
+                                        const existing = next[idx].images || [];
+                                        next[idx] = { ...next[idx], images: [...existing, ""] };
+                                        setEditing({ ...editing, colors: next });
+                                      }}
+                                      className="text-xs text-gray-700 bg-white hover:bg-gray-100 font-semibold px-2.5 py-1 rounded-lg border border-gray-300 transition cursor-pointer"
+                                    >
+                                      + Add URL
+                                    </button>
+                                  </div>
+                                </div>
+
+                                {(!c.images || c.images.length === 0) ? (
+                                  <p className="text-xs text-blue-600/70 italic py-1">
+                                    No additional angle images added for this color finish. Primary color image will be used. Click &ldquo;+ Upload Angles&rdquo; to add side views for this color.
+                                  </p>
+                                ) : (
+                                  <div className="space-y-2">
+                                    {c.images.map((colorImgUrl: string, imgIdx: number) => (
+                                      <div
+                                        key={imgIdx}
+                                        className="flex items-center gap-2 bg-white p-2 rounded-xl border border-blue-200 shadow-2xs"
+                                      >
+                                        <span className="text-xs font-bold text-blue-800 w-6 text-center shrink-0">
+                                          #{imgIdx + 1}
+                                        </span>
+                                        <div className="relative h-10 w-10 rounded-lg bg-gray-50 border border-gray-200 p-0.5 shrink-0 overflow-hidden flex items-center justify-center">
+                                          {colorImgUrl ? (
+                                            <img
+                                              src={colorImgUrl}
+                                              alt={`${c.name} Angle #${imgIdx + 1}`}
+                                              className="object-contain max-h-full max-w-full"
+                                            />
+                                          ) : (
+                                            <span className="text-xs text-gray-300">📷</span>
+                                          )}
+                                        </div>
+                                        <input
+                                          type="text"
+                                          value={colorImgUrl}
+                                          onChange={(e) => {
+                                            const next = [...(editing.colors || [])];
+                                            const updatedImages = [...(next[idx].images || [])];
+                                            updatedImages[imgIdx] = e.target.value;
+                                            next[idx] = { ...next[idx], images: updatedImages };
+                                            setEditing({ ...editing, colors: next });
+                                          }}
+                                          className="flex-1 border border-gray-300 rounded-lg px-2.5 py-1 text-xs font-mono bg-white"
+                                          placeholder={`URL for ${c.name} angle (e.g. /images/${c.name.toLowerCase()}-side.png)`}
+                                        />
+
+                                        {/* Reorder Buttons */}
+                                        <div className="flex items-center gap-0.5 shrink-0">
+                                          <button
+                                            type="button"
+                                            disabled={imgIdx === 0}
+                                            onClick={() => {
+                                              const next = [...(editing.colors || [])];
+                                              const updatedImages = [...(next[idx].images || [])];
+                                              const [moved] = updatedImages.splice(imgIdx, 1);
+                                              updatedImages.splice(imgIdx - 1, 0, moved);
+                                              next[idx] = { ...next[idx], images: updatedImages };
+                                              setEditing({ ...editing, colors: next });
+                                            }}
+                                            className="p-1 text-gray-400 hover:text-gray-800 disabled:opacity-20 text-xs font-bold cursor-pointer"
+                                            title="Move up"
+                                          >
+                                            ▲
+                                          </button>
+                                          <button
+                                            type="button"
+                                            disabled={imgIdx === (c.images?.length || 1) - 1}
+                                            onClick={() => {
+                                              const next = [...(editing.colors || [])];
+                                              const updatedImages = [...(next[idx].images || [])];
+                                              const [moved] = updatedImages.splice(imgIdx, 1);
+                                              updatedImages.splice(imgIdx + 1, 0, moved);
+                                              next[idx] = { ...next[idx], images: updatedImages };
+                                              setEditing({ ...editing, colors: next });
+                                            }}
+                                            className="p-1 text-gray-400 hover:text-gray-800 disabled:opacity-20 text-xs font-bold cursor-pointer"
+                                            title="Move down"
+                                          >
+                                            ▼
+                                          </button>
+                                        </div>
+
+                                        {/* Remove Angle Button */}
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            const next = [...(editing.colors || [])];
+                                            const updatedImages = [...(next[idx].images || [])];
+                                            updatedImages.splice(imgIdx, 1);
+                                            next[idx] = { ...next[idx], images: updatedImages };
+                                            setEditing({ ...editing, colors: next });
+                                          }}
+                                          className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg text-xs cursor-pointer shrink-0"
+                                          title="Remove this angle"
+                                        >
+                                          ✕
+                                        </button>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </div>

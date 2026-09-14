@@ -147,6 +147,7 @@ export function productsToCSV(products: Product[]): string {
     "tagline",
     "description",
     "image",
+    "images",
     "colors",
     "highlights",
   ];
@@ -161,6 +162,7 @@ export function productsToCSV(products: Product[]): string {
     escapeCSVField(p.tagline || ""),
     escapeCSVField(p.description || ""),
     escapeCSVField(p.image || ""),
+    escapeCSVField((p.images || []).join(" | ")),
     escapeCSVField(serializeColors(p.colors)),
     escapeCSVField((p.highlights || []).join(" | ")),
   ]);
@@ -289,6 +291,7 @@ export function csvToProducts(
   const taglineIdx = getIndex(["tagline", "subtitle", "caption"]);
   const descIdx = getIndex(["description", "desc", "details"]);
   const imageIdx = getIndex(["image", "imageurl", "photo", "cutout"]);
+  const imagesIdx = getIndex(["images", "gallery", "angles", "sides"]);
   const colorsIdx = getIndex(["colors", "finishes", "colour", "colours", "color"]);
   const highlightsIdx = getIndex(["highlights", "features", "specs", "bullets"]);
 
@@ -336,6 +339,12 @@ export function csvToProducts(
     const description = descIdx >= 0 ? row[descIdx] : undefined;
     const image = imageIdx >= 0 ? row[imageIdx] : undefined;
 
+    // Parse product multi-angle gallery images
+    const rawImages = imagesIdx >= 0 ? row[imagesIdx] : "";
+    const images = rawImages
+      ? rawImages.split(/[|]+/).map((img) => img.trim()).filter(Boolean)
+      : undefined;
+
     // Parse colors
     const rawColors = colorsIdx >= 0 ? row[colorsIdx] : "";
     const parsedColors = parseColors(rawColors);
@@ -356,6 +365,7 @@ export function csvToProducts(
       tagline: tagline || `The standard of Apple ${category}.`,
       description: description || `${name} delivers exceptional performance, iconic Apple design and all-day battery life.`,
       ...(image ? { image } : {}),
+      ...(images && images.length > 0 ? { images } : {}),
       colors: parsedColors,
       highlights,
     };

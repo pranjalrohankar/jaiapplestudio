@@ -26,7 +26,12 @@
         "1TB ₹3,74,900",
         "2TB ₹4,49,900"
       ],
-      "image": "/images/iphone-duo.jpg"
+      "image": "/images/iphone-duo.jpg",
+      "images": [
+        "/images/iphone-duo.jpg",
+        "/images/iphone-18-hero-banner.jpg",
+        "/images/iphone-18.jpg"
+      ]
     },
     {
       "slug": "iphone-18-pro-max",
@@ -40,23 +45,46 @@
         {
           "name": "Deep Black",
           "hex": "#000000",
-          "image": "/images/iphone-18-pro.jpg"
+          "image": "/images/iphone-18-pro.jpg",
+          "images": [
+            "/images/iphone-18-pro.jpg",
+            "/images/iphone-18-hero-banner.jpg"
+          ]
         },
         {
           "name": "Glacier",
           "hex": "#dfe7ee",
-          "image": "https://inventstore.in/wp-content/uploads/2024/09/iphone-16-pro-max.png"
+          "image": "https://inventstore.in/wp-content/uploads/2024/09/iphone-16-pro-max.png",
+          "images": [
+            "https://inventstore.in/wp-content/uploads/2024/09/iphone-16-pro-max.png",
+            "/images/iphone-18-hero-banner.jpg"
+          ]
         },
         {
           "name": "Silver",
           "hex": "#d9d9d9",
-          "image": "https://inventstore.in/wp-content/uploads/2024/09/iphone-16-pro-max.png"
+          "image": "https://inventstore.in/wp-content/uploads/2024/09/iphone-16-pro-max.png",
+          "images": [
+            "https://inventstore.in/wp-content/uploads/2024/09/iphone-16-pro-max.png",
+            "/images/iphone-18-hero-banner.jpg"
+          ]
         },
         {
           "name": "Burgundy",
           "hex": "#6d1022",
-          "image": "/images/iphone-18-pro-max.jpg"
+          "image": "/images/iphone-18-pro-max.jpg",
+          "images": [
+            "/images/iphone-18-pro-max.jpg",
+            "/images/iphone-18-hero-banner.jpg"
+          ]
         }
+      ],
+      "image": "/images/iphone-18-pro-max.jpg",
+      "images": [
+        "/images/iphone-18-pro-max.jpg",
+        "/images/iphone-18-pro.jpg",
+        "/images/iphone-18-hero-banner.jpg",
+        "/images/iphone-18.jpg"
       ],
       "highlights": [
         "256GB ₹1,79,900",

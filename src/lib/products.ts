@@ -17,6 +17,7 @@ export type Color = {
   name: string;
   hex: string;
   image?: string;
+  images?: string[];
 };
 
 export type VariantInfo = {
@@ -36,6 +37,7 @@ export type Product = {
   status?: "in-stock" | "pre-order" | "coming-soon" | "new-launch" | string;
   colors: Color[];
   image?: string;
+  images?: string[];
   highlights: string[];
 };
 

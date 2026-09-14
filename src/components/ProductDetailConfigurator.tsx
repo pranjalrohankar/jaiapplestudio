@@ -28,6 +28,7 @@ export default function ProductDetailConfigurator({ product }: { product: Produc
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
   const [isEnquiryOpen, setIsEnquiryOpen] = useState(false);
+  const [activeImgIndex, setActiveImgIndex] = useState(0);
 
   const priceLabel = priceForVariant(product, variant);
   const numericUnitPrice = priceValue(priceLabel);
@@ -41,7 +42,29 @@ export default function ProductDetailConfigurator({ product }: { product: Produc
       product.price?.toLowerCase().includes("coming soon"));
 
   const activeColorObj = product.colors.find((c) => c.name === color) ?? product.colors[0];
-  const displayImage = activeColorObj?.image || product.image;
+
+  // Build the dynamic multi-angle gallery list for the active color & product
+  const colorImages: string[] =
+    Array.isArray(activeColorObj?.images) && activeColorObj.images.length > 0
+      ? activeColorObj.images.filter(Boolean)
+      : activeColorObj?.image
+      ? [activeColorObj.image]
+      : [];
+
+  const productImages: string[] =
+    Array.isArray(product.images) && product.images.length > 0
+      ? product.images.filter(Boolean)
+      : product.image
+      ? [product.image]
+      : [];
+
+  // Combine color-specific angles first, then product-level gallery images without duplicates
+  const galleryList: string[] = Array.from(
+    new Set([...colorImages, ...productImages].filter(Boolean))
+  );
+
+  const currentDisplayImage =
+    galleryList[activeImgIndex] || galleryList[0] || product.image || "";
 
   const totalPrice =
     numericUnitPrice > 0 ? formatINR(numericUnitPrice * qty) : priceLabel;
@@ -49,27 +72,42 @@ export default function ProductDetailConfigurator({ product }: { product: Produc
   const emiPerMonth =
     numericUnitPrice > 0 ? formatINR(Math.round(numericUnitPrice / 12)) : null;
 
+  function handleColorChange(newColor: string) {
+    setColor(newColor);
+    setActiveImgIndex(0); // Reset gallery view to first angle on color switch
+  }
+
+  function handlePrevImage() {
+    if (galleryList.length <= 1) return;
+    setActiveImgIndex((prev) => (prev - 1 + galleryList.length) % galleryList.length);
+  }
+
+  function handleNextImage() {
+    if (galleryList.length <= 1) return;
+    setActiveImgIndex((prev) => (prev + 1) % galleryList.length);
+  }
+
   function handleAddToCart() {
-    addItem(product, qty, { color, variant, priceLabel });
+    addItem(product, qty, { color, variant, priceLabel, image: currentDisplayImage });
     setAdded(true);
     window.setTimeout(() => setAdded(false), 3500);
   }
 
   function handleBuyNow() {
-    addItem(product, qty, { color, variant, priceLabel });
+    addItem(product, qty, { color, variant, priceLabel, image: currentDisplayImage });
     router.push("/cart");
   }
 
   return (
     <div className="grid items-start gap-12 lg:grid-cols-12">
-      {/* LEFT COLUMN: Large Interactive Showcase */}
-      <div className="lg:col-span-6 lg:sticky lg:top-24 space-y-6">
+      {/* LEFT COLUMN: Large Interactive Showcase & Multi-Angle Gallery */}
+      <div className="lg:col-span-6 lg:sticky lg:top-24 space-y-4 sm:space-y-6">
         {/* Main Product Showcase Box */}
-        <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-b from-[#fbfbfd] via-[#f5f5f7] to-[#ebebee] p-8 sm:p-12 border border-black/[0.06] shadow-sm flex flex-col items-center justify-center min-h-[380px] sm:min-h-[480px]">
+        <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-b from-[#fbfbfd] via-[#f5f5f7] to-[#ebebee] p-6 sm:p-10 border border-black/[0.06] shadow-sm flex flex-col items-center justify-center min-h-[380px] sm:min-h-[460px] group">
           {/* Badge */}
           {product.badge && (
             <span
-              className={`absolute top-6 left-6 inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold text-white shadow-xs ${
+              className={`absolute top-6 left-6 inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold text-white shadow-xs z-10 ${
                 isPreOrder
                   ? "bg-[#0071e3]"
                   : isComingSoon
@@ -81,20 +119,30 @@ export default function ProductDetailConfigurator({ product }: { product: Produc
             </span>
           )}
 
+          {/* Angle Counter Badge */}
+          {galleryList.length > 1 && (
+            <span className="absolute top-6 right-6 inline-flex items-center gap-1.5 rounded-full bg-black/70 backdrop-blur-md px-3 py-1 text-[11px] font-bold text-white shadow-xs z-10">
+              <span>📷 Angle</span>
+              <span className="text-[#38bdf8]">
+                {activeImgIndex + 1}/{galleryList.length}
+              </span>
+            </span>
+          )}
+
           {/* Product Centerpiece */}
-          <div className="relative aspect-square w-full max-w-[340px] sm:max-w-[420px] my-auto flex items-center justify-center">
-            {displayImage ? (
+          <div className="relative aspect-square w-full max-w-[320px] sm:max-w-[400px] my-auto flex items-center justify-center py-2">
+            {currentDisplayImage ? (
               <div
-                key={displayImage}
+                key={currentDisplayImage}
                 className="relative w-full h-full animate-fadeIn transition-all duration-300 flex items-center justify-center"
               >
                 <Image
-                  src={displayImage}
-                  alt={`${product.name} - ${color}`}
+                  src={currentDisplayImage}
+                  alt={`${product.name} - ${color} - View ${activeImgIndex + 1}`}
                   fill
                   priority
                   sizes="(max-width: 768px) 100vw, 500px"
-                  className="object-contain p-3 sm:p-4 drop-shadow-[0_20px_45px_rgba(0,0,0,0.12)] transition-all duration-300 hover:scale-[1.03]"
+                  className="object-contain p-2 sm:p-3 drop-shadow-[0_20px_45px_rgba(0,0,0,0.12)] transition-all duration-300 hover:scale-[1.03]"
                 />
               </div>
             ) : (
@@ -104,11 +152,33 @@ export default function ProductDetailConfigurator({ product }: { product: Produc
             )}
           </div>
 
+          {/* Navigation Arrows (for multi-image products) */}
+          {galleryList.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={handlePrevImage}
+                aria-label="Previous view angle"
+                className="absolute left-3 top-1/2 -translate-y-1/2 z-20 grid h-9 w-9 sm:h-11 sm:w-11 place-items-center rounded-full bg-white/80 hover:bg-white text-gray-900 shadow-md backdrop-blur-md border border-black/5 transition-all opacity-70 group-hover:opacity-100 hover:scale-105 cursor-pointer"
+              >
+                &#8249;
+              </button>
+              <button
+                type="button"
+                onClick={handleNextImage}
+                aria-label="Next view angle"
+                className="absolute right-3 top-1/2 -translate-y-1/2 z-20 grid h-9 w-9 sm:h-11 sm:w-11 place-items-center rounded-full bg-white/80 hover:bg-white text-gray-900 shadow-md backdrop-blur-md border border-black/5 transition-all opacity-70 group-hover:opacity-100 hover:scale-105 cursor-pointer"
+              >
+                &#8250;
+              </button>
+            </>
+          )}
+
           {/* Active Color Name Pill */}
           {activeColorObj && (
-            <div className="mt-4 flex items-center justify-center gap-2 rounded-full bg-white/90 py-2 px-4 shadow-sm ring-1 ring-black/10 backdrop-blur-md">
+            <div className="mt-2 flex items-center justify-center gap-2 rounded-full bg-white/90 py-1.5 px-3.5 shadow-sm ring-1 ring-black/10 backdrop-blur-md">
               <span
-                className="h-4 w-4 rounded-full ring-1 ring-black/20 shadow-inner"
+                className="h-3.5 w-3.5 rounded-full ring-1 ring-black/20 shadow-inner"
                 style={{ backgroundColor: activeColorObj.hex }}
               />
               <span className="text-xs font-bold text-ink tracking-wide">
@@ -119,14 +189,14 @@ export default function ProductDetailConfigurator({ product }: { product: Produc
 
           {/* Interactive Color Finish Mini Bar for Instant Switching */}
           {product.colors.length > 1 && (
-            <div className="mt-3 flex items-center justify-center gap-2 flex-wrap max-w-full">
+            <div className="mt-2.5 flex items-center justify-center gap-1.5 sm:gap-2 flex-wrap max-w-full">
               {product.colors.map((c) => {
                 const isSelected = (activeColorObj?.name || color) === c.name;
                 return (
                   <button
                     key={c.name}
                     type="button"
-                    onClick={() => setColor(c.name)}
+                    onClick={() => handleColorChange(c.name)}
                     title={`Switch to ${c.name}`}
                     className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold transition-all cursor-pointer ${
                       isSelected
@@ -135,7 +205,7 @@ export default function ProductDetailConfigurator({ product }: { product: Produc
                     }`}
                   >
                     <span
-                      className="h-3 w-3 rounded-full ring-1 ring-black/15 shadow-inner"
+                      className="h-2.5 w-2.5 rounded-full ring-1 ring-black/15 shadow-inner"
                       style={{ backgroundColor: c.hex }}
                     />
                     <span>{c.name}</span>
@@ -145,13 +215,58 @@ export default function ProductDetailConfigurator({ product }: { product: Produc
             </div>
           )}
 
-          {/* Invisible Preloader for zero-latency color switching */}
+          {/* Invisible Preloader for all gallery images & color shots */}
           <div className="hidden" aria-hidden="true">
-            {product.colors.map((c) =>
-              c.image ? <img key={c.name} src={c.image} alt="" className="hidden" /> : null
-            )}
+            {galleryList.map((imgUrl, i) => (
+              <img key={i} src={imgUrl} alt="" className="hidden" />
+            ))}
           </div>
         </div>
+
+        {/* Multi-Angle Interactive Thumbnails Strip */}
+        {galleryList.length > 1 && (
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between px-1 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+              <span>View All Sides &amp; Angles ({galleryList.length})</span>
+              <span className="text-[#0071e3] font-semibold">Click thumbnail to switch view</span>
+            </div>
+            <div className="flex items-center gap-2.5 overflow-x-auto pb-2 pt-1 px-1 no-scrollbar">
+              {galleryList.map((imgUrl, idx) => {
+                const isCurrent = activeImgIndex === idx;
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setActiveImgIndex(idx)}
+                    className={`relative h-16 w-16 sm:h-20 sm:w-20 rounded-2xl p-1.5 shrink-0 bg-white border transition-all cursor-pointer flex flex-col items-center justify-center overflow-hidden ${
+                      isCurrent
+                        ? "border-[#0071e3] ring-2 ring-[#0071e3] shadow-md scale-105 bg-blue-50/30"
+                        : "border-gray-200 hover:border-gray-400 hover:scale-102 bg-white/80 opacity-75 hover:opacity-100"
+                    }`}
+                    title={`Angle ${idx + 1}`}
+                  >
+                    <div className="relative w-full h-full flex items-center justify-center">
+                      <Image
+                        src={imgUrl}
+                        alt={`Angle ${idx + 1}`}
+                        fill
+                        sizes="80px"
+                        className="object-contain p-0.5"
+                      />
+                    </div>
+                    <span
+                      className={`absolute bottom-0.5 right-1 text-[9px] font-extrabold px-1 rounded ${
+                        isCurrent ? "bg-[#0071e3] text-white" : "bg-black/40 text-white"
+                      }`}
+                    >
+                      #{idx + 1}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Apple Value Guarantee Strip */}
         <div className="grid grid-cols-3 gap-3 rounded-2xl bg-white p-4 ring-1 ring-black/[0.06] shadow-sm text-center">

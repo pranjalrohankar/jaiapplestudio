@@ -24,6 +24,7 @@ export type AddOptions = {
   color?: string;
   variant?: string;
   priceLabel?: string;
+  image?: string;
 };
 
 export type CartState = {
@@ -137,7 +138,7 @@ function addItem(product: Product, qty = 1, options?: AddOptions) {
         variant: options?.variant,
         price: priceValue(label),
         priceLabel: label,
-        image: product.image,
+        image: options?.image ?? product.image,
         qty,
         badge: product.badge,
         status: product.status,
