@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import ProductImage from "@/components/ProductImage";
 import AddToCartButton from "@/components/AddToCartButton";
@@ -9,6 +9,20 @@ import { priceValue, formatINR } from "@/lib/currency";
 
 export default function ProductCard({ product }: { product: Product }) {
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
+
+  // Deduplicate colors by name so each finish appears only once and keys are unique
+  const uniqueColors = useMemo(() => {
+    const map = new Map<string, typeof product.colors[0]>();
+    for (const c of product.colors || []) {
+      const name = (c.name || "").trim();
+      const key = name.toLowerCase();
+      if (!key) continue;
+      if (!map.has(key)) {
+        map.set(key, c);
+      }
+    }
+    return Array.from(map.values());
+  }, [product.colors]);
 
   const isPreOrder =
     product.badge?.toLowerCase().includes("pre-order") ||
@@ -38,44 +52,49 @@ export default function ProductCard({ product }: { product: Product }) {
 
   // Find active color object if user selected/hovered one
   const activeColorObj = selectedColor
-    ? product.colors.find((c) => c.name === selectedColor)
+    ? uniqueColors.find((c) => c.name.toLowerCase() === selectedColor.toLowerCase())
     : null;
   const activeImage = activeColorObj?.image || product.image;
 
   return (
-    <div className="product-block group flex flex-col justify-between rounded-2xl bg-white p-4 sm:p-5 border border-[#e6e6e6] transition-all duration-300 hover:shadow-[0_12px_28px_rgba(0,0,0,0.08)] hover:border-gray-300 h-full">
+    <div className="product-card group relative flex flex-col justify-between overflow-hidden rounded-2xl bg-white border border-gray-200/80 p-4 transition-all duration-300 hover:shadow-xl hover:border-gray-300">
       <div>
-        {/* Top Product Image Container */}
-        <Link
-          href={`/product/${product.slug}`}
-          className="relative block overflow-hidden rounded-2xl bg-[#f8f8fa] hover:bg-[#f2f2f6] p-3 sm:p-4 mb-3 transition-colors duration-300"
-        >
-          <div className="w-full flex items-center justify-center transition-transform duration-300 group-hover:scale-105">
-            <ProductImage
-              product={product}
-              overrideImage={activeImage}
-              className="aspect-square w-full object-contain max-h-[210px]"
-            />
-          </div>
-
-          {/* iNvent Style Price-Off / Status Badge */}
+        {/* Badges and Wishlist/Action Strip */}
+        <div className="flex items-center justify-between gap-2 min-h-[26px]">
           {product.badge ? (
             <span
-              className={`price-off-tag absolute left-3 top-3 inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-bold text-white shadow-xs ${
+              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold tracking-wide ${
                 isPreOrder
-                  ? "bg-[#0071e3]"
+                  ? "bg-[#0071e3] text-white"
                   : isComingSoon
-                  ? "bg-[#5856d6]"
-                  : "bg-[#1d1d1f]"
+                  ? "bg-purple-100 text-purple-800"
+                  : "bg-[#111111] text-white"
               }`}
             >
               {product.badge}
             </span>
-          ) : discountAmount ? (
-            <span className="price-off-tag absolute left-3 top-3 inline-flex items-center rounded-full bg-[#0071e3]/10 border border-[#0071e3]/20 px-2.5 py-0.5 text-[11px] font-bold text-[#0071e3]">
-              {discountAmount} Off
+          ) : (
+            <span />
+          )}
+
+          {/* Quick Category Indicator Pill */}
+          {product.category ? (
+            <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+              {product.category}
             </span>
           ) : null}
+        </div>
+
+        {/* Product Image Area */}
+        <Link
+          href={`/product/${product.slug}`}
+          className="relative mt-2 flex h-52 sm:h-56 w-full items-center justify-center overflow-hidden rounded-xl bg-gradient-to-b from-[#fbfbfd] to-[#f5f5f7] p-4 transition-transform duration-300 group-hover:scale-[1.02]"
+        >
+          <ProductImage
+            product={product}
+            overrideImage={activeImage}
+            className="aspect-square w-full object-contain max-h-[210px]"
+          />
         </Link>
 
         {/* Product Description Content (matching iNvent .product-desc-content) */}
@@ -93,13 +112,13 @@ export default function ProductCard({ product }: { product: Product }) {
           </p>
 
           {/* Color Dots Swatch with Interactive Switching */}
-          {product.colors.length > 0 ? (
+          {uniqueColors.length > 0 ? (
             <div className="mt-2 flex items-center gap-1.5 min-h-[18px]">
-              {product.colors.map((c) => {
-                const isActive = (selectedColor || product.colors[0]?.name) === c.name;
+              {uniqueColors.map((c, idx) => {
+                const isActive = (selectedColor || uniqueColors[0]?.name)?.toLowerCase() === c.name.toLowerCase();
                 return (
                   <button
-                    key={c.name}
+                    key={`${c.name}-${idx}`}
                     type="button"
                     title={c.name}
                     onMouseEnter={() => setSelectedColor(c.name)}

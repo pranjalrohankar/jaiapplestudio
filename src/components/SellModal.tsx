@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
@@ -21,8 +21,22 @@ export default function SellModal({
   const info = getVariants(product);
   const { addItem } = useCart();
 
+  // Deduplicate colors by name
+  const uniqueColors = useMemo(() => {
+    const map = new Map<string, typeof product.colors[0]>();
+    for (const c of product.colors || []) {
+      const name = (c.name || "").trim();
+      const key = name.toLowerCase();
+      if (!key) continue;
+      if (!map.has(key)) {
+        map.set(key, c);
+      }
+    }
+    return Array.from(map.values());
+  }, [product.colors]);
+
   const [mounted, setMounted] = useState(false);
-  const [color, setColor] = useState<string>(product.colors[0]?.name ?? "");
+  const [color, setColor] = useState<string>(uniqueColors[0]?.name ?? product.colors[0]?.name ?? "");
   const [variant, setVariant] = useState<string>(info.variants[0] ?? "");
   const [qty, setQty] = useState(1);
   const [justAdded, setJustAdded] = useState(false);
@@ -144,8 +158,8 @@ export default function SellModal({
 
             {/* Invisible Preloader */}
             <div className="hidden" aria-hidden="true">
-              {product.colors.map((c) =>
-                c.image ? <img key={c.name} src={c.image} alt="" className="hidden" /> : null
+              {uniqueColors.map((c, idx) =>
+                c.image ? <img key={`${c.name}-${idx}`} src={c.image} alt="" className="hidden" /> : null
               )}
             </div>
 
@@ -225,7 +239,7 @@ export default function SellModal({
               </div>
 
               {/* 1. Finish Selection */}
-              {product.colors.length > 0 && (
+              {uniqueColors.length > 0 && (
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-bold uppercase tracking-wider text-ink/50">
@@ -234,11 +248,11 @@ export default function SellModal({
                     </span>
                   </div>
                   <div className="flex flex-wrap gap-2.5">
-                    {product.colors.map((c) => {
-                      const isSelected = color === c.name;
+                    {uniqueColors.map((c, idx) => {
+                      const isSelected = color?.toLowerCase() === c.name.toLowerCase();
                       return (
                         <button
-                          key={c.name}
+                          key={`${c.name}-${idx}`}
                           type="button"
                           onClick={() => setColor(c.name)}
                           className={`group relative flex items-center gap-2.5 rounded-full px-4 py-2.5 text-xs font-semibold transition-all ${
