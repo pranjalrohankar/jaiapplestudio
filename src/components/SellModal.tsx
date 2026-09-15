@@ -63,8 +63,8 @@ export default function SellModal({
 
   const isSpecial = isPreOrder || isComingSoon;
 
-  const activeColorObj = product.colors.find((c) => c.name === color) ?? product.colors[0];
-  const displayImage = activeColorObj?.image || product.image;
+  const activeColorObj = uniqueColors.find((c) => c.name.toLowerCase() === color.toLowerCase()) ?? uniqueColors[0];
+  const displayImage = activeColorObj?.image || activeColorObj?.images?.[0] || product.image;
 
   function handleConfirmAdd() {
     addItem(product, qty, { color, variant, priceLabel });

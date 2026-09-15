@@ -9,8 +9,9 @@ import { priceValue, formatINR } from "@/lib/currency";
 
 export default function ProductCard({ product }: { product: Product }) {
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [angleIndex, setAngleIndex] = useState(0);
 
-  // Deduplicate colors by name so each finish appears only once and keys are unique
+  // Deduplicate and normalize colors by name so each finish appears only once and keys are unique
   const uniqueColors = useMemo(() => {
     const map = new Map<string, typeof product.colors[0]>();
     for (const c of product.colors || []) {
@@ -18,7 +19,31 @@ export default function ProductCard({ product }: { product: Product }) {
       const key = name.toLowerCase();
       if (!key) continue;
       if (!map.has(key)) {
-        map.set(key, c);
+        const rawImgs = Array.isArray(c.images) ? c.images.filter(Boolean) : [];
+        const primary = c.image?.trim() || rawImgs[0] || "";
+        map.set(key, {
+          ...c,
+          name,
+          hex: c.hex?.trim() || "#000000",
+          image: primary,
+          images: primary && !rawImgs.includes(primary) ? [primary, ...rawImgs] : rawImgs,
+        });
+      } else {
+        const existing = map.get(key)!;
+        const currentPrimary = c.image?.trim() || "";
+        const currentImgs = Array.isArray(c.images) ? c.images.filter(Boolean) : [];
+        const combined = [
+          ...(existing.images || []),
+          ...(existing.image ? [existing.image] : []),
+          ...(currentPrimary ? [currentPrimary] : []),
+          ...currentImgs,
+        ].filter((img, idx, arr) => Boolean(img && img.trim()) && arr.indexOf(img) === idx);
+
+        map.set(key, {
+          ...existing,
+          image: existing.image || currentPrimary || combined[0] || "",
+          images: combined,
+        });
       }
     }
     return Array.from(map.values());
@@ -50,11 +75,36 @@ export default function ProductCard({ product }: { product: Product }) {
   const priceAfterCashback =
     numericPrice > 0 && cashbackAmount > 0 ? formatINR(numericPrice - cashbackAmount) : null;
 
-  // Find active color object if user selected/hovered one
-  const activeColorObj = selectedColor
-    ? uniqueColors.find((c) => c.name.toLowerCase() === selectedColor.toLowerCase())
-    : null;
-  const activeImage = activeColorObj?.image || product.image;
+  // Find active color object if user selected/hovered one or default to first
+  const activeColorObj = useMemo(() => {
+    if (selectedColor) {
+      return (
+        uniqueColors.find((c) => c.name.toLowerCase() === selectedColor.toLowerCase()) ||
+        uniqueColors[0] ||
+        null
+      );
+    }
+    return uniqueColors[0] || null;
+  }, [selectedColor, uniqueColors]);
+
+  // Build the list of images available for this active color (or product fallback)
+  const activeGallery = useMemo(() => {
+    if (activeColorObj) {
+      const rawImgs = Array.isArray(activeColorObj.images) ? activeColorObj.images.filter(Boolean) : [];
+      const primary = activeColorObj.image?.trim() || "";
+      if (rawImgs.length > 0) {
+        return primary && !rawImgs.includes(primary) ? [primary, ...rawImgs] : rawImgs;
+      }
+      if (primary) return [primary];
+    }
+    if (Array.isArray(product.images) && product.images.length > 0) {
+      return product.images.filter(Boolean);
+    }
+    if (product.image) return [product.image];
+    return [];
+  }, [activeColorObj, product.images, product.image]);
+
+  const activeImage = activeGallery[angleIndex] || activeGallery[0] || product.image || "";
 
   return (
     <div className="product-card group relative flex flex-col justify-between overflow-hidden rounded-2xl bg-white border border-gray-200/80 p-4 transition-all duration-300 hover:shadow-xl hover:border-gray-300">
@@ -85,23 +135,76 @@ export default function ProductCard({ product }: { product: Product }) {
           ) : null}
         </div>
 
-        {/* Product Image Area */}
-        <Link
-          href={`/product/${product.slug}`}
-          className="relative mt-2 flex h-52 sm:h-56 w-full items-center justify-center overflow-hidden rounded-xl bg-gradient-to-b from-[#fbfbfd] to-[#f5f5f7] p-4 transition-transform duration-300 group-hover:scale-[1.02]"
-        >
-          <ProductImage
-            product={product}
-            overrideImage={activeImage}
-            className="aspect-square w-full object-contain max-h-[210px]"
-          />
-        </Link>
+        {/* Product Image Area with Multi-Angle Flip Support */}
+        <div className="relative mt-2 flex h-52 sm:h-56 w-full items-center justify-center overflow-hidden rounded-xl bg-gradient-to-b from-[#fbfbfd] to-[#f5f5f7] p-4 transition-transform duration-300 group-hover:scale-[1.01]">
+          <Link
+            href={`/product/${product.slug}`}
+            className="w-full h-full flex items-center justify-center"
+          >
+            <ProductImage
+              product={product}
+              overrideImage={activeImage}
+              className="aspect-square w-full object-contain max-h-[210px]"
+            />
+          </Link>
+
+          {/* Quick Angle Navigation on Card (when active color has > 1 photos) */}
+          {activeGallery.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setAngleIndex((prev) => (prev - 1 + activeGallery.length) % activeGallery.length);
+                }}
+                className="absolute left-2 top-1/2 -translate-y-1/2 z-10 h-7 w-7 rounded-full bg-white/90 hover:bg-white text-gray-800 shadow-sm border border-gray-200 flex items-center justify-center text-xs font-bold transition opacity-0 group-hover:opacity-100 cursor-pointer"
+                title="Previous angle"
+                aria-label="Previous angle"
+              >
+                ‹
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setAngleIndex((prev) => (prev + 1) % activeGallery.length);
+                }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 z-10 h-7 w-7 rounded-full bg-white/90 hover:bg-white text-gray-800 shadow-sm border border-gray-200 flex items-center justify-center text-xs font-bold transition opacity-0 group-hover:opacity-100 cursor-pointer"
+                title="Next angle"
+                aria-label="Next angle"
+              >
+                ›
+              </button>
+
+              {/* Mini Angle Indicator Dots */}
+              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1 z-10 bg-black/40 backdrop-blur-xs px-2 py-0.5 rounded-full">
+                {activeGallery.map((_, dotIdx) => (
+                  <button
+                    key={dotIdx}
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setAngleIndex(dotIdx);
+                    }}
+                    className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                      (angleIndex % activeGallery.length) === dotIdx ? "w-3 bg-white" : "w-1.5 bg-white/50"
+                    }`}
+                    aria-label={`View angle ${dotIdx + 1}`}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+        </div>
 
         {/* Product Description Content (matching iNvent .product-desc-content) */}
         <div className="product-desc-content flex flex-col">
           <Link
             href={`/product/${product.slug}`}
-            className="product-title text-base font-semibold tracking-tight text-[#111111] hover:text-[#0071e3] transition line-clamp-1"
+            className="product-title text-base font-semibold tracking-tight text-[#111111] hover:text-[#0071e3] transition line-clamp-1 mt-1"
           >
             {product.name}
           </Link>
@@ -113,29 +216,40 @@ export default function ProductCard({ product }: { product: Product }) {
 
           {/* Color Dots Swatch with Interactive Switching */}
           {uniqueColors.length > 0 ? (
-            <div className="mt-2 flex items-center gap-1.5 min-h-[18px]">
-              {uniqueColors.map((c, idx) => {
-                const isActive = (selectedColor || uniqueColors[0]?.name)?.toLowerCase() === c.name.toLowerCase();
-                return (
-                  <button
-                    key={`${c.name}-${idx}`}
-                    type="button"
-                    title={c.name}
-                    onMouseEnter={() => setSelectedColor(c.name)}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setSelectedColor(c.name);
-                    }}
-                    className={`h-3.5 w-3.5 rounded-full border transition-all cursor-pointer ${
-                      isActive
-                        ? "ring-2 ring-[#0071e3] ring-offset-1 scale-110 border-transparent shadow-xs"
-                        : "border-black/20 hover:scale-110"
-                    }`}
-                    style={{ backgroundColor: c.hex }}
-                    aria-label={`Select ${c.name}`}
-                  />
-                );
-              })}
+            <div className="mt-2 flex items-center gap-1.5 min-h-[18px] flex-wrap">
+              <div className="flex items-center gap-1.5">
+                {uniqueColors.map((c, idx) => {
+                  const isActive = (activeColorObj?.name || uniqueColors[0]?.name)?.toLowerCase() === c.name.toLowerCase();
+                  return (
+                    <button
+                      key={`${c.name}-${idx}`}
+                      type="button"
+                      title={c.name}
+                      onMouseEnter={() => {
+                        setSelectedColor(c.name);
+                        setAngleIndex(0);
+                      }}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setSelectedColor(c.name);
+                        setAngleIndex(0);
+                      }}
+                      className={`h-3.5 w-3.5 rounded-full border transition-all cursor-pointer ${
+                        isActive
+                          ? "ring-2 ring-[#0071e3] ring-offset-1 scale-110 border-transparent shadow-xs"
+                          : "border-black/20 hover:scale-110"
+                      }`}
+                      style={{ backgroundColor: c.hex }}
+                      aria-label={`Select ${c.name}`}
+                    />
+                  );
+                })}
+              </div>
+              {activeColorObj?.name && (
+                <span className="text-[10px] font-semibold text-gray-500 truncate max-w-[120px]">
+                  {activeColorObj.name}
+                </span>
+              )}
             </div>
           ) : (
             <div className="mt-2 min-h-[18px]" />
