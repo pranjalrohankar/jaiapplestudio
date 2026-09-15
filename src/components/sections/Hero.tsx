@@ -13,6 +13,19 @@ export default function Hero() {
   const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
+    // Check cached slides on mount safely after hydration
+    try {
+      if (typeof window !== "undefined") {
+        const cached = window.localStorage.getItem("jas-live-slider");
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setSlides(parsed);
+          }
+        }
+      }
+    } catch {}
+
     async function fetchLiveSlides() {
       try {
         const res = await fetch(`/api/slider?t=${Date.now()}`, {
@@ -100,6 +113,8 @@ export default function Hero() {
     slide.badge || slide.title || slide.subtitle || slide.price || slide.ctaText || slide.secondaryText
   );
 
+  const slideImgSrc = slide.image?.trim() || "/images/iphone-18-hero-banner.jpg";
+
   return (
     <section
       className="relative overflow-hidden bg-black text-white select-none w-full"
@@ -114,7 +129,7 @@ export default function Hero() {
           {slide.ctaLink && !hasOverlayContent ? (
             <Link href={slide.ctaLink} className="relative block w-full h-full cursor-pointer">
               <Image
-                src={slide.image}
+                src={slideImgSrc}
                 alt={slide.title?.trim() || "Jai Apple Store Banner"}
                 fill
                 priority={current === 0}
@@ -129,7 +144,7 @@ export default function Hero() {
           ) : (
             <div className="relative w-full h-full">
               <Image
-                src={slide.image}
+                src={slideImgSrc}
                 alt={slide.title?.trim() || "Jai Apple Store Banner"}
                 fill
                 priority={current === 0}

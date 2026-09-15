@@ -7,20 +7,22 @@ import Reveal from "@/components/Reveal";
 import { defaultCategoryTiles, type CategoryTile } from "@/lib/categories";
 
 export default function CategoryTiles() {
-  const [categories, setCategories] = useState<CategoryTile[]>(() => {
-    if (typeof window !== "undefined") {
-      try {
+  const [categories, setCategories] = useState<CategoryTile[]>(defaultCategoryTiles);
+
+  useEffect(() => {
+    // Check local cache on mount safely after hydration
+    try {
+      if (typeof window !== "undefined") {
         const cached = window.localStorage.getItem("jas-live-categories");
         if (cached) {
           const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setCategories(parsed);
+          }
         }
-      } catch {}
-    }
-    return defaultCategoryTiles;
-  });
+      }
+    } catch {}
 
-  useEffect(() => {
     async function fetchCategories() {
       try {
         const res = await fetch(`/api/categories?t=${Date.now()}`, {

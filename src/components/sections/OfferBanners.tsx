@@ -11,6 +11,19 @@ export default function OfferBanners() {
   const [banners, setBanners] = useState<OfferBanner[]>([]);
 
   useEffect(() => {
+    // Check cached banners on mount safely after hydration
+    try {
+      if (typeof window !== "undefined") {
+        const cached = window.localStorage.getItem("jas-live-banners");
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setBanners(parsed);
+          }
+        }
+      }
+    } catch {}
+
     async function fetchLiveBanners() {
       try {
         const res = await fetch(`/api/banners?t=${Date.now()}`, {

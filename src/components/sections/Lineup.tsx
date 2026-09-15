@@ -17,20 +17,22 @@ const filterTabs = [
 
 export default function Lineup() {
   const [activeTab, setActiveTab] = useState("all");
-  const [productList, setProductList] = useState<Product[]>(() => {
-    if (typeof window !== "undefined") {
-      try {
+  const [productList, setProductList] = useState<Product[]>(defaultProducts);
+
+  useEffect(() => {
+    // Check local cache on mount safely after hydration
+    try {
+      if (typeof window !== "undefined") {
         const cached = window.localStorage.getItem("jas-live-products");
         if (cached) {
           const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setProductList(parsed);
+          }
         }
-      } catch {}
-    }
-    return defaultProducts;
-  });
+      }
+    } catch {}
 
-  useEffect(() => {
     async function loadProducts() {
       try {
         const res = await fetch(`/api/products?t=${Date.now()}`, {
