@@ -1132,7 +1132,7 @@ export default function ProductsManager() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-sm overflow-y-auto">
           {/* Modal Container */}
           <div
-            className="relative w-full max-w-3xl bg-white rounded-3xl shadow-2xl border border-gray-100 my-auto overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+            className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-gray-100 my-auto overflow-hidden animate-in fade-in zoom-in-95 duration-150"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
@@ -1716,18 +1716,20 @@ export default function ProductsManager() {
                     </div>
                     <button
                       type="button"
-                      onClick={() =>
+                      onClick={() => {
+                        const currentColors = editing.colors || [];
+                        const finishNum = currentColors.length + 1;
                         setEditing({
                           ...editing,
                           colors: [
-                            ...(editing.colors || []),
-                            { name: "New Finish", hex: "#111111", image: "", images: [] },
+                            ...currentColors,
+                            { name: `Finish ${finishNum}`, hex: "#3b82f6", image: "", images: [] },
                           ],
-                        })
-                      }
-                      className="text-xs text-blue-600 hover:text-blue-800 font-semibold cursor-pointer"
+                        });
+                      }}
+                      className="text-xs text-blue-600 hover:text-blue-800 font-bold cursor-pointer flex items-center gap-1"
                     >
-                      + Add Finish
+                      <span>+</span> Add Finish
                     </button>
                   </div>
 
@@ -1802,135 +1804,153 @@ export default function ProductsManager() {
                   {(!editing.colors || editing.colors.length === 0) ? (
                     <p className="text-xs text-gray-400 italic">No color finishes configured.</p>
                   ) : (
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                       {editing.colors.map((c: Color, idx: number) => {
-                        const isExpanded =
-                          expandedColors[idx] !== undefined
-                            ? expandedColors[idx]
-                            : Boolean(c.images && c.images.length > 0);
-                        const angleCount = (c.images?.length || 0) + (c.image ? 1 : 0);
+                        const totalPhotos = (c.images?.length || 0) + (c.image && !(c.images || []).includes(c.image) ? 1 : 0);
                         return (
                           <div
                             key={idx}
-                            className="bg-white rounded-2xl border border-gray-200 shadow-2xs overflow-hidden transition-all"
+                            className="bg-white rounded-2xl border border-gray-200/90 shadow-xs hover:border-gray-300 transition-all overflow-hidden"
                           >
-                            {/* Color Header Row */}
-                            <div className="p-3 flex flex-wrap sm:flex-nowrap gap-2.5 items-center justify-between bg-white">
-                              {/* Color Picker & Hex */}
-                              <div className="flex items-center gap-1.5 shrink-0">
-                                <input
-                                  type="color"
-                                  value={c.hex.startsWith("#") && c.hex.length === 7 ? c.hex : "#000000"}
-                                  onChange={(e) => {
-                                    const next = [...(editing.colors || [])];
-                                    next[idx] = { ...next[idx], hex: e.target.value };
-                                    setEditing({ ...editing, colors: next });
-                                  }}
-                                  className="h-8 w-8 rounded-lg border border-gray-300 cursor-pointer p-0.5"
-                                />
-                                <input
-                                  type="text"
-                                  value={c.hex}
-                                  onChange={(e) => {
-                                    const next = [...(editing.colors || [])];
-                                    next[idx] = { ...next[idx], hex: e.target.value };
-                                    setEditing({ ...editing, colors: next });
-                                  }}
-                                  className="w-20 border border-gray-300 rounded-lg px-2 py-1 text-xs font-mono"
-                                  placeholder="#111111"
-                                />
+                            {/* Card Header: Color Swatch + Name + Hex + Angle Count + Delete Finish */}
+                            <div className="p-3.5 bg-gray-50/90 border-b border-gray-100 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3">
+                              <div className="flex items-center gap-3 flex-1 min-w-[240px]">
+                                {/* Color picker and hex */}
+                                <div className="flex items-center gap-2">
+                                  <label className="relative cursor-pointer group shrink-0" title="Click to pick color">
+                                    <input
+                                      type="color"
+                                      value={c.hex.startsWith("#") && c.hex.length === 7 ? c.hex : "#000000"}
+                                      onChange={(e) => {
+                                        const next = [...(editing.colors || [])];
+                                        next[idx] = { ...next[idx], hex: e.target.value };
+                                        setEditing({ ...editing, colors: next });
+                                      }}
+                                      className="sr-only"
+                                    />
+                                    <div
+                                      className="w-8 h-8 rounded-xl ring-2 ring-gray-300 group-hover:ring-blue-500 shadow-2xs transition-all flex items-center justify-center border border-white"
+                                      style={{ backgroundColor: c.hex }}
+                                    />
+                                  </label>
+                                  <div className="flex items-center bg-white border border-gray-300 rounded-xl px-2 py-1 shadow-2xs">
+                                    <span className="text-[10px] font-bold text-gray-400 select-none mr-1">HEX</span>
+                                    <input
+                                      type="text"
+                                      value={c.hex}
+                                      onChange={(e) => {
+                                        const next = [...(editing.colors || [])];
+                                        next[idx] = { ...next[idx], hex: e.target.value };
+                                        setEditing({ ...editing, colors: next });
+                                      }}
+                                      className="w-18 text-xs font-mono font-medium outline-none text-gray-800"
+                                      placeholder="#000000"
+                                    />
+                                  </div>
+                                </div>
+
+                                {/* Finish Name */}
+                                <div className="flex-1 min-w-[140px]">
+                                  <input
+                                    type="text"
+                                    value={c.name}
+                                    onChange={(e) => {
+                                      const next = [...(editing.colors || [])];
+                                      next[idx] = { ...next[idx], name: e.target.value };
+                                      setEditing({ ...editing, colors: next });
+                                    }}
+                                    className="w-full bg-white border border-gray-300 rounded-xl px-3 py-1.5 text-xs font-bold text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+                                    placeholder="Finish Name (e.g. Cosmic Orange, Desert Titanium)"
+                                  />
+                                </div>
                               </div>
 
-                              {/* Color Name */}
-                              <input
-                                type="text"
-                                value={c.name}
-                                onChange={(e) => {
-                                  const next = [...(editing.colors || [])];
-                                  next[idx] = { ...next[idx], name: e.target.value };
-                                  setEditing({ ...editing, colors: next });
-                                }}
-                                className="w-36 border border-gray-300 rounded-lg px-2.5 py-1 text-xs font-semibold"
-                                placeholder="Finish name"
-                              />
-
-                              {/* Color Primary Image URL */}
-                              <div className="flex-1 flex items-center gap-1.5 min-w-[180px]">
-                                <input
-                                  type="text"
-                                  value={c.image || ""}
-                                  onChange={(e) => {
-                                    const next = [...(editing.colors || [])];
-                                    next[idx] = { ...next[idx], image: e.target.value };
-                                    setEditing({ ...editing, colors: next });
-                                  }}
-                                  className="flex-1 border border-gray-300 rounded-lg px-2.5 py-1 text-xs font-mono"
-                                  placeholder="Color primary image URL"
-                                />
-                                <input
-                                  type="file"
-                                  accept="image/*"
-                                  onChange={(e) => handleColorPrimaryUpload(idx, e)}
-                                  className="hidden"
-                                  id={`color-primary-upload-${idx}`}
-                                />
-                                <label
-                                  htmlFor={`color-primary-upload-${idx}`}
-                                  className="p-1.5 rounded-lg border border-gray-300 bg-gray-50 hover:bg-gray-100 text-xs cursor-pointer transition shrink-0"
-                                  title="Upload image for this color"
-                                >
-                                  {uploadingColorIdx === idx ? "⏳" : "📁"}
-                                </label>
-                              </div>
-
-                              {/* Toggle Color-Specific Angles Gallery */}
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setExpandedColors((prev) => ({ ...prev, [idx]: !isExpanded }))
-                                }
-                                className={`text-xs font-bold px-3 py-1 rounded-lg border transition flex items-center gap-1 cursor-pointer shrink-0 ${
-                                  isExpanded
-                                    ? "bg-blue-600 text-white border-blue-600"
-                                    : "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
-                                }`}
-                              >
-                                <span>📷 All Sides</span>
-                                <span className="text-[10px] bg-white/20 px-1.5 py-0.2 rounded-full font-extrabold">
-                                  {c.images?.length || 0}
+                              {/* Right Header Actions: Angle Badge & Remove Finish Button */}
+                              <div className="flex items-center gap-2 shrink-0">
+                                <span className="text-[11px] font-bold text-blue-700 bg-blue-50 border border-blue-200/80 px-2.5 py-1 rounded-lg flex items-center gap-1.5">
+                                  <span>📸</span>
+                                  <span>{totalPhotos} Photo{totalPhotos === 1 ? "" : "s"}</span>
                                 </span>
-                                <span>{isExpanded ? "▲" : "▼"}</span>
-                              </button>
-
-                              {/* Remove Color Finish */}
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const next = [...(editing.colors || [])];
-                                  next.splice(idx, 1);
-                                  setEditing({ ...editing, colors: next });
-                                }}
-                                className="text-red-500 hover:text-red-700 text-xs px-2 py-1 cursor-pointer shrink-0"
-                                title="Remove color finish"
-                              >
-                                ✕
-                              </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const next = [...(editing.colors || [])];
+                                    next.splice(idx, 1);
+                                    setEditing({ ...editing, colors: next });
+                                  }}
+                                  className="text-xs font-semibold text-red-600 hover:text-red-700 hover:bg-red-50 px-2.5 py-1 rounded-lg border border-transparent hover:border-red-200 transition cursor-pointer flex items-center gap-1"
+                                  title="Remove this color finish"
+                                >
+                                  <span>✕</span>
+                                  <span>Remove</span>
+                                </button>
+                              </div>
                             </div>
 
-                            {/* Expanded Gallery for This Color Finish */}
-                            {isExpanded && (
-                              <div className="border-t border-blue-100 bg-blue-50/30 p-3.5 space-y-3">
+                            {/* Card Body: Angle Photos Showcase */}
+                            <div className="p-4 space-y-4 bg-white">
+                              {/* Primary Image / Front Angle */}
+                              <div className="space-y-1.5">
                                 <div className="flex items-center justify-between">
-                                  <div>
-                                    <h5 className="text-xs font-extrabold text-blue-950 flex items-center gap-1.5">
-                                      <span
-                                        className="h-3 w-3 rounded-full shadow-inner ring-1 ring-black/15"
-                                        style={{ backgroundColor: c.hex }}
+                                  <label className="text-xs font-bold text-gray-800 flex items-center gap-1.5">
+                                    <span className="w-2 h-2 rounded-full bg-blue-600" />
+                                    <span>Main / Primary Photo for &ldquo;{c.name || "Finish"}&rdquo;</span>
+                                  </label>
+                                  <span className="text-[11px] text-gray-400">Default product view for this finish</span>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                  {/* Preview Thumbnail */}
+                                  <div className="relative h-11 w-11 rounded-xl bg-gray-50 border border-gray-200 p-0.5 shrink-0 overflow-hidden flex items-center justify-center shadow-2xs">
+                                    {c.image ? (
+                                      <img
+                                        src={c.image}
+                                        alt={c.name || "Primary finish"}
+                                        className="object-contain max-h-full max-w-full"
                                       />
-                                      <span>All Angles / Sides for &ldquo;{c.name}&rdquo;</span>
+                                    ) : (
+                                      <span className="text-xs text-gray-300">🖼️</span>
+                                    )}
+                                  </div>
+
+                                  <input
+                                    type="text"
+                                    value={c.image || ""}
+                                    onChange={(e) => {
+                                      const next = [...(editing.colors || [])];
+                                      next[idx] = { ...next[idx], image: e.target.value };
+                                      setEditing({ ...editing, colors: next });
+                                    }}
+                                    className="flex-1 min-w-0 border border-gray-300 rounded-xl px-3 py-2 text-xs font-mono text-gray-800 placeholder:text-gray-400 focus:border-blue-500 outline-none"
+                                    placeholder="Main image URL (e.g. /images/iphone-orange.png or upload below)"
+                                  />
+
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => handleColorPrimaryUpload(idx, e)}
+                                    className="hidden"
+                                    id={`color-primary-upload-${idx}`}
+                                  />
+                                  <label
+                                    htmlFor={`color-primary-upload-${idx}`}
+                                    className="px-3.5 py-2 rounded-xl border border-gray-200 bg-gray-50 hover:bg-gray-100 text-gray-800 font-bold text-xs cursor-pointer transition shrink-0 flex items-center gap-1.5 shadow-2xs"
+                                    title="Upload primary image for this color"
+                                  >
+                                    {uploadingColorIdx === idx ? <span>⏳ Uploading...</span> : <span>📁 Upload Photo</span>}
+                                  </label>
+                                </div>
+                              </div>
+
+                              {/* Multi-Angle Gallery for this Color */}
+                              <div className="pt-3 border-t border-gray-100 space-y-3">
+                                <div className="flex flex-wrap items-center justify-between gap-2">
+                                  <div>
+                                    <h5 className="text-xs font-bold text-gray-800 flex items-center gap-1.5">
+                                      <span>📷 Additional Side & Angle Photos for &ldquo;{c.name || "Finish"}&rdquo;</span>
                                     </h5>
-                                    <p className="text-[11px] text-blue-800">
-                                      When users select this finish on the product page, these angle photos will automatically appear.
+                                    <p className="text-[11px] text-gray-500 mt-0.5">
+                                      Add back, side, ports, or zoom views. When customers choose &ldquo;{c.name || "this finish"}&rdquo;, they can flip through all these photos!
                                     </p>
                                   </div>
 
@@ -1945,10 +1965,10 @@ export default function ProductsManager() {
                                     />
                                     <label
                                       htmlFor={`color-gallery-upload-${idx}`}
-                                      className="text-xs text-blue-700 bg-white hover:bg-blue-50 font-bold px-3 py-1 rounded-lg border border-blue-300 cursor-pointer shadow-2xs transition flex items-center gap-1"
+                                      className="text-xs text-blue-700 bg-blue-50 hover:bg-blue-100 font-bold px-3 py-1.5 rounded-xl border border-blue-200 cursor-pointer shadow-2xs transition flex items-center gap-1.5"
                                     >
                                       <span>📁</span>
-                                      <span>+ Upload Angles for {c.name}</span>
+                                      <span>+ Upload Angles (Batch)</span>
                                     </label>
                                     <button
                                       type="button"
@@ -1958,28 +1978,34 @@ export default function ProductsManager() {
                                         next[idx] = { ...next[idx], images: [...existing, ""] };
                                         setEditing({ ...editing, colors: next });
                                       }}
-                                      className="text-xs text-gray-700 bg-white hover:bg-gray-100 font-semibold px-2.5 py-1 rounded-lg border border-gray-300 transition cursor-pointer"
+                                      className="text-xs text-gray-700 bg-white hover:bg-gray-50 font-semibold px-2.5 py-1.5 rounded-xl border border-gray-300 transition cursor-pointer"
                                     >
                                       + Add URL
                                     </button>
                                   </div>
                                 </div>
 
+                                {/* Angle Photos List */}
                                 {(!c.images || c.images.length === 0) ? (
-                                  <p className="text-xs text-blue-600/70 italic py-1">
-                                    No additional angle images added for this color finish. Primary color image will be used. Click &ldquo;+ Upload Angles&rdquo; to add side views for this color.
-                                  </p>
+                                  <div className="p-3.5 bg-blue-50/50 rounded-xl border border-blue-100/80 text-center">
+                                    <p className="text-xs text-blue-900 font-medium">
+                                      No extra side or angle photos added yet for {c.name || "this finish"}.
+                                    </p>
+                                    <p className="text-[11px] text-blue-700/80 mt-0.5">
+                                      Click <strong>&ldquo;+ Upload Angles (Batch)&rdquo;</strong> to upload multiple shots at once from your device, or click <strong>&ldquo;+ Add URL&rdquo;</strong>.
+                                    </p>
+                                  </div>
                                 ) : (
-                                  <div className="space-y-2">
+                                  <div className="space-y-2 pt-1">
                                     {c.images.map((colorImgUrl: string, imgIdx: number) => (
                                       <div
                                         key={imgIdx}
-                                        className="flex items-center gap-2 bg-white p-2 rounded-xl border border-blue-200 shadow-2xs"
+                                        className="flex items-center gap-2 bg-gray-50/80 hover:bg-gray-50 p-2 rounded-xl border border-gray-200 shadow-2xs transition"
                                       >
-                                        <span className="text-xs font-bold text-blue-800 w-6 text-center shrink-0">
+                                        <span className="text-xs font-bold text-gray-600 w-7 text-center shrink-0">
                                           #{imgIdx + 1}
                                         </span>
-                                        <div className="relative h-10 w-10 rounded-lg bg-gray-50 border border-gray-200 p-0.5 shrink-0 overflow-hidden flex items-center justify-center">
+                                        <div className="relative h-10 w-10 rounded-lg bg-white border border-gray-200 p-0.5 shrink-0 overflow-hidden flex items-center justify-center shadow-2xs">
                                           {colorImgUrl ? (
                                             <img
                                               src={colorImgUrl}
@@ -2000,8 +2026,8 @@ export default function ProductsManager() {
                                             next[idx] = { ...next[idx], images: updatedImages };
                                             setEditing({ ...editing, colors: next });
                                           }}
-                                          className="flex-1 border border-gray-300 rounded-lg px-2.5 py-1 text-xs font-mono bg-white"
-                                          placeholder={`URL for ${c.name} angle (e.g. /images/${c.name.toLowerCase()}-side.png)`}
+                                          className="flex-1 min-w-0 border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs font-mono bg-white text-gray-800 placeholder:text-gray-400 focus:border-blue-500 outline-none"
+                                          placeholder={`Angle photo URL (e.g. /images/${(c.name || "product").toLowerCase()}-side.png)`}
                                         />
 
                                         {/* Reorder Buttons */}
@@ -2017,7 +2043,7 @@ export default function ProductsManager() {
                                               next[idx] = { ...next[idx], images: updatedImages };
                                               setEditing({ ...editing, colors: next });
                                             }}
-                                            className="p-1 text-gray-400 hover:text-gray-800 disabled:opacity-20 text-xs font-bold cursor-pointer"
+                                            className="p-1.5 text-gray-400 hover:text-gray-800 disabled:opacity-20 text-xs font-bold cursor-pointer rounded-md hover:bg-gray-200 transition"
                                             title="Move up"
                                           >
                                             ▲
@@ -2033,7 +2059,7 @@ export default function ProductsManager() {
                                               next[idx] = { ...next[idx], images: updatedImages };
                                               setEditing({ ...editing, colors: next });
                                             }}
-                                            className="p-1 text-gray-400 hover:text-gray-800 disabled:opacity-20 text-xs font-bold cursor-pointer"
+                                            className="p-1.5 text-gray-400 hover:text-gray-800 disabled:opacity-20 text-xs font-bold cursor-pointer rounded-md hover:bg-gray-200 transition"
                                             title="Move down"
                                           >
                                             ▼
@@ -2050,8 +2076,8 @@ export default function ProductsManager() {
                                             next[idx] = { ...next[idx], images: updatedImages };
                                             setEditing({ ...editing, colors: next });
                                           }}
-                                          className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg text-xs cursor-pointer shrink-0"
-                                          title="Remove this angle"
+                                          className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg text-xs cursor-pointer shrink-0 font-bold transition"
+                                          title="Remove this angle photo"
                                         >
                                           ✕
                                         </button>
@@ -2060,7 +2086,7 @@ export default function ProductsManager() {
                                   </div>
                                 )}
                               </div>
-                            )}
+                            </div>
                           </div>
                         );
                       })}
