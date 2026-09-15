@@ -22,8 +22,13 @@ function serializeColors(colors?: Color[]): string {
     .map((c) => {
       const name = (c.name || "Color").trim();
       const hex = (c.hex || "#000000").trim();
-      if (c.image && c.image.trim()) {
-        return `${name}:${hex}:${c.image.trim()}`;
+      const allImgs: string[] = [
+        ...(c.image ? [c.image.trim()] : []),
+        ...(Array.isArray(c.images) ? c.images.map((s) => (typeof s === "string" ? s.trim() : "")).filter(Boolean) : []),
+      ].filter((img, idx, arr) => arr.indexOf(img) === idx);
+
+      if (allImgs.length > 0) {
+        return `${name}:${hex}:${allImgs.join(",")}`;
       }
       return `${name}:${hex}`;
     })
@@ -33,11 +38,11 @@ function serializeColors(colors?: Color[]): string {
 /**
  * Parse colors string from CSV back into Color[] array.
  * Robust parser supporting:
- * - "Name:#hex:https://image-url; Name:#hex:https://image-url"
+ * - "Name:#hex:https://img1,https://img2; Name:#hex:https://img"
  * - "Name:#hex; Name:#hex"
- * - "Name | #hex | https://image-url; Name | #hex | https://image-url"
+ * - "Name | #hex | https://img; Name | #hex | https://img"
  * - "Midnight, Starlight, Silver"
- * - JSON string "[{name, hex, image}]"
+ * - JSON string "[{name, hex, image, images}]"
  */
 export function parseColors(input?: string): Color[] {
   if (!input || !input.trim()) return [];
@@ -48,11 +53,19 @@ export function parseColors(input?: string): Color[] {
     try {
       const parsed = JSON.parse(trimmed);
       if (Array.isArray(parsed)) {
-        return parsed.map((item) => ({
-          name: String(item.name || "Color").trim(),
-          hex: String(item.hex || "#000000").trim(),
-          ...(item.image && String(item.image).trim() ? { image: String(item.image).trim() } : {}),
-        }));
+        return parsed.map((item) => {
+          const rawImgs = Array.isArray(item.images)
+            ? item.images.map((s: any) => String(s).trim()).filter(Boolean)
+            : [];
+          const primary = item.image ? String(item.image).trim() : rawImgs[0] || undefined;
+          const allImgs = primary && !rawImgs.includes(primary) ? [primary, ...rawImgs] : rawImgs;
+          return {
+            name: String(item.name || "Color").trim(),
+            hex: String(item.hex || "#000000").trim(),
+            ...(primary ? { image: primary } : {}),
+            ...(allImgs.length > 0 ? { images: allImgs } : {}),
+          };
+        });
       }
     } catch {}
   }
@@ -62,21 +75,24 @@ export function parseColors(input?: string): Color[] {
   const colors: Color[] = [];
 
   for (const entry of entries) {
-    // 1. Pipe-separated: Name | #hex | image_url
+    // 1. Pipe-separated: Name | #hex | image_url1, image_url2
     if (entry.includes("|")) {
       const parts = entry.split("|").map((p) => p.trim());
       const name = parts[0] || "Color";
       const hex = parts[1] && (parts[1].startsWith("#") || /^[0-9A-Fa-f]{3,6}$/.test(parts[1]))
         ? parts[1].startsWith("#") ? parts[1] : `#${parts[1]}`
         : getColorHexFromName(name);
-      const image = parts.slice(2).join("|").trim() || undefined;
+      const rawImageStr = parts.slice(2).join("|").trim();
+      const imgs = rawImageStr.split(",").map((s) => s.trim()).filter(Boolean);
+      const primary = imgs[0] || undefined;
       colors.push({
         name,
         hex,
-        ...(image ? { image } : {}),
+        ...(primary ? { image: primary } : {}),
+        ...(imgs.length > 0 ? { images: imgs } : {}),
       });
     }
-    // 2. Colon-separated: Name:#hex:https://image_url
+    // 2. Colon-separated: Name:#hex:https://img1,https://img2
     else if (entry.includes(":")) {
       const parts = entry.split(":").map((p) => p.trim());
       const name = parts[0] || "Color";
@@ -84,19 +100,21 @@ export function parseColors(input?: string): Color[] {
         ? parts[1].startsWith("#") ? parts[1] : `#${parts[1]}`
         : getColorHexFromName(name);
       
-      // Crucial: parts.slice(2).join(":") preserves the entire URL even with "https://"
-      let image: string | undefined = undefined;
+      let primary: string | undefined = undefined;
+      let imgs: string[] = [];
       if (parts.length > 2) {
         const joinedUrl = parts.slice(2).join(":").trim();
         if (joinedUrl.length > 0) {
-          image = joinedUrl;
+          imgs = joinedUrl.split(",").map((s) => s.trim()).filter(Boolean);
+          primary = imgs[0] || undefined;
         }
       }
 
       colors.push({
         name,
         hex,
-        ...(image ? { image } : {}),
+        ...(primary ? { image: primary } : {}),
+        ...(imgs.length > 0 ? { images: imgs } : {}),
       });
     }
     // 3. Simple comma-separated color names: "Midnight, Silver, Space Gray"
