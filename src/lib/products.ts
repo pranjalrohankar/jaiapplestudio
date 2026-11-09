@@ -7,10 +7,15 @@
  */
 
 export type Category = {
+  id?: string;
   slug: string;
   name: string;
-  blurb: string;
-  tint: string;
+  blurb?: string;
+  tint?: string;
+  subtitle?: string;
+  image?: string;
+  imageFit?: string;
+  isActive?: boolean;
 };
 
 export type Color = {

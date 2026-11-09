@@ -34,11 +34,11 @@ export async function GET() {
         () =>
           resolve({
             connected: false,
-            error: "Connection attempt timed out (> 3s).",
+            error: "Connection attempt timed out (> 8s).",
             atlasHint:
               "MongoDB Atlas Network Access: Please whitelist '0.0.0.0/0' (Allow Access From Anywhere) in MongoDB Atlas under Security -> Network Access.",
           }),
-        3000
+        8000
       )
     );
 
