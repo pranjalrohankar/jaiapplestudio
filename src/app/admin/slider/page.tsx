@@ -283,34 +283,36 @@ export default function AdminSliderManager() {
       )}
 
       {/* 1. Header & Actions */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 sm:p-6 rounded-2xl border border-gray-100 shadow-sm">
         <div>
           <div className="flex items-center gap-2">
             <span className="bg-purple-100 text-purple-800 text-xs font-bold px-2.5 py-0.5 rounded-md">
               Top of Homepage
             </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">
+            <h2 className="text-xl sm:text-3xl font-extrabold tracking-tight text-gray-900">
               🎠 Top Hero Slider
             </h2>
           </div>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">
             Manage the full-width promotional posters and device showcases displayed at the top of your homepage.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
           <button
             type="button"
             onClick={handleStartAddBanner}
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-sm transition cursor-pointer"
+            className="flex-1 sm:flex-initial justify-center inline-flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-sm transition cursor-pointer"
           >
-            🖼️ + Add Full Banner
+            <span>🖼️</span>
+            <span>+ Add Full Banner</span>
           </button>
           <button
             type="button"
             onClick={handleStartAddShowcase}
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-black hover:bg-gray-800 text-white text-xs sm:text-sm font-bold rounded-xl shadow-sm transition cursor-pointer"
+            className="flex-1 sm:flex-initial justify-center inline-flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 bg-black hover:bg-gray-800 text-white text-xs sm:text-sm font-bold rounded-xl shadow-sm transition cursor-pointer"
           >
-            📱 + Add Showcase
+            <span>📱</span>
+            <span>+ Add Showcase</span>
           </button>
         </div>
       </div>
@@ -419,7 +421,7 @@ export default function AdminSliderManager() {
                   </div>
 
                   {/* Right: Actions */}
-                  <div className="flex items-center justify-end gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-100">
+                  <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-100 w-full sm:w-auto">
                     <button
                       type="button"
                       onClick={() => handleToggleSlideActive(index)}
@@ -463,19 +465,19 @@ export default function AdminSliderManager() {
       {/* POPUP MODAL SLIDE EDITOR (Fixed on screen — NO SCROLLING UP REQUIRED!) */}
       {/* ========================================================================= */}
       {editingSlide && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-sm overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-6 bg-black/60 backdrop-blur-sm overflow-y-auto">
           <div
-            className="relative w-full max-w-3xl bg-white rounded-3xl shadow-2xl border border-gray-100 my-auto overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+            className="relative w-full max-w-3xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-gray-100 my-auto overflow-hidden animate-in fade-in zoom-in-95 duration-150"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="sticky top-0 z-20 bg-white/95 backdrop-blur px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <div className="sticky top-0 z-20 bg-white/95 backdrop-blur px-4 sm:px-6 py-3.5 sm:py-4 border-b border-gray-100 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold text-lg">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold text-lg shrink-0">
                   🎠
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900 leading-tight">
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 leading-tight">
                     {editingIndex === -1
                       ? isEditingBanner
                         ? "Add New Full-Width Banner"
@@ -494,7 +496,7 @@ export default function AdminSliderManager() {
                   setEditingSlide(null);
                   setEditingIndex(null);
                 }}
-                className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-900 flex items-center justify-center font-semibold text-sm transition"
+                className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-900 flex items-center justify-center font-semibold text-sm transition cursor-pointer"
                 title="Close (Esc)"
               >
                 ✕
@@ -503,7 +505,7 @@ export default function AdminSliderManager() {
 
             {/* Modal Form */}
             <form onSubmit={handleSaveSlideForm}>
-              <div className="p-6 space-y-6 max-h-[calc(85vh-140px)] overflow-y-auto">
+              <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 max-h-[calc(88vh-130px)] overflow-y-auto">
                 {/* Layout Mode Selector */}
                 <div className="space-y-2">
                   <label className="block text-xs font-bold uppercase text-gray-700">
@@ -796,21 +798,21 @@ export default function AdminSliderManager() {
               </div>
 
               {/* Modal Sticky Footer */}
-              <div className="sticky bottom-0 z-20 bg-gray-50 px-6 py-4 border-t border-gray-200 flex items-center justify-end gap-3 rounded-b-3xl">
+              <div className="sticky bottom-0 z-20 bg-gray-50 px-4 sm:px-6 py-3.5 sm:py-4 border-t border-gray-200 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5 sm:gap-3 rounded-b-2xl sm:rounded-b-3xl">
                 <button
                   type="button"
                   onClick={() => {
                     setEditingSlide(null);
                     setEditingIndex(null);
                   }}
-                  className="px-5 py-2.5 rounded-xl border border-gray-300 bg-white hover:bg-gray-100 text-gray-700 font-semibold text-sm transition"
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-gray-300 bg-white hover:bg-gray-100 text-gray-700 font-semibold text-sm transition text-center cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving || uploading}
-                  className="px-6 py-2.5 rounded-xl bg-gray-950 hover:bg-black text-white font-semibold text-sm shadow-md transition disabled:opacity-50 flex items-center gap-2 cursor-pointer"
+                  className="w-full sm:w-auto justify-center px-6 py-2.5 rounded-xl bg-gray-950 hover:bg-black text-white font-semibold text-sm shadow-md transition disabled:opacity-50 flex items-center gap-2 cursor-pointer"
                 >
                   {saving && (
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />

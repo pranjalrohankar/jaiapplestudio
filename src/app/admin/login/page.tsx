@@ -32,16 +32,16 @@ function AdminLoginContent() {
   }
 
   return (
-    <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-b from-[#16171b] via-[#121316] to-[#0d0e11] p-8 sm:p-12 text-white shadow-2xl ring-1 ring-white/10">
+    <div className="relative overflow-hidden rounded-3xl sm:rounded-[2.5rem] bg-gradient-to-b from-[#16171b] via-[#121316] to-[#0d0e11] p-5 sm:p-12 text-white shadow-2xl ring-1 ring-white/10">
       {/* Ambient background blur */}
       <div className="pointer-events-none absolute -left-20 -top-20 h-64 w-64 rounded-full bg-blue-600/20 blur-3xl" />
       <div className="pointer-events-none absolute -right-20 -bottom-20 h-64 w-64 rounded-full bg-purple-600/20 blur-3xl" />
 
       <div className="relative z-10">
         {/* Header */}
-        <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center justify-center mb-4 group">
-            <div className="relative h-24 w-20 sm:h-28 sm:w-24 shrink-0 transition group-hover:scale-105">
+        <div className="text-center mb-6 sm:mb-8">
+          <Link href="/" className="inline-flex items-center justify-center mb-3 sm:mb-4 group">
+            <div className="relative h-20 w-16 sm:h-28 sm:w-24 shrink-0 transition group-hover:scale-105">
               <Image
                 src="/images/logo-transparent.png"
                 alt="Jai Apple Store Logo"
@@ -57,10 +57,10 @@ function AdminLoginContent() {
               RESTRICTED ACCESS
             </div>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+          <h1 className="text-xl sm:text-3xl font-extrabold tracking-tight text-white">
             Jai Apple Store Admin
           </h1>
-          <p className="mt-2 text-xs sm:text-sm text-white/80">
+          <p className="mt-1.5 sm:mt-2 text-xs sm:text-sm text-white/80">
             Sign in with store administrator credentials to manage orders, products &amp; banners
           </p>
         </div>

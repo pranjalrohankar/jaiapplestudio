@@ -365,15 +365,15 @@ export default function AdminEnquiriesPage() {
       )}
 
       {/* Header & Action Controls */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 sm:p-7 rounded-3xl border border-gray-100 shadow-xs">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 sm:p-7 rounded-2xl sm:rounded-3xl border border-gray-100 shadow-xs">
         <div>
           <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-            <span className="text-xs font-bold uppercase tracking-wider bg-blue-50 text-blue-700 px-3 py-1 rounded-full border border-blue-200/60">
+            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider bg-blue-50 text-blue-700 px-2.5 sm:px-3 py-1 rounded-full border border-blue-200/60">
               Unified Leads &amp; Orders Manager
             </span>
             <button
               onClick={() => setAutoSync(!autoSync)}
-              className={`text-xs font-bold px-3 py-1 rounded-full border transition flex items-center gap-1.5 cursor-pointer ${
+              className={`text-[11px] sm:text-xs font-bold px-2.5 sm:px-3 py-1 rounded-full border transition flex items-center gap-1.5 cursor-pointer ${
                 autoSync
                   ? "bg-emerald-50 text-emerald-800 border-emerald-200"
                   : "bg-gray-100 text-gray-600 border-gray-200"
@@ -388,7 +388,7 @@ export default function AdminEnquiriesPage() {
               </span>
             )}
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
+          <h1 className="text-xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
             Customer Enquiries &amp; Orders
           </h1>
           <p className="text-xs sm:text-sm text-gray-500 mt-1">
@@ -396,12 +396,12 @@ export default function AdminEnquiriesPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5 flex-wrap">
+        <div className="flex items-center gap-2 sm:gap-2.5 w-full sm:w-auto">
           <button
             type="button"
             onClick={() => fetchEnquiries()}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3.5 py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 shadow-xs transition cursor-pointer"
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3.5 py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 shadow-xs transition cursor-pointer"
           >
             <span>🔄</span>
             <span>{loading ? "Refreshing..." : "Refresh"}</span>
@@ -411,7 +411,7 @@ export default function AdminEnquiriesPage() {
             type="button"
             onClick={exportToCSV}
             disabled={enquiries.length === 0}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-gray-900 px-4 py-2 text-xs font-bold text-white hover:bg-gray-800 shadow-xs transition cursor-pointer disabled:opacity-50"
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 rounded-xl bg-gray-900 px-4 py-2 text-xs font-bold text-white hover:bg-gray-800 shadow-xs transition cursor-pointer disabled:opacity-50"
           >
             <span>📥</span>
             <span>Export CSV</span>
@@ -420,41 +420,41 @@ export default function AdminEnquiriesPage() {
       </div>
 
       {/* KPI Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="rounded-2xl bg-white p-5 border border-gray-200/80 shadow-xs">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+        <div className="rounded-xl sm:rounded-2xl bg-white p-3.5 sm:p-5 border border-gray-200/80 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Total Leads</span>
-            <span className="text-lg">💬</span>
+            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-gray-400">Total Leads</span>
+            <span className="text-base sm:text-lg">💬</span>
           </div>
-          <p className="text-3xl font-extrabold text-gray-900 mt-2">{totalCount}</p>
-          <p className="text-xs text-gray-400 mt-0.5">All customer submissions</p>
+          <p className="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-1 sm:mt-2">{totalCount}</p>
+          <p className="text-[11px] sm:text-xs text-gray-400 mt-0.5">All customer submissions</p>
         </div>
 
-        <div className="rounded-2xl bg-emerald-50/40 p-5 border border-emerald-200 shadow-xs">
+        <div className="rounded-xl sm:rounded-2xl bg-emerald-50/40 p-3.5 sm:p-5 border border-emerald-200 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">Cart Orders</span>
-            <span className="text-lg">🛒</span>
+            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-emerald-700">Cart Orders</span>
+            <span className="text-base sm:text-lg">🛒</span>
           </div>
-          <p className="text-3xl font-extrabold text-emerald-700 mt-2">{cartOrdersCount}</p>
-          <p className="text-xs text-emerald-600/80 mt-0.5">Direct cart checkouts</p>
+          <p className="text-2xl sm:text-3xl font-extrabold text-emerald-700 mt-1 sm:mt-2">{cartOrdersCount}</p>
+          <p className="text-[11px] sm:text-xs text-emerald-600/80 mt-0.5">Direct cart checkouts</p>
         </div>
 
-        <div className="rounded-2xl bg-blue-50/40 p-5 border border-blue-200 shadow-xs">
+        <div className="rounded-xl sm:rounded-2xl bg-blue-50/40 p-3.5 sm:p-5 border border-blue-200 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-blue-700">New Leads</span>
-            <span className="text-lg">⚡</span>
+            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-blue-700">New Leads</span>
+            <span className="text-base sm:text-lg">⚡</span>
           </div>
-          <p className="text-3xl font-extrabold text-blue-700 mt-2">{newCount}</p>
-          <p className="text-xs text-blue-600/80 mt-0.5">Awaiting follow-up</p>
+          <p className="text-2xl sm:text-3xl font-extrabold text-blue-700 mt-1 sm:mt-2">{newCount}</p>
+          <p className="text-[11px] sm:text-xs text-blue-600/80 mt-0.5">Awaiting follow-up</p>
         </div>
 
-        <div className="rounded-2xl bg-purple-50/40 p-5 border border-purple-200 shadow-xs">
+        <div className="rounded-xl sm:rounded-2xl bg-purple-50/40 p-3.5 sm:p-5 border border-purple-200 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-purple-700">Converted / Closed</span>
-            <span className="text-lg">🎉</span>
+            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-purple-700">Converted</span>
+            <span className="text-base sm:text-lg">🎉</span>
           </div>
-          <p className="text-3xl font-extrabold text-purple-700 mt-2">{convertedCount}</p>
-          <p className="text-xs text-purple-700/80 mt-0.5">Successful sales</p>
+          <p className="text-2xl sm:text-3xl font-extrabold text-purple-700 mt-1 sm:mt-2">{convertedCount}</p>
+          <p className="text-[11px] sm:text-xs text-purple-700/80 mt-0.5">Successful sales</p>
         </div>
       </div>
 
@@ -557,7 +557,8 @@ export default function AdminEnquiriesPage() {
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <>
+            <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left text-xs sm:text-sm border-collapse">
               <thead>
                 <tr className="border-b border-gray-200 bg-gray-50/80 text-[11px] font-bold uppercase tracking-wider text-gray-500">
@@ -803,16 +804,233 @@ export default function AdminEnquiriesPage() {
               </tbody>
             </table>
           </div>
-        )}
+
+          {/* Mobile Touch Cards View (Shown on < md screens) */}
+          <div className="md:hidden divide-y divide-gray-100">
+            {filteredEnquiries.map((enquiry) => {
+              const statusConfig = STATUS_COLORS[enquiry.status] || STATUS_COLORS.New;
+              const sourceConfig = SOURCE_LABELS[enquiry.source || ""] || SOURCE_LABELS.contact_page;
+              const isUpdating = updatingId === enquiry.enquiryNo;
+              const isEditingNote = editingNoteId === enquiry.enquiryNo;
+              const hasCartItems = Array.isArray(enquiry.items) && enquiry.items.length > 0;
+
+              return (
+                <div
+                  key={enquiry.enquiryNo}
+                  className={`p-4 space-y-3 transition ${
+                    enquiry.status === "New" ? "bg-blue-50/20" : "bg-white"
+                  }`}
+                >
+                  {/* Top Row: Ref, Date, Source & Status */}
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="font-mono font-bold text-xs text-gray-900 bg-gray-100 px-2 py-0.5 rounded-md">
+                          {enquiry.enquiryNo}
+                        </span>
+                        <span
+                          className={`inline-flex items-center gap-1 text-[10px] uppercase font-bold px-2 py-0.5 rounded-full border ${sourceConfig.bg} ${sourceConfig.text}`}
+                        >
+                          <span>{sourceConfig.icon}</span>
+                          <span>{sourceConfig.label}</span>
+                        </span>
+                      </div>
+                      <div className="text-[11px] text-gray-500 mt-1">
+                        {formatEnquiryDate(enquiry.createdAt || enquiry.date)}
+                      </div>
+                    </div>
+
+                    {/* Status Dropdown */}
+                    <div className="relative inline-block shrink-0">
+                      <select
+                        disabled={isUpdating}
+                        value={enquiry.status}
+                        onChange={(e) =>
+                          handleStatusChange(enquiry.enquiryNo, e.target.value as EnquiryStatus)
+                        }
+                        className={`appearance-none font-bold text-xs pl-6 pr-6 py-1.5 rounded-full border cursor-pointer outline-none transition ${statusConfig.bg} ${statusConfig.border}`}
+                      >
+                        {STATUS_OPTIONS.map((st) => (
+                          <option key={st} value={st}>
+                            {st}
+                          </option>
+                        ))}
+                      </select>
+                      <span
+                        className={`absolute left-2.5 top-2.5 w-2 h-2 rounded-full ${statusConfig.dot}`}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Customer Info Card */}
+                  <div className="bg-gray-50/90 rounded-2xl p-3 border border-gray-100 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="font-extrabold text-sm text-gray-900">{enquiry.name}</span>
+                      {enquiry.city && (
+                        <span className="text-xs text-gray-500 flex items-center gap-1">
+                          <span>📍</span>
+                          <span>{enquiry.city}</span>
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center justify-between text-xs pt-0.5">
+                      <a
+                        href={`tel:${enquiry.phone.replace(/[^0-9+]/g, "")}`}
+                        className="font-mono font-bold text-blue-600 hover:underline flex items-center gap-1"
+                      >
+                        <span>📞</span>
+                        <span>{enquiry.phone}</span>
+                      </a>
+                      {enquiry.email && (
+                        <span className="text-gray-400 truncate max-w-[150px]">
+                          {enquiry.email}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Order / Enquiry Content */}
+                  {hasCartItems ? (
+                    <div className="bg-emerald-50/40 border border-emerald-200/70 rounded-2xl p-3 space-y-1">
+                      <div className="flex items-center justify-between font-bold text-xs text-emerald-950">
+                        <span className="flex items-center gap-1">
+                          <span>🛒</span>
+                          <span>{enquiry.items!.length} item{enquiry.items!.length > 1 ? "s" : ""}</span>
+                        </span>
+                        {enquiry.totalDisplay && (
+                          <span className="text-emerald-700 font-extrabold text-xs">
+                            {enquiry.totalDisplay}
+                          </span>
+                        )}
+                      </div>
+                      <ul className="text-xs text-gray-700 space-y-0.5 pt-0.5">
+                        {enquiry.items!.map((item, idx) => (
+                          <li key={idx} className="truncate">
+                            • {item.qty}x <strong>{item.name}</strong> {item.variant ? `(${item.variant})` : ""}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : (
+                    <div className="bg-blue-50/30 border border-blue-100 rounded-2xl p-3">
+                      <div className="font-bold text-xs text-gray-900">
+                        {enquiry.product || enquiry.productName || "General Store Enquiry"}
+                      </div>
+                      {(enquiry.preferredVariant || enquiry.preferredColor) && (
+                        <div className="text-xs text-gray-500 mt-0.5">
+                          {[enquiry.preferredVariant, enquiry.preferredColor].filter(Boolean).join(" • ")}
+                        </div>
+                      )}
+                      {enquiry.budget && (
+                        <div className="text-xs text-emerald-700 font-semibold mt-0.5">
+                          Budget: {enquiry.budget}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Customer Message snippet */}
+                  {enquiry.message && (
+                    <div className="text-xs text-gray-600 bg-gray-50 p-2.5 rounded-xl border border-gray-100 leading-relaxed">
+                      <span className="font-bold text-[10px] uppercase text-gray-400 block mb-0.5">Customer Note:</span>
+                      <p className="line-clamp-2">{enquiry.message}</p>
+                    </div>
+                  )}
+
+                  {/* Admin Remark */}
+                  <div>
+                    {isEditingNote ? (
+                      <div className="space-y-1.5">
+                        <textarea
+                          rows={2}
+                          value={noteDraft}
+                          onChange={(e) => setNoteDraft(e.target.value)}
+                          placeholder="Write admin follow-up note..."
+                          className="w-full text-xs p-2 rounded-lg border border-blue-400 bg-white outline-none"
+                          autoFocus
+                        />
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => handleSaveNote(enquiry.enquiryNo)}
+                            className="px-2.5 py-1 rounded bg-blue-600 text-white font-bold text-xs cursor-pointer"
+                          >
+                            Save
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setEditingNoteId(null)}
+                            className="px-2.5 py-1 rounded bg-gray-200 text-gray-700 text-xs cursor-pointer"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div
+                        onClick={() => {
+                          setEditingNoteId(enquiry.enquiryNo);
+                          setNoteDraft(enquiry.adminNote || "");
+                        }}
+                        className="text-xs p-2 rounded-xl bg-amber-50/50 border border-amber-200/50 text-amber-900 cursor-pointer flex items-center justify-between"
+                      >
+                        <span className="italic truncate mr-2">
+                          {enquiry.adminNote || "+ Add follow-up remark"}
+                        </span>
+                        <span className="text-[11px] text-amber-600 shrink-0 font-semibold">✏️ Edit</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Mobile Action Buttons Bar */}
+                  <div className="grid grid-cols-4 gap-2 pt-2 border-t border-gray-100">
+                    <a
+                      href={getCustomerWhatsAppLink(enquiry)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-1 py-2 px-1 rounded-xl bg-emerald-600 text-white font-bold text-xs shadow-2xs hover:bg-emerald-700 transition"
+                    >
+                      <WhatsAppIcon width={14} height={14} />
+                      <span>Chat</span>
+                    </a>
+                    <a
+                      href={`tel:${enquiry.phone.replace(/[^0-9+]/g, "")}`}
+                      className="flex items-center justify-center gap-1 py-2 px-1 rounded-xl bg-blue-600 text-white font-bold text-xs shadow-2xs hover:bg-blue-700 transition"
+                    >
+                      <PhoneIcon width={14} height={14} />
+                      <span>Call</span>
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedEnquiry(enquiry)}
+                      className="flex items-center justify-center gap-1 py-2 px-1 rounded-xl bg-gray-100 text-gray-800 font-bold text-xs hover:bg-gray-200 transition cursor-pointer"
+                    >
+                      <span>🔍 View</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteEnquiry(enquiry.enquiryNo)}
+                      className="flex items-center justify-center gap-1 py-2 px-1 rounded-xl bg-rose-50 text-rose-600 font-bold text-xs hover:bg-rose-100 transition cursor-pointer"
+                    >
+                      <TrashIcon width={13} height={13} />
+                      <span>Delete</span>
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
       </div>
 
       {/* Detail View Modal */}
       {selectedEnquiry && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-fadeIn">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-gray-100 max-h-[90vh] overflow-y-auto space-y-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white rounded-2xl sm:rounded-3xl max-w-2xl w-full p-4 sm:p-8 shadow-2xl border border-gray-100 max-h-[92vh] overflow-y-auto space-y-5 sm:space-y-6">
             <div className="flex items-center justify-between pb-4 border-b border-gray-100">
               <div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                   <span className="font-mono text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
                     {selectedEnquiry.enquiryNo}
                   </span>
@@ -831,14 +1049,14 @@ export default function AdminEnquiriesPage() {
                     {SOURCE_LABELS[selectedEnquiry.source || ""]?.label || selectedEnquiry.source}
                   </span>
                 </div>
-                <h3 className="text-xl font-extrabold text-gray-900 mt-1">
+                <h3 className="text-lg sm:text-xl font-extrabold text-gray-900 mt-1">
                   {selectedEnquiry.name}
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setSelectedEnquiry(null)}
-                className="p-2 rounded-full hover:bg-gray-100 text-gray-500 cursor-pointer"
+                className="p-2 rounded-full hover:bg-gray-100 text-gray-500 cursor-pointer shrink-0"
               >
                 <CloseIcon width={20} height={20} />
               </button>
@@ -939,19 +1157,19 @@ export default function AdminEnquiriesPage() {
             </div>
 
             {/* Quick Actions in Modal */}
-            <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
+            <div className="flex flex-col sm:flex-row items-center gap-2.5 sm:gap-3 pt-4 border-t border-gray-100">
               <a
                 href={getCustomerWhatsAppLink(selectedEnquiry)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 btn-wa text-center justify-center py-3 text-sm font-bold shadow-md cursor-pointer"
+                className="w-full sm:flex-1 btn-wa text-center justify-center py-3 text-sm font-bold shadow-md cursor-pointer"
               >
                 <WhatsAppIcon width={18} height={18} />
                 Chat on WhatsApp
               </a>
               <a
                 href={`tel:${selectedEnquiry.phone.replace(/[^0-9+]/g, "")}`}
-                className="flex-1 inline-flex items-center justify-center gap-2 rounded-full bg-gray-900 text-white py-3 text-sm font-bold hover:bg-gray-800 transition cursor-pointer"
+                className="w-full sm:flex-1 inline-flex items-center justify-center gap-2 rounded-full bg-gray-900 text-white py-3 text-sm font-bold hover:bg-gray-800 transition cursor-pointer"
               >
                 <PhoneIcon width={18} height={18} />
                 Call Customer

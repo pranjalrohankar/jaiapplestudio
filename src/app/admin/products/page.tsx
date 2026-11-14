@@ -729,26 +729,26 @@ export default function ProductsManager() {
       )}
 
       {/* Header Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 sm:p-6 rounded-2xl border border-gray-100 shadow-sm">
         <div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
+          <h2 className="text-xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
             Products Catalog
           </h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">
             Manage your store devices, pricing, images, Coming Soon alerts, and Pre-Order bookings.
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 w-full sm:w-auto">
           {/* Export CSV Button */}
           <button
             type="button"
             onClick={() => handleExportCSV(false)}
-            className="bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 font-semibold px-4 py-2.5 rounded-xl shadow-xs transition flex items-center gap-2 text-sm cursor-pointer"
+            className="flex-1 sm:flex-initial justify-center bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 font-semibold px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl shadow-xs transition flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm cursor-pointer"
             title={`Export all ${data.products.length} products to CSV`}
           >
-            <span className="text-base">📥</span>
+            <span className="text-sm sm:text-base">📥</span>
             <span>Export CSV</span>
-            <span className="text-[11px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-md font-mono">
+            <span className="text-[10px] sm:text-[11px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-md font-mono">
               {data.products.length}
             </span>
           </button>
@@ -763,10 +763,10 @@ export default function ProductsManager() {
               setConfirmReplace(false);
               setShowImportModal(true);
             }}
-            className="bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 font-semibold px-4 py-2.5 rounded-xl shadow-xs transition flex items-center gap-2 text-sm cursor-pointer"
+            className="flex-1 sm:flex-initial justify-center bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 font-semibold px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl shadow-xs transition flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm cursor-pointer"
             title="Import or bulk update products from a CSV file"
           >
-            <span className="text-base">📤</span>
+            <span className="text-sm sm:text-base">📤</span>
             <span>Import CSV</span>
           </button>
 
@@ -786,9 +786,9 @@ export default function ProductsManager() {
                 colors: [],
               });
             }}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2.5 rounded-xl shadow-sm hover:shadow transition flex items-center justify-center gap-2 shrink-0 cursor-pointer text-sm"
+            className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 sm:px-5 py-2.5 rounded-xl shadow-sm hover:shadow transition flex items-center justify-center gap-2 shrink-0 cursor-pointer text-xs sm:text-sm"
           >
-            <span className="text-lg leading-none">+</span>
+            <span className="text-base sm:text-lg leading-none">+</span>
             <span>Add Product</span>
           </button>
         </div>
@@ -924,7 +924,8 @@ export default function ProductsManager() {
 
       {/* Products Table (Always in place so scroll position is never lost) */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Desktop Table View (>= md screens) */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-gray-50/80 border-b border-gray-200 text-xs font-bold uppercase tracking-wider text-gray-500">
@@ -1123,20 +1124,185 @@ export default function ProductsManager() {
             </tbody>
           </table>
         </div>
+
+        {/* Mobile Products Card List (< md screens) */}
+        <div className="md:hidden divide-y divide-gray-100">
+          {filteredProducts.length === 0 ? (
+            <div className="py-12 text-center text-gray-400 text-sm">
+              No products match your criteria.
+            </div>
+          ) : (
+            filteredProducts.map((p) => {
+              const b = (p.badge || "").toLowerCase();
+              const isComingSoon = b.includes("coming soon") || p.price?.toLowerCase().includes("coming soon");
+              const isPreOrder = b.includes("pre-order") || b.includes("preorder");
+              const isNew = b.includes("new");
+
+              return (
+                <div key={p.slug} className="p-4 space-y-3 bg-white">
+                  {/* Top row: Thumbnail + Details */}
+                  <div className="flex items-start gap-3">
+                    <div className="h-16 w-16 rounded-xl bg-gray-50 border border-gray-200/80 flex items-center justify-center p-1.5 shrink-0 overflow-hidden">
+                      {p.image ? (
+                        <img
+                          src={p.image}
+                          alt={p.name}
+                          className="object-contain max-h-full max-w-full"
+                        />
+                      ) : (
+                        <span className="text-2xl opacity-30">📱</span>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-1">
+                        <h4 className="font-extrabold text-sm text-gray-900 leading-snug">
+                          {p.name}
+                        </h4>
+                        <span
+                          className={`shrink-0 font-extrabold text-sm ${
+                            isComingSoon
+                              ? "text-purple-700"
+                              : isPreOrder
+                              ? "text-blue-700"
+                              : "text-gray-900"
+                          }`}
+                        >
+                          {p.price}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2 mt-1 flex-wrap">
+                        <span className="bg-gray-100 text-gray-700 text-[10px] font-bold px-2 py-0.5 rounded capitalize">
+                          {p.category}
+                        </span>
+                        <span className="text-[11px] font-mono text-gray-400">/{p.slug}</span>
+                        <a
+                          href={`/product/${encodeURIComponent(p.slug)}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded hover:bg-blue-100 transition inline-flex items-center gap-0.5"
+                        >
+                          Live ↗
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Middle row: Priority reorder buttons & Status selector */}
+                  <div className="flex items-center justify-between gap-2 pt-1 border-t border-gray-100">
+                    <div className="inline-flex items-center gap-1 bg-gray-50 border border-gray-200 rounded-xl p-1 shadow-2xs">
+                      <button
+                        type="button"
+                        onClick={() => handleMoveProduct(p.slug, "top")}
+                        title="Move to Top (#1 Priority on Site)"
+                        className="px-2 py-1 text-[11px] font-bold text-blue-600 bg-white border border-blue-200/80 rounded-lg shadow-2xs cursor-pointer flex items-center gap-1"
+                      >
+                        <span>🔝</span>
+                        <span>Top</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleMoveProduct(p.slug, "up")}
+                        title="Move Up"
+                        className="p-1 text-xs text-gray-700 bg-white border border-gray-200 rounded-lg cursor-pointer"
+                      >
+                        ▲
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleMoveProduct(p.slug, "down")}
+                        title="Move Down"
+                        className="p-1 text-xs text-gray-700 bg-white border border-gray-200 rounded-lg cursor-pointer"
+                      >
+                        ▼
+                      </button>
+                    </div>
+
+                    {/* Status dropdown */}
+                    <select
+                      value={
+                        isComingSoon
+                          ? "coming-soon"
+                          : isPreOrder
+                          ? "pre-order"
+                          : isNew
+                          ? "new"
+                          : p.badge
+                          ? "custom"
+                          : "in-stock"
+                      }
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === "coming-soon") handleQuickStatusChange(p.slug, "Coming Soon");
+                        else if (val === "pre-order") handleQuickStatusChange(p.slug, "Pre-Order");
+                        else if (val === "new") handleQuickStatusChange(p.slug, "New");
+                        else if (val === "in-stock") handleQuickStatusChange(p.slug, "");
+                      }}
+                      className={`rounded-full px-2.5 py-1.5 text-xs font-bold border cursor-pointer outline-none shadow-2xs ${
+                        isComingSoon
+                          ? "bg-purple-100 text-purple-800 border-purple-300"
+                          : isPreOrder
+                          ? "bg-blue-100 text-blue-800 border-blue-300"
+                          : isNew
+                          ? "bg-amber-100 text-amber-800 border-amber-300"
+                          : p.badge
+                          ? "bg-gray-100 text-gray-800 border-gray-300"
+                          : "bg-emerald-50 text-emerald-700 border-emerald-200"
+                      }`}
+                    >
+                      <option value="in-stock">🟢 In Stock</option>
+                      <option value="coming-soon">🟣 Coming Soon</option>
+                      <option value="pre-order">🔵 Pre-Order</option>
+                      <option value="new">⭐ New Launch</option>
+                      {p.badge && !isComingSoon && !isPreOrder && !isNew && (
+                        <option value="custom">🏷️ {p.badge}</option>
+                      )}
+                    </select>
+                  </div>
+
+                  {/* Bottom row: Action Buttons */}
+                  <div className="grid grid-cols-3 gap-2 pt-1">
+                    <button
+                      onClick={() => {
+                        setPinToTop(false);
+                        setEditing(p);
+                      }}
+                      className="w-full py-2 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white font-bold text-xs rounded-xl transition text-center cursor-pointer shadow-2xs"
+                    >
+                      ✏️ Edit
+                    </button>
+                    <button
+                      onClick={() => handleDuplicate(p)}
+                      className="w-full py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs rounded-xl transition text-center cursor-pointer"
+                    >
+                      📋 Clone
+                    </button>
+                    <button
+                      onClick={() => handleDelete(p.slug)}
+                      className="w-full py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs rounded-xl transition text-center cursor-pointer"
+                    >
+                      🗑️ Delete
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
       </div>
 
       {/* ========================================================================= */}
       {/* POPUP MODAL PRODUCT EDITOR (Fixed on screen — NO SCROLLING UP REQUIRED!) */}
       {/* ========================================================================= */}
       {editing && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-sm overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-6 bg-black/60 backdrop-blur-sm overflow-y-auto">
           {/* Modal Container */}
           <div
-            className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-gray-100 my-auto overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+            className="relative w-full max-w-4xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-gray-100 my-auto overflow-hidden animate-in fade-in zoom-in-95 duration-150"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="sticky top-0 z-20 bg-white/95 backdrop-blur px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <div className="sticky top-0 z-20 bg-white/95 backdrop-blur px-4 sm:px-6 py-3.5 sm:py-4 border-b border-gray-100 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-lg">
                   {editing.name ? "✏️" : "✨"}
@@ -2165,20 +2331,20 @@ export default function ProductsManager() {
               </div>
 
               {/* Modal Sticky Footer */}
-              <div className="sticky bottom-0 z-20 bg-gray-50 px-6 py-4 border-t border-gray-200 flex flex-wrap items-center justify-between gap-3 rounded-b-3xl">
+              <div className="sticky bottom-0 z-20 bg-gray-50 px-4 sm:px-6 py-3.5 sm:py-4 border-t border-gray-200 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3 rounded-b-2xl sm:rounded-b-3xl">
                 <button
                   type="button"
                   onClick={() => setEditing(null)}
-                  className="px-5 py-2.5 rounded-xl border border-gray-300 bg-white hover:bg-gray-100 text-gray-700 font-semibold text-sm transition cursor-pointer"
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-gray-300 bg-white hover:bg-gray-100 text-gray-700 font-semibold text-sm transition cursor-pointer text-center"
                 >
                   Cancel
                 </button>
-                <div className="flex items-center gap-2.5">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2.5">
                   <button
                     type="button"
                     disabled={saving}
                     onClick={() => handleSave(undefined, true)}
-                    className="px-4 py-2.5 rounded-xl border border-blue-300 bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold text-xs sm:text-sm transition flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                    className="justify-center px-4 py-2.5 rounded-xl border border-blue-300 bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold text-xs sm:text-sm transition flex items-center gap-1.5 cursor-pointer shadow-2xs"
                     title="Save changes and immediately pin to #1 Top position"
                   >
                     <span>🔝</span>
@@ -2187,7 +2353,7 @@ export default function ProductsManager() {
                   <button
                     type="submit"
                     disabled={saving}
-                    className="px-6 py-2.5 rounded-xl bg-gray-950 hover:bg-black text-white font-semibold text-sm shadow-md transition disabled:opacity-50 flex items-center gap-2 cursor-pointer"
+                    className="justify-center px-6 py-2.5 rounded-xl bg-gray-950 hover:bg-black text-white font-semibold text-sm shadow-md transition disabled:opacity-50 flex items-center gap-2 cursor-pointer"
                   >
                     {saving && (
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -2204,19 +2370,19 @@ export default function ProductsManager() {
       {/* BULK CSV IMPORT MODAL */}
       {showImportModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-md animate-fadeIn"
+          className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-6 bg-black/60 backdrop-blur-md animate-fadeIn"
           onClick={() => {
             if (!importing) setShowImportModal(false);
           }}
         >
           <div
-            className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[92vh] animate-scaleUp"
+            className="relative w-full max-w-4xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[92vh] animate-scaleUp"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="bg-gradient-to-r from-gray-900 to-gray-950 px-6 sm:px-8 py-5 text-white flex items-center justify-between">
+            <div className="bg-gradient-to-r from-gray-900 to-gray-950 px-4 sm:px-8 py-4 sm:py-5 text-white flex items-center justify-between">
               <div>
-                <h3 className="text-xl font-bold flex items-center gap-2">
+                <h3 className="text-lg sm:text-xl font-bold flex items-center gap-2">
                   <span>📤</span> Bulk Products Import (CSV)
                 </h3>
                 <p className="text-xs text-gray-300 mt-1">
@@ -2234,7 +2400,7 @@ export default function ProductsManager() {
             </div>
 
             {/* Modal Body */}
-            <div className="p-6 sm:p-8 space-y-6 overflow-y-auto flex-1">
+            <div className="p-4 sm:p-8 space-y-4 sm:space-y-6 overflow-y-auto flex-1">
               {/* Template & Guidelines Banner */}
               <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="space-y-1 text-xs text-blue-900">

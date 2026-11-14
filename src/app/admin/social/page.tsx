@@ -200,24 +200,24 @@ export default function AdminSocialManager() {
       )}
 
       {/* 1. Header & Actions */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 sm:p-6 rounded-2xl border border-gray-100 shadow-sm">
         <div>
           <div className="flex items-center gap-2">
             <span className="bg-pink-100 text-pink-800 text-xs font-bold px-2.5 py-0.5 rounded-md">
               Store Footer
             </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">
+            <h2 className="text-xl sm:text-3xl font-extrabold tracking-tight text-gray-900">
               🌐 Social Media Accounts
             </h2>
           </div>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">
             Control which social media profiles appear in the footer of your website. Only enabled platforms are displayed.
           </p>
         </div>
         <button
           type="button"
           onClick={handleStartAdd}
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-black hover:bg-gray-800 text-white text-xs sm:text-sm font-bold rounded-xl shadow-sm transition cursor-pointer"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-black hover:bg-gray-800 text-white text-xs sm:text-sm font-bold rounded-xl shadow-sm transition cursor-pointer"
         >
           <span className="text-lg leading-none">+</span>
           <span>Add Social Account</span>
@@ -310,7 +310,7 @@ export default function AdminSocialManager() {
                   </div>
 
                   {/* Right: Actions */}
-                  <div className="flex items-center justify-end gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-100">
+                  <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-100 w-full sm:w-auto">
                     <button
                       type="button"
                       onClick={() => handleToggleLinkActive(index)}
@@ -381,19 +381,19 @@ export default function AdminSocialManager() {
       {/* POPUP MODAL SOCIAL PLATFORM EDITOR (Fixed on screen — NO SCROLLING UP REQUIRED!) */}
       {/* ========================================================================= */}
       {editingLink && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-sm overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-6 bg-black/60 backdrop-blur-sm overflow-y-auto">
           <div
-            className="relative w-full max-w-xl bg-white rounded-3xl shadow-2xl border border-gray-100 my-auto overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+            className="relative w-full max-w-xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-gray-100 my-auto overflow-hidden animate-in fade-in zoom-in-95 duration-150"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="sticky top-0 z-20 bg-white/95 backdrop-blur px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <div className="sticky top-0 z-20 bg-white/95 backdrop-blur px-4 sm:px-6 py-3.5 sm:py-4 border-b border-gray-100 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-pink-50 text-pink-600 flex items-center justify-center font-bold text-lg">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-pink-50 text-pink-600 flex items-center justify-center font-bold text-lg shrink-0">
                   🌐
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900 leading-tight">
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 leading-tight">
                     {editingIndex === -1 ? "Add Social Platform" : `Edit Platform: ${editingLink.platform}`}
                   </h3>
                   <p className="text-xs text-gray-500">
@@ -408,7 +408,7 @@ export default function AdminSocialManager() {
                   setEditingLink(null);
                   setEditingIndex(null);
                 }}
-                className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-900 flex items-center justify-center font-semibold text-sm transition"
+                className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-900 flex items-center justify-center font-semibold text-sm transition cursor-pointer"
                 title="Close (Esc)"
               >
                 ✕
@@ -417,7 +417,7 @@ export default function AdminSocialManager() {
 
             {/* Modal Form */}
             <form onSubmit={handleSaveLinkForm}>
-              <div className="p-6 space-y-6 max-h-[calc(85vh-140px)] overflow-y-auto">
+              <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 max-h-[calc(88vh-130px)] overflow-y-auto">
                 {/* Quick Presets */}
                 <div className="space-y-2 bg-gray-50/80 p-4 rounded-2xl border border-gray-200">
                   <span className="block text-xs font-bold uppercase text-gray-600">
@@ -498,21 +498,21 @@ export default function AdminSocialManager() {
               </div>
 
               {/* Modal Sticky Footer */}
-              <div className="sticky bottom-0 z-20 bg-gray-50 px-6 py-4 border-t border-gray-200 flex items-center justify-end gap-3 rounded-b-3xl">
+              <div className="sticky bottom-0 z-20 bg-gray-50 px-4 sm:px-6 py-3.5 sm:py-4 border-t border-gray-200 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5 sm:gap-3 rounded-b-2xl sm:rounded-b-3xl">
                 <button
                   type="button"
                   onClick={() => {
                     setEditingLink(null);
                     setEditingIndex(null);
                   }}
-                  className="px-5 py-2.5 rounded-xl border border-gray-300 bg-white hover:bg-gray-100 text-gray-700 font-semibold text-sm transition"
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-gray-300 bg-white hover:bg-gray-100 text-gray-700 font-semibold text-sm transition text-center cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-6 py-2.5 rounded-xl bg-gray-950 hover:bg-black text-white font-semibold text-sm shadow-md transition disabled:opacity-50 flex items-center gap-2 cursor-pointer"
+                  className="w-full sm:w-auto justify-center px-6 py-2.5 rounded-xl bg-gray-950 hover:bg-black text-white font-semibold text-sm shadow-md transition disabled:opacity-50 flex items-center gap-2 cursor-pointer"
                 >
                   {saving && (
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />

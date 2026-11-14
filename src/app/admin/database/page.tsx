@@ -89,42 +89,42 @@ export default function DatabaseSyncManager() {
       )}
 
       {/* Header Banner */}
-      <div className="bg-white p-6 sm:p-8 rounded-3xl border border-gray-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="bg-white p-4 sm:p-8 rounded-2xl sm:rounded-3xl border border-gray-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5 sm:gap-6">
         <div>
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider bg-blue-50 text-blue-700 px-3 py-1 rounded-full border border-blue-200/60">
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
+            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider bg-blue-50 text-blue-700 px-3 py-1 rounded-full border border-blue-200/60">
               MongoDB Atlas Sync &amp; Backend Health
             </span>
             {loading ? (
-              <span className="text-xs font-bold uppercase tracking-wider bg-gray-100 text-gray-600 px-3 py-1 rounded-full border border-gray-200 flex items-center gap-1.5">
+              <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider bg-gray-100 text-gray-600 px-3 py-1 rounded-full border border-gray-200 flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-gray-400 animate-pulse"></span>
                 Checking Connection...
               </span>
             ) : status?.connected ? (
-              <span className="text-xs font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full border border-emerald-200/60 flex items-center gap-1.5">
+              <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full border border-emerald-200/60 flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 Connected
               </span>
             ) : (
-              <span className="text-xs font-bold uppercase tracking-wider bg-amber-50 text-amber-800 px-3 py-1 rounded-full border border-amber-200/60 flex items-center gap-1.5">
+              <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider bg-amber-50 text-amber-800 px-3 py-1 rounded-full border border-amber-200/60 flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-amber-500"></span>
                 Connection Pending
               </span>
             )}
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
+          <h1 className="text-xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
             Database &amp; Backend Sync
           </h1>
-          <p className="mt-1.5 text-sm text-gray-500 max-w-2xl">
+          <p className="mt-1.5 text-xs sm:text-sm text-gray-500 max-w-2xl">
             Synchronize your local products catalog, hero sliders, offer banners, categories, and orders directly into your MongoDB Atlas cloud database.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 w-full md:w-auto">
           <button
             onClick={checkStatus}
             disabled={loading}
-            className="px-4 py-3 rounded-2xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-semibold text-sm transition cursor-pointer flex items-center gap-2"
+            className="w-full sm:w-auto justify-center px-4 py-2.5 sm:py-3 rounded-2xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-semibold text-xs sm:text-sm transition cursor-pointer flex items-center gap-2"
           >
             <span>🔄</span>
             <span>{loading ? "Checking..." : "Refresh Status"}</span>
@@ -133,7 +133,7 @@ export default function DatabaseSyncManager() {
           <button
             onClick={handleSyncAll}
             disabled={syncing}
-            className="px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md transition flex items-center gap-2 cursor-pointer disabled:opacity-50"
+            className="w-full sm:w-auto justify-center px-5 sm:px-6 py-2.5 sm:py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm shadow-md transition flex items-center gap-2 cursor-pointer disabled:opacity-50"
           >
             {syncing ? (
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -147,18 +147,18 @@ export default function DatabaseSyncManager() {
 
       {/* Diagnostics / IP Whitelist Notice (Only if check is complete and not connected) */}
       {!loading && status && !status.connected && (
-        <div className="bg-amber-50/80 border border-amber-200 rounded-3xl p-6 sm:p-7 shadow-xs">
-          <div className="flex items-start gap-4">
-            <span className="text-3xl shrink-0">🔒</span>
+        <div className="bg-amber-50/80 border border-amber-200 rounded-2xl sm:rounded-3xl p-4 sm:p-7 shadow-xs">
+          <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
+            <span className="text-2xl sm:text-3xl shrink-0">🔒</span>
             <div className="space-y-3">
-              <h3 className="text-base font-bold text-amber-900">
+              <h3 className="text-sm sm:text-base font-bold text-amber-900">
                 MongoDB Atlas Connection Pending (IP Access List Setup)
               </h3>
               <p className="text-xs sm:text-sm text-amber-800 leading-relaxed">
                 Your database is currently showing <strong>0 documents</strong> because MongoDB Atlas has an IP security firewall that blocks connections until your server or IP is added to the Network Access list.
               </p>
 
-              <div className="bg-white/80 p-4 rounded-2xl border border-amber-200/80 text-xs sm:text-sm space-y-2">
+              <div className="bg-white/80 p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-amber-200/80 text-xs sm:text-sm space-y-2">
                 <div className="font-bold text-gray-900">Follow these 3 quick steps in MongoDB Atlas:</div>
                 <ol className="list-decimal list-inside space-y-1.5 text-gray-700">
                   <li>Log in to your <strong>MongoDB Atlas Dashboard</strong> (<a href="https://cloud.mongodb.com" target="_blank" rel="noreferrer" className="text-blue-600 underline font-semibold">cloud.mongodb.com</a>).</li>
@@ -182,12 +182,12 @@ export default function DatabaseSyncManager() {
 
       {/* Sync Success Banner */}
       {syncResult && (
-        <div className="bg-emerald-50 border border-emerald-200 rounded-3xl p-6 animate-fadeIn">
-          <div className="flex items-center gap-3 text-emerald-900 font-bold text-base mb-2">
+        <div className="bg-emerald-50 border border-emerald-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 animate-fadeIn">
+          <div className="flex items-center gap-2 sm:gap-3 text-emerald-900 font-bold text-sm sm:text-base mb-2">
             <span>✓</span>
             <span>{syncResult.message}</span>
           </div>
-          <div className="flex flex-wrap gap-3 mt-3">
+          <div className="flex flex-wrap gap-2 sm:gap-3 mt-3">
             {Object.entries(syncResult.syncedCounts || {}).map(([key, val]: any) => (
               <span key={key} className="bg-white border border-emerald-200 px-3 py-1.5 rounded-xl text-xs font-semibold text-emerald-800 capitalize">
                 {key}: <strong>{val}</strong>
@@ -198,7 +198,7 @@ export default function DatabaseSyncManager() {
       )}
 
       {/* Live Collection Statistics Grid */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         {/* Products */}
         <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
           <div>
